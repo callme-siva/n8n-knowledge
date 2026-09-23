@@ -1,6 +1,14 @@
-# How to test n8n workflows
+<div align="center">
 
-Testing happens at three levels. Beginners only need the first; contributors should use all three.
+# 🧪 How to test n8n workflows
+
+**Four levels of testing, from the editor to a real n8n install.**
+
+</div>
+
+---
+
+Testing happens at four levels. Beginners only need the first; contributors should use all four.
 
 ## Level 1: in the editor (everyone)
 - **Run node by node.** Click ▶ on a single node to run the workflow up to that node. Check the OUTPUT panel before adding the next node.
@@ -35,3 +43,7 @@ N8N_USER_FOLDER=/tmp/n8n-test npx n8n import:workflow --separate --input=/tmp/im
 
 ## Level 4: end-to-end (optional)
 Run each workflow once with real credentials and the inputs from [sample-data.md](sample-data.md). Record the result in your PR description.
+
+---
+
+<p align="center"><a href="../README.md">← Back to the learning path</a> · <a href="architecture.md">🏗️ Architecture</a></p>

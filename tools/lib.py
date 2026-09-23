@@ -104,27 +104,63 @@ def form_field(label, ftype=None, required=False, options=None, placeholder=None
     return f
 
 
-def write(root, wf, readme):
+def write(root, wf, doc):
+    from render import canvas_svg, mermaid
     d = os.path.join(root, "workflows", wf.slug)
     os.makedirs(d, exist_ok=True)
+    data = wf.to_json()
     with open(os.path.join(d, "workflow.json"), "w") as fh:
-        json.dump(wf.to_json(), fh, indent=2, ensure_ascii=False)
+        json.dump(data, fh, indent=2, ensure_ascii=False)
+    with open(os.path.join(d, "canvas.svg"), "w") as fh:
+        fh.write(canvas_svg(data))
+    md = doc if isinstance(doc, str) else render_readme(dict(doc, slug=wf.slug), data, mermaid(data))
     with open(os.path.join(d, "README.md"), "w") as fh:
-        fh.write(readme.strip() + "\n")
+        fh.write(md.strip() + "\n")
+
+
+LEVELS = {"🟢": ("Beginner", "2EA44F"), "🟡": ("Integrations", "D4A106"), "🟠": ("AI", "F97316"), "🔴": ("Multi-agent & production", "DC2626")}
+
+
+def badge(label, value, color):
+    from urllib.parse import quote
+    q = lambda t: quote(t.replace("-", "--").replace("_", "__").replace(" ", "_"))
+    return f"![{label}: {value}](https://img.shields.io/badge/{q(label)}-{q(value)}-{color}?style=flat-square)"
 
 
 def readme(num, title, level, domain, time, story, learn, flow, creds, steps, test, errors, extend):
-    L = [f"# {num} · {title}", "",
-         f"**Level:** {level} · **Domain:** {domain} · **Build time:** {time}", ""]
-    L += ["## The real-world problem", story, "",
-          "## What you will learn", *[f"- {x}" for x in learn], "",
-          "## How it flows", "```", flow.strip("\n"), "```", "",
-          "## Credentials you need", *([f"- {c}" for c in creds] or ["- None — this one runs with zero setup."]), "",
-          "## Build it step by step",
-          "> Import `workflow.json` to see the finished version, **or** build it yourself using these steps (recommended — you learn more).", ""]
-    L += [f"{i}. {s}" for i, s in enumerate(steps, 1)]
-    L += ["", "## Test it", *[f"- {t}" for t in test], "",
-          "## Common errors", "| Symptom | Fix |", "|---|---|", *[f"| {a} | {b} |" for a, b in errors], "",
-          "## Level up (try these next)", *[f"- {x}" for x in extend], "",
-          "---", "[← Back to the learning path](../../README.md)"]
+    return dict(num=num, title=title, level=level, domain=domain, time=time, story=story, learn=learn,
+                flow=flow, creds=creds, steps=steps, test=test, errors=errors, extend=extend)
+
+
+REGISTRY = []
+
+
+def render_readme(r, data, diagram):
+    REGISTRY.append(dict(r, name=data['name']))
+    lvl_name, color = LEVELS[r["level"][0]]
+    nodes = [n for n in data["nodes"] if "stickyNote" not in n["type"]]
+    L = ['<div align="center">', "", f"# {r['num']} · {r['title']}", "",
+         " ".join([badge("level", lvl_name, color), badge("domain", r["domain"], "334155"),
+                   badge("build time", r["time"], "0EA5E9"), badge("nodes", str(len(nodes)), "7C3AED")]), "",
+         "<img src=\"canvas.svg\" alt=\"Workflow canvas snapshot\" width=\"100%\">", "",
+         "</div>", "",
+         "> [!NOTE]", f"> **The real-world problem.** {r['story']}", "",
+         "## 🎯 What you'll learn", "", *[f"- {x}" for x in r["learn"]], "",
+         "## 🏗️ Architecture", "", diagram, "",
+         "<details><summary>Plain-text flow</summary>", "", "```", r["flow"].strip("\n"), "```", "", "</details>", "",
+         "## 🔑 Credentials", "", "| You need | Where to get it |", "|---|---|"]
+    if r["creds"]:
+        for c in r["creds"]:
+            name, _, rest = c.partition(": ")
+            L.append(f"| {name.strip()} | {rest.strip() or '[docs/credentials.md](../../docs/credentials.md)'} |")
+    else:
+        L.append("| Nothing | Runs with zero setup |")
+    L += ["", "## 🛠️ Build it step by step", "",
+          "> [!TIP]", "> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.", ""]
+    L += [f"{i}. {s}" for i, s in enumerate(r["steps"], 1)]
+    L += ["", "## ✅ Test it", "", *[f"- [ ] {t}" for t in r["test"]], "",
+          "## 🧯 Troubleshooting", ""]
+    for a, b in r["errors"]:
+        L += [f"<details><summary><b>{a.replace('`', '')}</b></summary>", "", b, "", "</details>", ""]
+    L += ["## 🚀 Level up", "", *[f"- {x}" for x in r["extend"]], "", "---", "", "{{NAV}}"]
     return "\n".join(L)

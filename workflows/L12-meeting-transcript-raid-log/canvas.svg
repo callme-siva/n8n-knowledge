@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -105 1304 591" width="1304" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
+<rect x="-100" y="-105" width="1304" height="591" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-105" width="1304" height="591" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-105" width="1304" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-85" width="1304" height="16" fill="#1F2937"/>
+<circle cx="-80" cy="-87" r="5" fill="#FF5F57"/><circle cx="-62" cy="-87" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-87" r="5" fill="#28C840"/>
+<text x="-24" y="-82" font-size="13" fill="#E5E7EB" font-weight="600">L12 · Meeting transcript → RAID log (Structured Output)</text>
+<rect x="-60" y="-29" width="520" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-46" y="-1" font-size="15" fill="#5B4B12" font-weight="700">🧩 L12 · Structured output</text>
+<text x="-46" y="21" font-size="12.5" fill="#5B4B12" font-weight="400">Paste a meeting transcript → Gemini returns JSON that follows a schema →</text>
+<text x="-46" y="38" font-size="12.5" fill="#5B4B12" font-weight="400">one Sheet row per Risk / Assumption / Issue / Dependency.</text>
+<text x="-46" y="55" font-size="12.5" fill="#5B4B12" font-weight="400">This is the most useful AI pattern in business: unstructured text → rows.</text>
+<path d="M100,162.0 C162.0,162.0 162.0,162.0 220,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M324,162.0 C450.0,162.0 450.0,162.0 572,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M272.0,336 C272.0,291.0 274.0,291.0 274.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M400.0,336 C400.0,291.0 274.0,291.0 274.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M676,162.0 C738.0,162.0 738.0,162.0 796,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M900,162.0 C962.0,162.0 962.0,162.0 1020,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<rect x="0" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
+<path d="M30,112 H10 A10,10 0 0 0 0,122 V202 A10,10 0 0 0 10,212 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
+<rect x="22" y="130" width="56" height="56" rx="12" fill="#E8F7EE"/>
+<text x="50" y="167" font-size="24" text-anchor="middle" fill="#2EA44F" font-weight="700">☰</text>
+<text x="50.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Submit Meeting</text>
+<text x="50.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Transcript</text>
+<rect x="224" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="246" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="274" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">✦</text>
+<text x="274.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Extract RAID</text>
+<circle cx="272" cy="368" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="272" y="375" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="272" y="420" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">RAID Analysis</text>
+<text x="272" y="435" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
+<circle cx="400" cy="368" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="400" y="375" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
+<text x="400" y="420" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">RAID Parser</text>
+<rect x="576" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="598" y="130" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="626" y="167" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⇶</text>
+<text x="626.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Split RAID Items</text>
+<rect x="800" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
+<rect x="822" y="130" width="56" height="56" rx="12" fill="#EEF2F7"/>
+<text x="850" y="167" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
+<text x="850.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Build RAID Row</text>
+<rect x="1024" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="1046" y="130" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="1074" y="167" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
+<text x="1074.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Append RAID to</text>
+<text x="1074.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Sheet</text>
+</svg>

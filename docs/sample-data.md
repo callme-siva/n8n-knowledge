@@ -1,4 +1,12 @@
-# Sample data for testing
+<div align="center">
+
+# 🧾 Sample data for testing
+
+**Made-up inputs for testing every AI lesson.**
+
+</div>
+
+---
 
 All names and companies below are fictional.
 
@@ -55,3 +63,7 @@ curl -X POST http://localhost:5678/webhook-test/expense -H 'Content-Type: applic
 ```bash
 curl -X POST http://localhost:5678/webhook-test/expense -H 'Content-Type: application/json' -d '{"amount":-5,"category":"pizza"}'
 ```
+
+---
+
+<p align="center"><a href="../README.md">← Back to the learning path</a> · <a href="architecture.md">🏗️ Architecture</a></p>

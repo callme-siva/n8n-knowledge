@@ -1,4 +1,12 @@
-# Credentials: set up once, use everywhere
+<div align="center">
+
+# 🔑 Credentials: set up once, use everywhere
+
+**Gemini, Google, Jira, SerpAPI and GitHub, step by step.**
+
+</div>
+
+---
 
 | Credential | Used in | Free? |
 |---|---|---|
@@ -9,7 +17,8 @@
 | [SerpAPI](#serpapi) | L03 | ✅ 100 searches/month |
 | [GitHub](#github) | L16 | ✅ |
 
-> 🔒 **Never commit credentials.** n8n stores them encrypted in its own database; exported workflows only reference them by name. `tools/validate.py` fails if a workflow still contains a `credentials` block.
+> [!CAUTION]
+> **Never commit credentials.** n8n stores them encrypted in its own database; exported workflows only reference them by name. `tools/validate.py` fails if a workflow still contains a `credentials` block.
 
 ## Google Gemini
 1. Go to https://aistudio.google.com/app/apikey → **Create API key**.
@@ -43,3 +52,7 @@ Sign up at https://serpapi.com → copy the key → n8n *SerpApi* credential.
 
 ## GitHub
 https://github.com/settings/tokens → *classic token* with `repo` + `read:project` → n8n *GitHub API* credential.
+
+---
+
+<p align="center"><a href="../README.md">← Back to the learning path</a> · <a href="architecture.md">🏗️ Architecture</a></p>

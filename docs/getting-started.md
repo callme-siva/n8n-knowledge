@@ -1,4 +1,12 @@
-# Getting started
+<div align="center">
+
+# 🚀 Getting started
+
+**Install n8n, import workflows and learn the 5 core ideas.**
+
+</div>
+
+---
 
 ## 1. Run n8n: pick one
 
@@ -22,6 +30,7 @@ docker volume create n8n_data
 docker run -it --rm --name n8n -p 5678:5678 -e GENERIC_TIMEZONE=Asia/Kolkata -e TZ=Asia/Kolkata -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
 ```
 
+> [!IMPORTANT]
 > **Webhooks and forms from outside your laptop** (L09, L15 approval links): your n8n must be reachable from the internet. On a VPS, set `WEBHOOK_URL=https://your-domain/`. On a laptop, use a tunnel (for example `cloudflared tunnel --url http://localhost:5678`) and set `WEBHOOK_URL` to the tunnel URL.
 
 **Tested with:** n8n **2.40.x**. The workflows use node versions available since n8n 1.90, so older 1.x installs should mostly work.
@@ -52,4 +61,6 @@ After import, open every node with a ⚠️ and pick your credential. Then searc
 4. Compare with `workflow.json`.
 5. Do one of the *Level up* ideas.
 
-Next: [credentials.md](credentials.md)
+---
+
+<p align="center"><a href="../README.md">← Back to the learning path</a> · <a href="architecture.md">🏗️ Architecture</a></p>

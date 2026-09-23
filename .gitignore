@@ -1,5 +1,6 @@
-node_modules/
-.DS_Store
-__pycache__/
 *.local.json
+.DS_Store
 .n8n/
+.preview/
+__pycache__/
+node_modules/
