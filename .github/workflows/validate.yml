@@ -18,12 +18,14 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/setup-node@v4
-        with: { node-version: "22" }
+        with: { node-version: "24" }
+      - name: Build tools for native modules (node-gyp needs distutils, removed in Python 3.12)
+        run: python3 -m pip install --quiet setuptools
       - name: Cache n8n
         uses: actions/cache@v4
         with:
           path: ~/n8n/node_modules
-          key: n8n-2.40.5-${{ runner.os }}
+          key: n8n-2.40.5-node24-${{ runner.os }}
       - name: Install n8n 2.40.5
         run: mkdir -p ~/n8n && cd ~/n8n && ( [ -x node_modules/.bin/n8n ] || (npm init -y >/dev/null && npm i n8n@2.40.5 --no-audit --no-fund --loglevel=error) )
       - name: Check nodes, parameters and option values against n8n
