@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -88 2136 574" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -88 1336 1016" width="1336" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-88" width="2136" height="574" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-88" width="2136" height="574" rx="14" fill="url(#dots)"/>
-<rect x="-100" y="-88" width="2136" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-68" width="2136" height="16" fill="#1F2937"/>
+<rect x="-100" y="-88" width="1336" height="1016" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-88" width="1336" height="1016" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-88" width="1336" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-68" width="1336" height="16" fill="#1F2937"/>
 <circle cx="-80" cy="-70" r="5" fill="#FF5F57"/><circle cx="-62" cy="-70" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-70" r="5" fill="#28C840"/>
 <text x="-24" y="-65" font-size="13" fill="#E5E7EB" font-weight="600">L18 · Resume ↔ job fit analyser (4 specialist agents)</text>
 <rect x="-60" y="-12" width="520" height="84" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
@@ -11,14 +11,14 @@
 <text x="-46" y="55" font-size="12.5" fill="#5B4B12" font-weight="400">Interview Coach and Learning-Plan agents → one email report.</text>
 <path d="M100,162.0 C162.0,162.0 162.0,162.0 220,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M324,162.0 C386.0,162.0 386.0,162.0 444,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M548,162.0 C674.0,162.0 674.0,162.0 796,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M548,162.0 H572 Q582,162.0 582,172.0 V479 Q582,489 572,489 H-34 Q-44,489 -44,499 V594.0 Q-44,604.0 -34,604.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M560.0,336 C560.0,291.0 498.0,291.0 498.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M900,162.0 C1026.0,162.0 1026.0,162.0 1148,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M912.0,336 C912.0,291.0 850.0,291.0 850.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1252,162.0 C1378.0,162.0 1378.0,162.0 1500,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1264.0,336 C1264.0,291.0 1202.0,291.0 1202.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1604,162.0 C1730.0,162.0 1730.0,162.0 1852,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1616.0,336 C1616.0,291.0 1554.0,291.0 1554.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M100,604.0 C226.0,604.0 226.0,604.0 348,604.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M112.0,778 C112.0,733.0 50.0,733.0 50.0,690" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M452,604.0 C578.0,604.0 578.0,604.0 700,604.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M464.0,778 C464.0,733.0 402.0,733.0 402.0,690" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M804,604.0 C930.0,604.0 930.0,604.0 1052,604.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M816.0,778 C816.0,733.0 754.0,733.0 754.0,690" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <rect x="0" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,112 H10 A10,10 0 0 0 0,122 V202 A10,10 0 0 0 10,212 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="130" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -38,35 +38,35 @@
 <text x="560" y="375" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
 <text x="560" y="420" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model -</text>
 <text x="560" y="435" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Analyzer</text>
-<rect x="800" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="822" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="850" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="850.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Job Fit Analyst</text>
-<circle cx="912" cy="368" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="912" y="375" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="912" y="420" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model -</text>
-<text x="912" y="435" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Matcher</text>
-<rect x="1152" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="1174" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="1202" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="1202.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Interview Question</text>
-<text x="1202.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Generator</text>
-<circle cx="1264" cy="368" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1264" y="375" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1264" y="420" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model -</text>
-<text x="1264" y="435" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Interview</text>
-<rect x="1504" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="1526" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="1554" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="1554.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Learning Plan</text>
-<text x="1554.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Builder</text>
-<circle cx="1616" cy="368" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1616" y="375" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1616" y="420" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model -</text>
-<text x="1616" y="435" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Learning</text>
-<rect x="1856" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1878" y="130" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1906" y="167" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1906.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Send Analysis</text>
-<text x="1906.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email</text>
+<rect x="0" y="554" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="572" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="50" y="609" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="50.0" y="674" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Job Fit Analyst</text>
+<circle cx="112" cy="810" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="112" y="817" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="112" y="862" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model -</text>
+<text x="112" y="877" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Matcher</text>
+<rect x="352" y="554" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="374" y="572" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="402" y="609" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="402.0" y="674" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Interview Question</text>
+<text x="402.0" y="689" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Generator</text>
+<circle cx="464" cy="810" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="464" y="817" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="464" y="862" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model -</text>
+<text x="464" y="877" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Interview</text>
+<rect x="704" y="554" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="726" y="572" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="754" y="609" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="754.0" y="674" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Learning Plan</text>
+<text x="754.0" y="689" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Builder</text>
+<circle cx="816" cy="810" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="816" y="817" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="816" y="862" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model -</text>
+<text x="816" y="877" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Learning</text>
+<rect x="1056" y="554" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="1078" y="572" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="1106" y="609" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="1106.0" y="674" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Send Analysis</text>
+<text x="1106.0" y="689" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email</text>
 </svg>

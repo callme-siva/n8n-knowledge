@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -217 2584 595" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -217 1336 1049" width="1336" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-217" width="2584" height="595" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-217" width="2584" height="595" rx="14" fill="url(#dots)"/>
-<rect x="-100" y="-217" width="2584" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-197" width="2584" height="16" fill="#1F2937"/>
+<rect x="-100" y="-217" width="1336" height="1049" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-217" width="1336" height="1049" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-217" width="1336" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-197" width="1336" height="16" fill="#1F2937"/>
 <circle cx="-80" cy="-199" r="5" fill="#FF5F57"/><circle cx="-62" cy="-199" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-199" r="5" fill="#28C840"/>
 <text x="-24" y="-194" font-size="13" fill="#E5E7EB" font-weight="600">L16 · Sprint progress report (4 cooperating agents)</text>
 <rect x="-60" y="-141" width="520" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
@@ -10,18 +10,18 @@
 <text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">GitHub Projects (GraphQL) → metrics → Capacity → Backlog → Burndown →</text>
 <text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">Coordinator agents, each reading the previous agent&#x27;s output.</text>
 <text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">Set org and projectNumber in Config.</text>
-<path d="M324,50.0 C374.0,50.0 174.0,242.0 220,242.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M324,50.0 H348 Q358,50.0 358,60.0 V342 Q358,352 348,352 H190 Q180,352 180,342 V252.0 Q180,242.0 190,242.0 H220" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M324,242.0 C386.0,242.0 386.0,50.0 444,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M548,50.0 C610.0,50.0 610.0,50.0 668,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M772,50.0 C834.0,50.0 834.0,50.0 892,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M996,50.0 C1122.0,50.0 1122.0,50.0 1244,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M996,50.0 H1020 Q1030,50.0 1030,60.0 V383 Q1030,393 1020,393 H-34 Q-44,393 -44,403 V498.0 Q-44,508.0 -34,508.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M1008.0,224 C1008.0,179.0 946.0,179.0 946.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1348,50.0 C1474.0,50.0 1474.0,50.0 1596,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1360.0,224 C1360.0,179.0 1298.0,179.0 1298.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1700,50.0 C1826.0,50.0 1826.0,50.0 1948,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1712.0,224 C1712.0,179.0 1650.0,179.0 1650.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M2052,50.0 C2178.0,50.0 2178.0,50.0 2300,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M2064.0,224 C2064.0,179.0 2002.0,179.0 2002.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M100,508.0 C226.0,508.0 226.0,508.0 348,508.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M112.0,682 C112.0,637.0 50.0,637.0 50.0,594" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M452,508.0 C578.0,508.0 578.0,508.0 700,508.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M464.0,682 C464.0,637.0 402.0,637.0 402.0,594" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M804,508.0 C930.0,508.0 930.0,508.0 1052,508.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M816.0,682 C816.0,637.0 754.0,637.0 754.0,594" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <path d="M100,50.0 C162.0,50.0 162.0,50.0 220,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <rect x="224" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
 <rect x="246" y="18" width="56" height="56" rx="12" fill="#EEF2F7"/>
@@ -51,38 +51,38 @@
 <text x="1008" y="263" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
 <text x="1008" y="308" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Capacity</text>
 <text x="1008" y="323" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
-<rect x="1248" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="1270" y="18" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="1298" y="55" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="1298.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Backlog Health</text>
-<text x="1298.0" y="135" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Agent</text>
-<circle cx="1360" cy="256" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1360" y="263" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1360" y="308" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Backlog Model</text>
-<rect x="1600" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="1622" y="18" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="1650" y="55" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="1650.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Burndown Tracking</text>
-<text x="1650.0" y="135" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Agent</text>
-<circle cx="1712" cy="256" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1712" y="263" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1712" y="308" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Burndown</text>
-<text x="1712" y="323" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
-<rect x="1952" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="1974" y="18" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="2002" y="55" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="2002.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Coordinator Agent</text>
-<circle cx="2064" cy="256" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="2064" y="263" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="2064" y="308" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Coordinator</text>
-<text x="2064" y="323" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
-<rect x="2304" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="2326" y="18" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="2354" y="55" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="2354.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email Daily Report</text>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,0 H10 A10,10 0 0 0 0,10 V90 A10,10 0 0 0 10,100 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
 <text x="50" y="55" font-size="24" text-anchor="middle" fill="#2EA44F" font-weight="700">◷</text>
 <text x="50.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Weekdays 9 AM</text>
+<rect x="0" y="458" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="476" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="50" y="513" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="50.0" y="578" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Backlog Health</text>
+<text x="50.0" y="593" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Agent</text>
+<circle cx="112" cy="714" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="112" y="721" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="112" y="766" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Backlog Model</text>
+<rect x="352" y="458" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="374" y="476" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="402" y="513" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="402.0" y="578" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Burndown Tracking</text>
+<text x="402.0" y="593" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Agent</text>
+<circle cx="464" cy="714" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="464" y="721" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="464" y="766" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Burndown</text>
+<text x="464" y="781" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
+<rect x="704" y="458" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="726" y="476" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="754" y="513" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="754.0" y="578" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Coordinator Agent</text>
+<circle cx="816" cy="714" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="816" y="721" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="816" y="766" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Coordinator</text>
+<text x="816" y="781" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
+<rect x="1056" y="458" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="1078" y="476" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="1106" y="513" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="1106.0" y="578" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email Daily Report</text>
 </svg>

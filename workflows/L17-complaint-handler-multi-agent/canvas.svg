@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -122 2840 832" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -122 1096 2164" width="1096" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-122" width="2840" height="832" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-122" width="2840" height="832" rx="14" fill="url(#dots)"/>
-<rect x="-100" y="-122" width="2840" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-102" width="2840" height="16" fill="#1F2937"/>
+<rect x="-100" y="-122" width="1096" height="2164" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-122" width="1096" height="2164" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-122" width="1096" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-102" width="1096" height="16" fill="#1F2937"/>
 <circle cx="-80" cy="-104" r="5" fill="#FF5F57"/><circle cx="-62" cy="-104" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-104" r="5" fill="#28C840"/>
 <text x="-24" y="-99" font-size="13" fill="#E5E7EB" font-weight="600">L17 · Customer complaint handler (5 agents + auto-fixing parsers)</text>
 <rect x="-60" y="-46" width="520" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
@@ -12,24 +12,24 @@
 <text x="-46" y="38" font-size="12.5" fill="#5B4B12" font-weight="400">repairs bad JSON automatically.</text>
 <text x="-46" y="55" font-size="12.5" fill="#5B4B12" font-weight="400">⚠️ Add a human approval (L15) before auto-sending in real life.</text>
 <path d="M100,162.0 C178.0,162.0 178.0,162.0 252,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M356,162.0 C554.0,162.0 554.0,162.0 748,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M356,162.0 H380 Q390,162.0 390,172.0 V703 Q390,713 380,713 H-34 Q-44,713 -44,723 V818.0 Q-44,828.0 -34,828.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M272.0,352 C272.0,299.0 306.0,299.0 306.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <path d="M400.0,352 C400.0,299.0 306.0,299.0 306.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <path d="M480.0,560 C480.0,505.0 400,505.0 400,452" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M852,162.0 C1050.0,162.0 1050.0,162.0 1244,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M768.0,352 C768.0,299.0 802.0,299.0 802.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M896.0,352 C896.0,299.0 802.0,299.0 802.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M976.0,560 C976.0,505.0 896,505.0 896,452" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1348,162.0 C1546.0,162.0 1546.0,162.0 1740,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1264.0,352 C1264.0,299.0 1298.0,299.0 1298.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1392.0,352 C1392.0,299.0 1298.0,299.0 1298.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1472.0,560 C1472.0,505.0 1392,505.0 1392,452" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1844,162.0 C2026.0,162.0 2026.0,162.0 2204,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1760.0,352 C1760.0,299.0 1794.0,299.0 1794.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1888.0,352 C1888.0,299.0 1794.0,299.0 1794.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M1968.0,560 C1968.0,505.0 1888,505.0 1888,452" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M2308,162.0 C2434.0,162.0 2434.0,162.0 2556,162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M2320.0,352 C2320.0,299.0 2258.0,299.0 2258.0,248" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M100,828.0 C298.0,828.0 298.0,828.0 492,828.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M16.0,1018 C16.0,965.0 50.0,965.0 50.0,914" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M144.0,1018 C144.0,965.0 50.0,965.0 50.0,914" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M224.0,1226 C224.0,1171.0 144,1171.0 144,1118" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M596,828.0 H620 Q630,828.0 630,838.0 V1369 Q630,1379 620,1379 H-34 Q-44,1379 -44,1389 V1484.0 Q-44,1494.0 -34,1494.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M512.0,1018 C512.0,965.0 546.0,965.0 546.0,914" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M640.0,1018 C640.0,965.0 546.0,965.0 546.0,914" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M720.0,1226 C720.0,1171.0 640,1171.0 640,1118" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M100,1494.0 C282.0,1494.0 282.0,1494.0 460,1494.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M16.0,1684 C16.0,1631.0 50.0,1631.0 50.0,1580" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M144.0,1684 C144.0,1631.0 50.0,1631.0 50.0,1580" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M224.0,1892 C224.0,1837.0 144,1837.0 144,1784" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M564,1494.0 C690.0,1494.0 690.0,1494.0 812,1494.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M576.0,1684 C576.0,1631.0 514.0,1631.0 514.0,1580" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <rect x="0" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,112 H10 A10,10 0 0 0 0,122 V202 A10,10 0 0 0 10,212 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="130" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -52,66 +52,66 @@
 <text x="480" y="599" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
 <text x="480" y="644" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Understanding</text>
 <text x="480" y="659" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Fix Model</text>
-<rect x="752" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="774" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="802" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="802.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigate</text>
-<text x="802.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Customer/Order</text>
-<circle cx="768" cy="384" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="768" y="391" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="768" y="436" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigate</text>
-<text x="768" y="451" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
-<circle cx="896" cy="384" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="896" y="391" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
-<text x="896" y="436" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigation</text>
-<text x="896" y="451" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Schema</text>
-<circle cx="976" cy="592" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="976" y="599" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="976" y="644" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigation</text>
-<text x="976" y="659" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Fix Model</text>
-<rect x="1248" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="1270" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="1298" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="1298.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Determine</text>
-<text x="1298.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
-<circle cx="1264" cy="384" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1264" y="391" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1264" y="436" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
-<text x="1264" y="451" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
-<circle cx="1392" cy="384" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1392" y="391" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
-<text x="1392" y="436" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
-<text x="1392" y="451" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Schema</text>
-<circle cx="1472" cy="592" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1472" y="599" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1472" y="644" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
-<text x="1472" y="659" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Fix Model</text>
-<rect x="1744" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="1766" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="1794" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="1794.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Check Escalation</text>
-<circle cx="1760" cy="384" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1760" y="391" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1760" y="436" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalation</text>
-<text x="1760" y="451" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
-<circle cx="1888" cy="384" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1888" y="391" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
-<text x="1888" y="436" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalation</text>
-<text x="1888" y="451" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Schema</text>
-<circle cx="1968" cy="592" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="1968" y="599" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="1968" y="644" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalation</text>
-<text x="1968" y="659" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Fix Model</text>
-<rect x="2208" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="2230" y="130" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="2258" y="167" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
-<text x="2258.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Draft Response</text>
-<circle cx="2320" cy="384" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="2320" y="391" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="2320" y="436" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Draft Model</text>
-<rect x="2560" y="112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="2582" y="130" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="2610" y="167" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="2610.0" y="232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Send Response</text>
-<text x="2610.0" y="247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email</text>
+<rect x="0" y="778" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="796" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="50" y="833" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="50.0" y="898" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigate</text>
+<text x="50.0" y="913" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Customer/Order</text>
+<circle cx="16" cy="1050" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="16" y="1057" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="16" y="1102" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigate</text>
+<text x="16" y="1117" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
+<circle cx="144" cy="1050" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="144" y="1057" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
+<text x="144" y="1102" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigation</text>
+<text x="144" y="1117" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Schema</text>
+<circle cx="224" cy="1258" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="224" y="1265" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="224" y="1310" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Investigation</text>
+<text x="224" y="1325" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Fix Model</text>
+<rect x="496" y="778" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="518" y="796" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="546" y="833" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="546.0" y="898" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Determine</text>
+<text x="546.0" y="913" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
+<circle cx="512" cy="1050" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="512" y="1057" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="512" y="1102" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
+<text x="512" y="1117" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
+<circle cx="640" cy="1050" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="640" y="1057" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
+<text x="640" y="1102" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
+<text x="640" y="1117" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Schema</text>
+<circle cx="720" cy="1258" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="720" y="1265" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="720" y="1310" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Resolution</text>
+<text x="720" y="1325" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Fix Model</text>
+<rect x="0" y="1444" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="1462" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="50" y="1499" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="50.0" y="1564" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Check Escalation</text>
+<circle cx="16" cy="1716" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="16" y="1723" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="16" y="1768" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalation</text>
+<text x="16" y="1783" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Model</text>
+<circle cx="144" cy="1716" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="144" y="1723" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
+<text x="144" y="1768" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalation</text>
+<text x="144" y="1783" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Schema</text>
+<circle cx="224" cy="1924" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="224" y="1931" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="224" y="1976" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalation</text>
+<text x="224" y="1991" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Fix Model</text>
+<rect x="464" y="1444" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="486" y="1462" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="514" y="1499" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">🤖</text>
+<text x="514.0" y="1564" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Draft Response</text>
+<circle cx="576" cy="1716" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="576" y="1723" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="576" y="1768" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Draft Model</text>
+<rect x="816" y="1444" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="838" y="1462" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="866" y="1499" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="866.0" y="1564" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Send Response</text>
+<text x="866.0" y="1579" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email</text>
 </svg>

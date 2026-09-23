@@ -1,30 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -474 1620 780" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -234 960 1046" width="960" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-474" width="1620" height="780" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-474" width="1620" height="780" rx="14" fill="url(#dots)"/>
-<rect x="-100" y="-474" width="1620" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-454" width="1620" height="16" fill="#1F2937"/>
-<circle cx="-80" cy="-456" r="5" fill="#FF5F57"/><circle cx="-62" cy="-456" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-456" r="5" fill="#28C840"/>
-<text x="-24" y="-451" font-size="13" fill="#E5E7EB" font-weight="600">L04 · Currency rate alert (IF + Switch)</text>
-<rect x="-60" y="-398" width="420" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-46" y="-370" font-size="15" fill="#5B4B12" font-weight="700">🔀 L04 · Branching</text>
-<text x="-46" y="-348" font-size="12.5" fill="#5B4B12" font-weight="400">IF = two roads (true/false).</text>
-<text x="-46" y="-331" font-size="12.5" fill="#5B4B12" font-weight="400">Switch = many roads.</text>
-<text x="-46" y="-314" font-size="12.5" fill="#5B4B12" font-weight="400">USD→INR is checked every hour; you get an email only when</text>
-<text x="-46" y="-297" font-size="12.5" fill="#5B4B12" font-weight="400">something interesting happens.</text>
+<rect x="-100" y="-234" width="960" height="1046" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-234" width="960" height="1046" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-234" width="960" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-214" width="960" height="16" fill="#1F2937"/>
+<circle cx="-80" cy="-216" r="5" fill="#FF5F57"/><circle cx="-62" cy="-216" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-216" r="5" fill="#28C840"/>
+<text x="-24" y="-211" font-size="13" fill="#E5E7EB" font-weight="600">L04 · Currency rate alert (IF + Switch)</text>
+<rect x="-60" y="-158" width="420" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-46" y="-130" font-size="15" fill="#5B4B12" font-weight="700">🔀 L04 · Branching</text>
+<text x="-46" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">IF = two roads (true/false).</text>
+<text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Switch = many roads.</text>
+<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">USD→INR is checked every hour; you get an email only when</text>
+<text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">something interesting happens.</text>
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,50.0 C380.0,50.0 380.0,50.0 436,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M540,50.0 C600.0,50.0 600.0,50.0 656,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M760,33.333333333333336 C820.0,33.333333333333336 820.0,-50.0 876,-50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="768" y="28.333333333333336" font-size="11" fill="#64748B">true</text>
-<path d="M760,66.66666666666667 C820.0,66.66666666666667 820.0,170.0 876,170.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="768" y="61.66666666666667" font-size="11" fill="#64748B">false</text>
-<path d="M980,-50.0 C1040.0,-50.0 1040.0,-50.0 1096,-50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1200,-75.0 C1270.0,-75.0 1270.0,-190.0 1336,-190.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1208" y="-80.0" font-size="11" fill="#64748B">High</text>
-<path d="M1200,-50.0 C1270.0,-50.0 1270.0,-30.0 1336,-30.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1208" y="-55.0" font-size="11" fill="#64748B">Low</text>
-<path d="M1200,-25.0 C1270.0,-25.0 1270.0,130.0 1336,130.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1208" y="-30.0" font-size="11" fill="#64748B">Normal</text>
+<path d="M540,50.0 H564 Q574,50.0 574,60.0 V191 Q574,201 564,201 H-34 Q-44,201 -44,211 V546.0 Q-44,556.0 -34,556.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,539.3333333333334 C160.0,539.3333333333334 160.0,456.0 216,456.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="534.3333333333334" font-size="11" fill="#64748B">true</text>
+<path d="M100,572.6666666666666 C160.0,572.6666666666666 160.0,676.0 216,676.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="567.6666666666666" font-size="11" fill="#64748B">false</text>
+<path d="M320,456.0 C380.0,456.0 380.0,456.0 436,456.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M540,431.0 C610.0,431.0 610.0,316.0 676,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="548" y="426.0" font-size="11" fill="#64748B">High</text>
+<path d="M540,456.0 C610.0,456.0 610.0,476.0 676,476.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="548" y="451.0" font-size="11" fill="#64748B">Low</text>
+<path d="M540,481.0 C610.0,481.0 610.0,636.0 676,636.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="548" y="476.0" font-size="11" fill="#64748B">Normal</text>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,0 H10 A10,10 0 0 0 0,10 V90 A10,10 0 0 0 10,100 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -38,34 +38,34 @@
 <rect x="462" y="18" width="56" height="56" rx="12" fill="#E6FAF8"/>
 <text x="490" y="55" font-size="24" text-anchor="middle" fill="#0D9488" font-weight="700">⇄</text>
 <text x="490.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Get Exchange Rate</text>
-<rect x="660" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="682" y="18" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="710" y="55" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
-<text x="710.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">API OK?</text>
-<rect x="880" y="-100" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
-<rect x="902" y="-82" width="56" height="56" rx="12" fill="#EEF2F7"/>
-<text x="930" y="-45" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
-<text x="930.0" y="20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Extract Rate</text>
-<rect x="1100" y="-100" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1122" y="-82" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="1150" y="-45" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
-<text x="1150.0" y="20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Which Zone?</text>
-<rect x="1340" y="-240" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1362" y="-222" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1390" y="-185" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1390.0" y="-120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Alert: Rate High</text>
-<rect x="1340" y="-80" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1362" y="-62" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1390" y="-25" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1390.0" y="40" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Alert: Rate Low</text>
-<rect x="1340" y="80" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1362" y="98" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="1390" y="135" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">→</text>
-<text x="1390.0" y="200" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Normal — do</text>
-<text x="1390.0" y="215" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">nothing</text>
-<rect x="880" y="120" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="902" y="138" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="930" y="175" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⛔</text>
-<text x="930.0" y="240" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">API Failed — log</text>
-<text x="930.0" y="255" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">it</text>
+<rect x="0" y="506" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="524" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="50" y="561" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
+<text x="50.0" y="626" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">API OK?</text>
+<rect x="220" y="406" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
+<rect x="242" y="424" width="56" height="56" rx="12" fill="#EEF2F7"/>
+<text x="270" y="461" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
+<text x="270.0" y="526" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Extract Rate</text>
+<rect x="440" y="406" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="462" y="424" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="490" y="461" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
+<text x="490.0" y="526" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Which Zone?</text>
+<rect x="680" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="702" y="284" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="730" y="321" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="730.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Alert: Rate High</text>
+<rect x="680" y="426" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="702" y="444" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="730" y="481" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="730.0" y="546" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Alert: Rate Low</text>
+<rect x="680" y="586" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="702" y="604" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="730" y="641" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">→</text>
+<text x="730.0" y="706" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Normal — do</text>
+<text x="730.0" y="721" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">nothing</text>
+<rect x="220" y="626" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="242" y="644" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="270" y="681" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⛔</text>
+<text x="270.0" y="746" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">API Failed — log</text>
+<text x="270.0" y="761" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">it</text>
 </svg>

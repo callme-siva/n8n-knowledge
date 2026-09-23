@@ -22,7 +22,7 @@
 
 ```mermaid
 flowchart LR
-  n0("MCP Server Trigger"):::sub
+  n0(["MCP Server Trigger"]):::trigger
   n1("lookup_customer"):::sub
   n2("get_exchange_rate"):::sub
   n3("calculator"):::sub

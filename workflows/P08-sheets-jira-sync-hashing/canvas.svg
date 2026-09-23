@@ -1,29 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -357 1740 783" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -217 940 1049" width="940" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-80" y="-357" width="1740" height="783" rx="14" fill="#F8FAFC"/>
-<rect x="-80" y="-357" width="1740" height="783" rx="14" fill="url(#dots)"/>
-<rect x="-80" y="-357" width="1740" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-337" width="1740" height="16" fill="#1F2937"/>
-<circle cx="-60" cy="-339" r="5" fill="#FF5F57"/><circle cx="-42" cy="-339" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-339" r="5" fill="#28C840"/>
-<text x="-4" y="-334" font-size="13" fill="#E5E7EB" font-weight="600">P08 · Two-system sync: Google Sheets backlog → Jira (create/update with change detection)</text>
-<rect x="-40" y="-281" width="580" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-26" y="-253" font-size="15" fill="#5B4B12" font-weight="700">🔄 P08 · Sync without duplicates</text>
-<text x="-26" y="-231" font-size="12.5" fill="#5B4B12" font-weight="400">Business users plan in a sheet; engineers work in Jira. Every 15 min: rows without a</text>
-<text x="-26" y="-214" font-size="12.5" fill="#5B4B12" font-weight="400">Jira key are created, rows whose content hash changed are updated, unchanged rows</text>
-<text x="-26" y="-197" font-size="12.5" fill="#5B4B12" font-weight="400">are skipped. Key + hash are written back.</text>
+<rect x="-80" y="-217" width="940" height="1049" rx="14" fill="#F8FAFC"/>
+<rect x="-80" y="-217" width="940" height="1049" rx="14" fill="url(#dots)"/>
+<rect x="-80" y="-217" width="940" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-197" width="940" height="16" fill="#1F2937"/>
+<circle cx="-60" cy="-199" r="5" fill="#FF5F57"/><circle cx="-42" cy="-199" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-199" r="5" fill="#28C840"/>
+<text x="-4" y="-194" font-size="13" fill="#E5E7EB" font-weight="600">P08 · Two-system sync: Google Sheets backlog → Jira (create/update with change detection)</text>
+<rect x="-40" y="-141" width="580" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-26" y="-113" font-size="15" fill="#5B4B12" font-weight="700">🔄 P08 · Sync without duplicates</text>
+<text x="-26" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Business users plan in a sheet; engineers work in Jira. Every 15 min: rows without a</text>
+<text x="-26" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">Jira key are created, rows whose content hash changed are updated, unchanged rows</text>
+<text x="-26" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">are skipped. Key + hash are written back.</text>
 <path d="M100,50.0 C150.0,50.0 150.0,50.0 196,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M300,50.0 C350.0,50.0 350.0,50.0 396,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M500,50.0 C550.0,50.0 550.0,50.0 596,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M700,50.0 C750.0,50.0 750.0,50.0 796,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M900,25.0 C970.0,25.0 970.0,-90.0 1036,-90.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="908" y="20.0" font-size="11" fill="#64748B">Create</text>
-<path d="M900,50.0 C970.0,50.0 970.0,110.0 1036,110.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="908" y="45.0" font-size="11" fill="#64748B">Update</text>
-<path d="M900,75.0 C970.0,75.0 970.0,290.0 1036,290.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="908" y="70.0" font-size="11" fill="#64748B">Skip</text>
-<path d="M1140,-90.0 C1200.0,-90.0 1200.0,-90.0 1256,-90.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1360,-90.0 C1420.0,-90.0 1420.0,10.0 1476,10.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1140,110.0 C1200.0,110.0 1200.0,110.0 1256,110.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1360,110.0 C1420.0,110.0 1420.0,10.0 1476,10.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M700,50.0 H724 Q734,50.0 734,60.0 V191 Q734,201 724,201 H-34 Q-44,201 -44,211 V446.0 Q-44,456.0 -34,456.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,431.0 C170.0,431.0 170.0,316.0 236,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="426.0" font-size="11" fill="#64748B">Create</text>
+<path d="M100,456.0 C170.0,456.0 170.0,516.0 236,516.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="451.0" font-size="11" fill="#64748B">Update</text>
+<path d="M100,481.0 C170.0,481.0 170.0,696.0 236,696.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="476.0" font-size="11" fill="#64748B">Skip</text>
+<path d="M340,316.0 C400.0,316.0 400.0,316.0 456,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M560,316.0 C620.0,316.0 620.0,416.0 676,416.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M340,516.0 C400.0,516.0 400.0,516.0 456,516.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M560,516.0 C620.0,516.0 620.0,416.0 676,416.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,0 H10 A10,10 0 0 0 0,10 V90 A10,10 0 0 0 10,100 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -42,34 +42,34 @@
 <text x="650" y="55" font-size="16" text-anchor="middle" fill="#64748B" font-weight="700">{ }</text>
 <text x="650.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Decide Create /</text>
 <text x="650.0" y="135" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Update / Skip</text>
-<rect x="800" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="822" y="18" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="850" y="55" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
-<text x="850.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Operation</text>
-<rect x="1040" y="-140" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
-<rect x="1062" y="-122" width="56" height="56" rx="12" fill="#EAF3FF"/>
-<text x="1090" y="-85" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">◆</text>
-<text x="1090.0" y="-20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Jira: Create</text>
-<rect x="1040" y="60" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
-<rect x="1062" y="78" width="56" height="56" rx="12" fill="#EAF3FF"/>
-<text x="1090" y="115" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">◆</text>
-<text x="1090.0" y="180" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Jira: Update</text>
-<rect x="1260" y="-140" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1282" y="-122" width="56" height="56" rx="12" fill="#EEF2F7"/>
-<text x="1310" y="-85" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
-<text x="1310.0" y="-20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Created → Write</text>
-<text x="1310.0" y="-5" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Back</text>
-<rect x="1260" y="60" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1282" y="78" width="56" height="56" rx="12" fill="#EEF2F7"/>
-<text x="1310" y="115" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
-<text x="1310.0" y="180" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Updated → Write</text>
-<text x="1310.0" y="195" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Back</text>
-<rect x="1480" y="-40" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
-<rect x="1502" y="-22" width="56" height="56" rx="12" fill="#EAF3FF"/>
-<text x="1530" y="15" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
-<text x="1530.0" y="80" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Save Key + Hash</text>
-<rect x="1040" y="240" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1062" y="258" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="1090" y="295" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">→</text>
-<text x="1090.0" y="360" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Unchanged</text>
+<rect x="0" y="406" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="424" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="50" y="461" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
+<text x="50.0" y="526" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Operation</text>
+<rect x="240" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="262" y="284" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="290" y="321" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">◆</text>
+<text x="290.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Jira: Create</text>
+<rect x="240" y="466" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="262" y="484" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="290" y="521" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">◆</text>
+<text x="290.0" y="586" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Jira: Update</text>
+<rect x="460" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
+<rect x="482" y="284" width="56" height="56" rx="12" fill="#EEF2F7"/>
+<text x="510" y="321" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
+<text x="510.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Created → Write</text>
+<text x="510.0" y="401" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Back</text>
+<rect x="460" y="466" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
+<rect x="482" y="484" width="56" height="56" rx="12" fill="#EEF2F7"/>
+<text x="510" y="521" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
+<text x="510.0" y="586" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Updated → Write</text>
+<text x="510.0" y="601" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Back</text>
+<rect x="680" y="366" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="702" y="384" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="730" y="421" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
+<text x="730.0" y="486" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Save Key + Hash</text>
+<rect x="240" y="646" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="262" y="664" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="290" y="701" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">→</text>
+<text x="290.0" y="766" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Unchanged</text>
 </svg>

@@ -47,7 +47,7 @@ def cat(n):
     if "@n8n/n8n-nodes-langchain" in n["type"]:
         if s in ("agent", "chainLlm") or n["name"] in MAIN_TARGETS:
             return "ai"
-        if s == "chatTrigger":
+        if s.endswith("Trigger"):
             return "trigger"
         return "sub"
     if re.search(r"[Tt]rigger$|^webhook$", s):
@@ -99,10 +99,48 @@ def _note_h(p):
     return 22 + sum(len(r[0]) * r[3] for r in _note_rows(p)) + 6
 
 
+FOLD_WIDTH = 1250  # canvases wider than this (in n8n units) are folded into two rows
+
+
+def _fold(wf, nodes):
+    """Fold a very wide workflow into rows. Returns (nodes, row_of, gutters) where gutters[r] is the y of the lane above row r."""
+    import math
+    main = [n for n in nodes if cat(n) != "sub"]
+    xs = sorted({n["position"][0] for n in main})
+    if not xs or xs[-1] - xs[0] <= FOLD_WIDTH:
+        return nodes, {n["name"]: 0 for n in nodes}, {}
+    k = math.ceil((xs[-1] - xs[0]) / FOLD_WIDTH)
+    width = (xs[-1] - xs[0]) / k
+    # row boundaries snap to real node columns so no column is cut in half
+    starts = [xs[0]] + [min(xs, key=lambda x: abs(x - (xs[0] + i * width))) for i in range(1, k)]
+    parent = {src: dst for src, dst, kd, _ in _edges(wf) if kd != "main"}
+    pos = {n["name"]: n["position"][0] for n in nodes}
+    def home_x(n):  # sub-nodes follow the node they plug into
+        name = n["name"]
+        for _ in range(3):
+            name = parent.get(name, name)
+        return pos.get(name, n["position"][0])
+    row = {n["name"]: max(i for i, st in enumerate(starts) if home_x(n) >= st) for n in nodes}
+    out, gutters, y_offset, prev_bottom = [], {}, 0, None
+    for r in range(k):
+        members = [n for n in nodes if row[n["name"]] == r]
+        if not members:
+            continue
+        top = min(n["position"][1] for n in members)
+        if prev_bottom is not None:
+            y_offset = prev_bottom + 120 - top
+            gutters[r] = prev_bottom + 55
+        moved = [dict(n, position=[n["position"][0] - (starts[r] - xs[0]), n["position"][1] + y_offset]) for n in members]
+        out += moved
+        prev_bottom = max(n["position"][1] + (98 if cat(n) == "sub" else 146) for n in moved)
+    return out, row, gutters
+
+
 def canvas_svg(wf):
     _mark(wf)
     nodes = [n for n in wf["nodes"] if "stickyNote" not in n["type"]]
     notes = [n for n in wf["nodes"] if "stickyNote" in n["type"]]
+    nodes, row, gutter = _fold(wf, nodes)
     by = {n["name"]: n for n in nodes}
     top = min(n["position"][1] for n in nodes)
     notes = [dict(n, position=[n["position"][0], top - 40 - _note_h(n["parameters"])]) for n in notes]
@@ -147,8 +185,13 @@ def canvas_svg(wf):
             sy = a["position"][1] + S * (oi + 1) / (nout + 1)
             x1, y1 = a["position"][0] + S, sy
             x2, y2 = b["position"][0], b["position"][1] + (S / 2 if cat(b) != "sub" else 32)
-            dx = max(40, abs(x2 - x1) / 2)
-            o.append(f'<path d="M{x1},{y1} C{x1 + dx},{y1} {x2 - dx},{y2} {x2 - 4},{y2}" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>')
+            if x2 < x1 + 10 or row.get(src) != row.get(dst):  # backwards, loop, or changes row → route through a gutter lane
+                gy = gutter.get(row.get(dst)) if row.get(src) != row.get(dst) and row.get(dst) in gutter else max(a["position"][1], b["position"][1]) + S + 60
+                path = f"M{x1},{y1} H{x1 + 24} Q{x1 + 34},{y1} {x1 + 34},{y1 + 10} V{gy - 10} Q{x1 + 34},{gy} {x1 + 24},{gy} H{x2 - 34} Q{x2 - 44},{gy} {x2 - 44},{gy + (10 if y2 > gy else -10)} V{y2 + (-10 if y2 > gy else 10)} Q{x2 - 44},{y2} {x2 - 34},{y2} H{x2 - 4}"
+            else:
+                dx = max(40, abs(x2 - x1) / 2)
+                path = f"M{x1},{y1} C{x1 + dx},{y1} {x2 - dx},{y2} {x2 - 4},{y2}"
+            o.append(f'<path d="{path}" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>')
             labs = _out_labels(a)
             if len(labs) > oi and nout > 1:
                 o.append(f'<text x="{x1 + 8}" y="{y1 - 5}" font-size="11" fill="#64748B">{escape(labs[oi])}</text>')

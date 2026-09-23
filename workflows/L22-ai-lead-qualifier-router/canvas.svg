@@ -1,27 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -434 1680 784" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -234 980 1198" width="980" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-434" width="1680" height="784" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-434" width="1680" height="784" rx="14" fill="url(#dots)"/>
-<rect x="-100" y="-434" width="1680" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-414" width="1680" height="16" fill="#1F2937"/>
-<circle cx="-80" cy="-416" r="5" fill="#FF5F57"/><circle cx="-62" cy="-416" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-416" r="5" fill="#28C840"/>
-<text x="-24" y="-411" font-size="13" fill="#E5E7EB" font-weight="600">L22 · AI lead qualifier &amp; router (Sales capstone)</text>
-<rect x="-60" y="-358" width="500" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-46" y="-330" font-size="15" fill="#5B4B12" font-weight="700">🏁 L22 · Capstone: everything together</text>
-<text x="-46" y="-308" font-size="12.5" fill="#5B4B12" font-weight="400">Form → Gemini scores the lead (BANT) with structured output → Switch</text>
-<text x="-46" y="-291" font-size="12.5" fill="#5B4B12" font-weight="400">routes Hot / Warm / Cold → CRM sheet, instant sales alert, tailored</text>
-<text x="-46" y="-274" font-size="12.5" fill="#5B4B12" font-weight="400">reply.</text>
-<text x="-46" y="-257" font-size="12.5" fill="#5B4B12" font-weight="400">Errors → L19. Emails → could call L20a.</text>
+<rect x="-100" y="-234" width="980" height="1198" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-234" width="980" height="1198" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-234" width="980" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-214" width="980" height="16" fill="#1F2937"/>
+<circle cx="-80" cy="-216" r="5" fill="#FF5F57"/><circle cx="-62" cy="-216" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-216" r="5" fill="#28C840"/>
+<text x="-24" y="-211" font-size="13" fill="#E5E7EB" font-weight="600">L22 · AI lead qualifier &amp; router (Sales capstone)</text>
+<rect x="-60" y="-158" width="500" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-46" y="-130" font-size="15" fill="#5B4B12" font-weight="700">🏁 L22 · Capstone: everything together</text>
+<text x="-46" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">Form → Gemini scores the lead (BANT) with structured output → Switch</text>
+<text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">routes Hot / Warm / Cold → CRM sheet, instant sales alert, tailored</text>
+<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">reply.</text>
+<text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">Errors → L19. Emails → could call L20a.</text>
 <path d="M100,50.0 C170.0,50.0 170.0,50.0 236,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M340,50.0 C410.0,50.0 410.0,50.0 476,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M580,50.0 C640.0,50.0 640.0,50.0 696,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M800,50.0 C860.0,50.0 860.0,50.0 916,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1020,25.0 C1090.0,25.0 1090.0,-150.0 1156,-150.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1028" y="20.0" font-size="11" fill="#64748B">Hot</text>
-<path d="M1020,50.0 C1210.0,50.0 1210.0,-50.0 1396,-50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1028" y="45.0" font-size="11" fill="#64748B">Warm</text>
-<path d="M1020,75.0 C1090.0,75.0 1090.0,210.0 1156,210.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1028" y="70.0" font-size="11" fill="#64748B">Cold</text>
-<path d="M1260,-150.0 C1330.0,-150.0 1330.0,-50.0 1396,-50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M580,50.0 H604 Q614,50.0 614,60.0 V343 Q614,353 604,353 H-34 Q-44,353 -44,363 V658.0 Q-44,668.0 -34,668.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,668.0 C160.0,668.0 160.0,668.0 216,668.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M320,643.0 C390.0,643.0 390.0,468.0 456,468.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="328" y="638.0" font-size="11" fill="#64748B">Hot</text>
+<path d="M320,668.0 C510.0,668.0 510.0,568.0 696,568.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="328" y="663.0" font-size="11" fill="#64748B">Warm</text>
+<path d="M320,693.0 C390.0,693.0 390.0,828.0 456,828.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="328" y="688.0" font-size="11" fill="#64748B">Cold</text>
+<path d="M560,468.0 C630.0,468.0 630.0,568.0 696,568.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M212.0,200 C212.0,167.0 290.0,167.0 290.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <path d="M372.0,200 C372.0,167.0 290.0,167.0 290.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
@@ -43,26 +43,26 @@
 <rect x="502" y="18" width="56" height="56" rx="12" fill="#EEF2F7"/>
 <text x="530" y="55" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
 <text x="530.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Build CRM Row</text>
-<rect x="700" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
-<rect x="722" y="18" width="56" height="56" rx="12" fill="#EAF3FF"/>
-<text x="750" y="55" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
-<text x="750.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Save to CRM Sheet</text>
-<rect x="920" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="942" y="18" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="970" y="55" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
-<text x="970.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Route by Tier</text>
-<rect x="1160" y="-200" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1182" y="-182" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1210" y="-145" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1210.0" y="-80" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">🔥 Alert Sales Now</text>
-<rect x="1400" y="-100" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1422" y="-82" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1450" y="-45" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1450.0" y="20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Personal Reply</text>
-<text x="1450.0" y="35" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">(Hot/Warm)</text>
-<rect x="1160" y="160" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1182" y="178" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1210" y="215" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1210.0" y="280" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Nurture Email</text>
-<text x="1210.0" y="295" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">(Cold)</text>
+<rect x="0" y="618" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="636" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="50" y="673" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
+<text x="50.0" y="738" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Save to CRM Sheet</text>
+<rect x="220" y="618" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="242" y="636" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="270" y="673" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
+<text x="270.0" y="738" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Route by Tier</text>
+<rect x="460" y="418" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="482" y="436" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="510" y="473" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="510.0" y="538" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">🔥 Alert Sales Now</text>
+<rect x="700" y="518" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="722" y="536" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="750" y="573" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="750.0" y="638" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Personal Reply</text>
+<text x="750.0" y="653" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">(Hot/Warm)</text>
+<rect x="460" y="778" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="482" y="796" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="510" y="833" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="510.0" y="898" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Nurture Email</text>
+<text x="510.0" y="913" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">(Cold)</text>
 </svg>

@@ -1,25 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -317 1600 603" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -217 940 869" width="940" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-80" y="-317" width="1600" height="603" rx="14" fill="#F8FAFC"/>
-<rect x="-80" y="-317" width="1600" height="603" rx="14" fill="url(#dots)"/>
-<rect x="-80" y="-317" width="1600" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-297" width="1600" height="16" fill="#1F2937"/>
-<circle cx="-60" cy="-299" r="5" fill="#FF5F57"/><circle cx="-42" cy="-299" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-299" r="5" fill="#28C840"/>
-<text x="-4" y="-294" font-size="13" fill="#E5E7EB" font-weight="600">Q06 · Invoice due &amp; overdue reminders (Sheets as a mini-CRM)</text>
-<rect x="-40" y="-241" width="480" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-26" y="-213" font-size="15" fill="#5B4B12" font-weight="700">💸 Q06 · Get paid on time</text>
-<text x="-26" y="-191" font-size="12.5" fill="#5B4B12" font-weight="400">Daily: finds unpaid invoices due in 3 days (friendly nudge) or</text>
-<text x="-26" y="-174" font-size="12.5" fill="#5B4B12" font-weight="400">overdue (firm reminder), emails the client, and writes lastreminded</text>
-<text x="-26" y="-157" font-size="12.5" fill="#5B4B12" font-weight="400">back so nobody gets spammed.</text>
+<rect x="-80" y="-217" width="940" height="869" rx="14" fill="#F8FAFC"/>
+<rect x="-80" y="-217" width="940" height="869" rx="14" fill="url(#dots)"/>
+<rect x="-80" y="-217" width="940" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-197" width="940" height="16" fill="#1F2937"/>
+<circle cx="-60" cy="-199" r="5" fill="#FF5F57"/><circle cx="-42" cy="-199" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-199" r="5" fill="#28C840"/>
+<text x="-4" y="-194" font-size="13" fill="#E5E7EB" font-weight="600">Q06 · Invoice due &amp; overdue reminders (Sheets as a mini-CRM)</text>
+<rect x="-40" y="-141" width="480" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-26" y="-113" font-size="15" fill="#5B4B12" font-weight="700">💸 Q06 · Get paid on time</text>
+<text x="-26" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Daily: finds unpaid invoices due in 3 days (friendly nudge) or</text>
+<text x="-26" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">overdue (firm reminder), emails the client, and writes lastreminded</text>
+<text x="-26" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">back so nobody gets spammed.</text>
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,50.0 C380.0,50.0 380.0,50.0 436,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M540,50.0 C600.0,50.0 600.0,50.0 656,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M760,33.333333333333336 C830.0,33.333333333333336 830.0,-50.0 896,-50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="768" y="28.333333333333336" font-size="11" fill="#64748B">Upcoming</text>
-<path d="M760,66.66666666666667 C830.0,66.66666666666667 830.0,150.0 896,150.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="768" y="61.66666666666667" font-size="11" fill="#64748B">Overdue</text>
-<path d="M1000,-50.0 C1060.0,-50.0 1060.0,50.0 1116,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1000,150.0 C1060.0,150.0 1060.0,50.0 1116,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1220,50.0 C1280.0,50.0 1280.0,50.0 1336,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M540,50.0 H564 Q574,50.0 574,60.0 V191 Q574,201 564,201 H-34 Q-44,201 -44,211 V406.0 Q-44,416.0 -34,416.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,399.3333333333333 C170.0,399.3333333333333 170.0,316.0 236,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="394.3333333333333" font-size="11" fill="#64748B">Upcoming</text>
+<path d="M100,432.6666666666667 C170.0,432.6666666666667 170.0,516.0 236,516.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="427.6666666666667" font-size="11" fill="#64748B">Overdue</text>
+<path d="M340,316.0 C400.0,316.0 400.0,416.0 456,416.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M340,516.0 C400.0,516.0 400.0,416.0 456,416.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M560,416.0 C620.0,416.0 620.0,416.0 676,416.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,0 H10 A10,10 0 0 0 0,10 V90 A10,10 0 0 0 10,100 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -34,24 +34,24 @@
 <text x="490" y="55" font-size="16" text-anchor="middle" fill="#64748B" font-weight="700">{ }</text>
 <text x="490.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Who Needs a</text>
 <text x="490.0" y="135" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Reminder?</text>
-<rect x="660" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="682" y="18" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="710" y="55" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
-<text x="710.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Stage</text>
-<rect x="900" y="-100" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="922" y="-82" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="950" y="-45" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="950.0" y="20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Friendly Nudge</text>
-<rect x="900" y="100" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="922" y="118" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="950" y="155" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="950.0" y="220" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Firm Reminder</text>
-<rect x="1120" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1142" y="18" width="56" height="56" rx="12" fill="#EEF2F7"/>
-<text x="1170" y="55" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
-<text x="1170.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Mark Reminded</text>
-<rect x="1340" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
-<rect x="1362" y="18" width="56" height="56" rx="12" fill="#EAF3FF"/>
-<text x="1390" y="55" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
-<text x="1390.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Write Back</text>
+<rect x="0" y="366" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="384" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="50" y="421" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑃</text>
+<text x="50.0" y="486" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Stage</text>
+<rect x="240" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="262" y="284" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="290" y="321" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="290.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Friendly Nudge</text>
+<rect x="240" y="466" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="262" y="484" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="290" y="521" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="290.0" y="586" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Firm Reminder</text>
+<rect x="460" y="366" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
+<rect x="482" y="384" width="56" height="56" rx="12" fill="#EEF2F7"/>
+<text x="510" y="421" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
+<text x="510.0" y="486" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Mark Reminded</text>
+<rect x="680" y="366" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="702" y="384" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="730" y="421" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
+<text x="730.0" y="486" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Write Back</text>
 </svg>

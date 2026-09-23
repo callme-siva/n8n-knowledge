@@ -1,31 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -377 1800 823" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -277 1140 1273" width="1140" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-80" y="-377" width="1800" height="823" rx="14" fill="#F8FAFC"/>
-<rect x="-80" y="-377" width="1800" height="823" rx="14" fill="url(#dots)"/>
-<rect x="-80" y="-377" width="1800" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-357" width="1800" height="16" fill="#1F2937"/>
-<circle cx="-60" cy="-359" r="5" fill="#FF5F57"/><circle cx="-42" cy="-359" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-359" r="5" fill="#28C840"/>
-<text x="-4" y="-354" font-size="13" fill="#E5E7EB" font-weight="600">P02 · Support inbox copilot (classify → answer from FAQ → Gmail draft, or escalate)</text>
-<rect x="-40" y="-301" width="560" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-26" y="-273" font-size="15" fill="#5B4B12" font-weight="700">🎧 P02 · AI drafts, humans send</text>
-<text x="-26" y="-251" font-size="12.5" fill="#5B4B12" font-weight="400">Classifies each support email, answers only from your FAQ sheet, scores its own</text>
-<text x="-26" y="-234" font-size="12.5" fill="#5B4B12" font-weight="400">confidence, and either creates a Gmail draft for an agent to review or escalates</text>
-<text x="-26" y="-217" font-size="12.5" fill="#5B4B12" font-weight="400">to Slack. It never sends by itself.</text>
+<rect x="-80" y="-277" width="1140" height="1273" rx="14" fill="#F8FAFC"/>
+<rect x="-80" y="-277" width="1140" height="1273" rx="14" fill="url(#dots)"/>
+<rect x="-80" y="-277" width="1140" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-257" width="1140" height="16" fill="#1F2937"/>
+<circle cx="-60" cy="-259" r="5" fill="#FF5F57"/><circle cx="-42" cy="-259" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-259" r="5" fill="#28C840"/>
+<text x="-4" y="-254" font-size="13" fill="#E5E7EB" font-weight="600">P02 · Support inbox copilot (classify → answer from FAQ → Gmail draft, or escalate)</text>
+<rect x="-40" y="-201" width="560" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-26" y="-173" font-size="15" fill="#5B4B12" font-weight="700">🎧 P02 · AI drafts, humans send</text>
+<text x="-26" y="-151" font-size="12.5" fill="#5B4B12" font-weight="400">Classifies each support email, answers only from your FAQ sheet, scores its own</text>
+<text x="-26" y="-134" font-size="12.5" fill="#5B4B12" font-weight="400">confidence, and either creates a Gmail draft for an agent to review or escalates</text>
+<text x="-26" y="-117" font-size="12.5" fill="#5B4B12" font-weight="400">to Slack. It never sends by itself.</text>
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,20.0 C390.0,20.0 390.0,-10.0 456,-10.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M320,40.0 C820.0,40.0 820.0,170.0 1316,170.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M320,40.0 H344 Q354,40.0 354,50.0 V451 Q354,461 344,461 H626 Q616,461 616,471 V846.0 Q616,856.0 626,856.0 H656" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,60.0 C390.0,60.0 390.0,310.0 456,310.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M320,80.0 C820.0,80.0 820.0,170.0 1316,170.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M560,-10.0 C610.0,-10.0 610.0,-10.0 656,-10.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M760,-10.0 C820.0,-10.0 820.0,-10.0 876,-10.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M980,-10.0 C1040.0,-10.0 1040.0,-10.0 1096,-10.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1200,-26.666666666666664 C1260.0,-26.666666666666664 1260.0,-110.0 1316,-110.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1208" y="-31.666666666666664" font-size="11" fill="#64748B">true</text>
-<path d="M1200,6.666666666666671 C1260.0,6.666666666666671 1260.0,170.0 1316,170.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="1208" y="1.6666666666666714" font-size="11" fill="#64748B">false</text>
-<path d="M1420,-110.0 C1480.0,-110.0 1480.0,-110.0 1536,-110.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M320,80.0 H344 Q354,80.0 354,90.0 V451 Q354,461 344,461 H626 Q616,461 616,471 V846.0 Q616,856.0 626,856.0 H656" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M560,-10.0 H584 Q594,-10.0 594,0.0 V451 Q594,461 584,461 H-34 Q-44,461 -44,471 V666.0 Q-44,676.0 -34,676.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,676.0 C160.0,676.0 160.0,676.0 216,676.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M320,676.0 C380.0,676.0 380.0,676.0 436,676.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M540,659.3333333333334 C600.0,659.3333333333334 600.0,576.0 656,576.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="548" y="654.3333333333334" font-size="11" fill="#64748B">true</text>
+<path d="M540,692.6666666666666 C600.0,692.6666666666666 600.0,856.0 656,856.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="548" y="687.6666666666666" font-size="11" fill="#64748B">false</text>
+<path d="M760,576.0 C820.0,576.0 820.0,576.0 876,576.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M252.0,220 C252.0,177.0 270.0,177.0 270.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M872.0,160 C872.0,117.0 930.0,117.0 930.0,76" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
-<path d="M992.0,160 C992.0,117.0 930.0,117.0 930.0,76" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M212.0,846 C212.0,803.0 270.0,803.0 270.0,762" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<path d="M332.0,846 C332.0,803.0 270.0,803.0 270.0,762" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,0 H10 A10,10 0 0 0 0,10 V90 A10,10 0 0 0 10,100 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -43,39 +43,39 @@
 <rect x="482" y="-42" width="56" height="56" rx="12" fill="#EAF3FF"/>
 <text x="510" y="-5" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
 <text x="510.0" y="60" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Load FAQ</text>
-<rect x="660" y="-60" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="682" y="-42" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="710" y="-5" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="710.0" y="60" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">FAQ as Text</text>
-<rect x="880" y="-60" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
-<rect x="902" y="-42" width="56" height="56" rx="12" fill="#F1EBFF"/>
-<text x="930" y="-5" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">✦</text>
-<text x="930.0" y="60" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Draft Answer</text>
-<circle cx="872" cy="192" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="872" y="199" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
-<text x="872" y="244" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Gemini</text>
-<text x="872" y="259" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">(answer)</text>
-<circle cx="992" cy="192" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
-<text x="992" y="199" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
-<text x="992" y="244" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Answer Schema</text>
-<rect x="1100" y="-60" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1122" y="-42" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="1150" y="-5" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
-<text x="1150.0" y="60" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Confident?</text>
-<rect x="1320" y="-160" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1342" y="-142" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1370" y="-105" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1370.0" y="-40" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Create Gmail Draft</text>
-<rect x="1540" y="-160" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1562" y="-142" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1590" y="-105" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1590.0" y="-40" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Mark ai-drafted</text>
-<rect x="1320" y="120" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1342" y="138" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1370" y="175" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1370.0" y="240" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalate to Slack</text>
 <rect x="460" y="260" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
 <rect x="482" y="278" width="56" height="56" rx="12" fill="#FFF4E5"/>
 <text x="510" y="315" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">→</text>
 <text x="510.0" y="380" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Ignore Spam</text>
+<rect x="0" y="626" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="644" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="50" y="681" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="50.0" y="746" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">FAQ as Text</text>
+<rect x="220" y="626" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
+<rect x="242" y="644" width="56" height="56" rx="12" fill="#F1EBFF"/>
+<text x="270" y="681" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">✦</text>
+<text x="270.0" y="746" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Draft Answer</text>
+<circle cx="212" cy="878" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="212" y="885" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">G</text>
+<text x="212" y="930" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Gemini</text>
+<text x="212" y="945" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">(answer)</text>
+<circle cx="332" cy="878" r="32" fill="#F7F3FF" stroke="#A78BFA" stroke-width="2" filter="url(#sh)"/>
+<text x="332" y="885" font-size="19" text-anchor="middle" fill="#A78BFA" font-weight="700">{}</text>
+<text x="332" y="930" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Answer Schema</text>
+<rect x="440" y="626" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="462" y="644" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="490" y="681" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
+<text x="490.0" y="746" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Confident?</text>
+<rect x="660" y="526" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="682" y="544" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="710" y="581" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="710.0" y="646" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Create Gmail Draft</text>
+<rect x="880" y="526" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="902" y="544" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="930" y="581" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="930.0" y="646" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Mark ai-drafted</text>
+<rect x="660" y="806" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="682" y="824" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="710" y="861" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="710.0" y="926" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Escalate to Slack</text>
 </svg>

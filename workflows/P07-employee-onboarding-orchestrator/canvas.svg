@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -357 1800 663" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -357 1140 1189" width="1140" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-80" y="-357" width="1800" height="663" rx="14" fill="#F8FAFC"/>
-<rect x="-80" y="-357" width="1800" height="663" rx="14" fill="url(#dots)"/>
-<rect x="-80" y="-357" width="1800" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-337" width="1800" height="16" fill="#1F2937"/>
+<rect x="-80" y="-357" width="1140" height="1189" rx="14" fill="#F8FAFC"/>
+<rect x="-80" y="-357" width="1140" height="1189" rx="14" fill="url(#dots)"/>
+<rect x="-80" y="-357" width="1140" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-337" width="1140" height="16" fill="#1F2937"/>
 <circle cx="-60" cy="-339" r="5" fill="#FF5F57"/><circle cx="-42" cy="-339" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-339" r="5" fill="#28C840"/>
 <text x="-4" y="-334" font-size="13" fill="#E5E7EB" font-weight="600">P07 · Employee onboarding orchestrator (Jira checklist + calendar + welcome + Slack)</text>
 <rect x="-40" y="-281" width="580" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
@@ -13,14 +13,14 @@
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M100,50.0 C270.0,50.0 270.0,170.0 436,170.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,50.0 C380.0,50.0 380.0,-90.0 436,-90.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M540,-90.0 C600.0,-90.0 600.0,-90.0 656,-90.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M540,170.0 C600.0,170.0 600.0,170.0 656,170.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M760,170.0 C820.0,170.0 820.0,170.0 876,170.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M760,-90.0 C930.0,-90.0 930.0,50.0 1096,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M980,170.0 C1040.0,170.0 1040.0,50.0 1096,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1200,50.0 C1260.0,50.0 1260.0,-50.0 1316,-50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1200,50.0 C1260.0,50.0 1260.0,110.0 1316,110.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M1420,-50.0 C1480.0,-50.0 1480.0,50.0 1536,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M540,-90.0 H564 Q574,-90.0 574,-80.0 V311 Q574,321 564,321 H-34 Q-44,321 -44,331 V426.0 Q-44,436.0 -34,436.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M540,170.0 H564 Q574,170.0 574,180.0 V311 Q574,321 564,321 H-34 Q-44,321 -44,331 V686.0 Q-44,696.0 -34,696.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,696.0 C160.0,696.0 160.0,696.0 216,696.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,436.0 C270.0,436.0 270.0,576.0 436,576.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M320,696.0 C380.0,696.0 380.0,576.0 436,576.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M540,576.0 C600.0,576.0 600.0,476.0 656,476.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M540,576.0 C600.0,576.0 600.0,636.0 656,636.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M760,476.0 C820.0,476.0 820.0,576.0 876,576.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,0 H10 A10,10 0 0 0 0,10 V90 A10,10 0 0 0 10,100 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -35,37 +35,37 @@
 <rect x="462" y="-122" width="56" height="56" rx="12" fill="#EAF3FF"/>
 <text x="490" y="-85" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">◆</text>
 <text x="490.0" y="-20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Create Jira Task</text>
-<rect x="660" y="-140" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="682" y="-122" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="710" y="-85" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="710.0" y="-20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Collect Jira Keys</text>
 <rect x="440" y="120" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
 <rect x="462" y="138" width="56" height="56" rx="12" fill="#EEF2F7"/>
 <text x="490" y="175" font-size="16" text-anchor="middle" fill="#64748B" font-weight="700">{ }</text>
 <text x="490.0" y="240" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Day-1 Sessions</text>
-<rect x="660" y="120" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="682" y="138" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="710" y="175" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="710.0" y="240" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Book Calendar</text>
-<text x="710.0" y="255" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Event</text>
-<rect x="880" y="120" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="902" y="138" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="930" y="175" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="930.0" y="240" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Collect Events</text>
-<rect x="1100" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="1122" y="18" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="1150" y="55" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⊕</text>
-<text x="1150.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Wait for Both</text>
-<rect x="1320" y="-100" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1342" y="-82" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1370" y="-45" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1370.0" y="20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Welcome Email</text>
-<rect x="1320" y="60" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1342" y="78" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1370" y="115" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1370.0" y="180" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Tell the Team</text>
-<rect x="1540" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1562" y="18" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1590" y="55" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1590.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Summary to HR</text>
+<rect x="0" y="386" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="404" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="50" y="441" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="50.0" y="506" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Collect Jira Keys</text>
+<rect x="0" y="646" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="664" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="50" y="701" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="50.0" y="766" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Book Calendar</text>
+<text x="50.0" y="781" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Event</text>
+<rect x="220" y="646" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="242" y="664" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="270" y="701" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="270.0" y="766" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Collect Events</text>
+<rect x="440" y="526" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="462" y="544" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="490" y="581" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⊕</text>
+<text x="490.0" y="646" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Wait for Both</text>
+<rect x="660" y="426" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="682" y="444" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="710" y="481" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="710.0" y="546" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Welcome Email</text>
+<rect x="660" y="586" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="682" y="604" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="710" y="641" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="710.0" y="706" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Tell the Team</text>
+<rect x="880" y="526" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="902" y="544" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="930" y="581" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="930.0" y="646" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Summary to HR</text>
 </svg>
