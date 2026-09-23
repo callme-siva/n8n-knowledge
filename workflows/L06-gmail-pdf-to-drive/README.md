@@ -104,7 +104,24 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 12 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 12 lines, shown below) |
+
+**Code:**
+
+```javascript
+// One email can carry many files. Output one item per PDF.
+const out = [];
+for (const item of $input.all()) {
+  for (const [key, bin] of Object.entries(item.binary || {})) {
+    const name = bin.fileName || key;
+    if (bin.mimeType === 'application/pdf' || name.toLowerCase().endsWith('.pdf')) {
+      const date = new Date(item.json.date || Date.now()).toISOString().slice(0, 10);
+      out.push({ json: { fileName: `${date}_${name}`, from: item.json.from?.text || '', subject: item.json.subject || '', messageId: item.json.id }, binary: { data: bin } });
+    }
+  }
+}
+return out;
+```
 
 </details>
 

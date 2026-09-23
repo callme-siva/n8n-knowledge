@@ -140,7 +140,24 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsonSchemaExample` | (JSON schema, 12 lines. See workflow.json) |
+| `jsonSchemaExample` | (JSON schema, 12 lines, shown below) |
+
+**Schema example:**
+
+```json
+{
+  "sentiment": "mixed",
+  "summary": "Delivery was good but too many unplanned requests.",
+  "action_items": [
+    {
+      "title": "Limit mid-sprint scope changes",
+      "description": "PO to route new requests to the backlog; SM tracks count.",
+      "priority": "High",
+      "owner_role": "Product Owner"
+    }
+  ]
+}
+```
 
 </details>
 
@@ -150,7 +167,16 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 4 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 4 lines, shown below) |
+
+**Code:**
+
+```javascript
+const o = $input.first().json.output;
+const li = (o.action_items || []).map((a, i) => `<li><b>${i + 1}. ${a.title}</b> (${a.priority}, ${a.owner_role})<br>${a.description}</li>`).join('');
+return [{ json: { ...o, sprint: $('Retrospective Form').first().json.Sprint,
+  html: `<p><b>Sentiment:</b> ${o.sentiment}</p><p>${o.summary}</p><p>Proposed Jira tasks:</p><ol>${li}</ol><p>Approve to create them in Jira.</p>` } }];
+```
 
 </details>
 
@@ -187,7 +213,13 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 1 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 1 lines, shown below) |
+
+**Code:**
+
+```javascript
+return $('Build Approval Message').first().json.action_items.map(a => ({ json: { ...a, sprint: $('Build Approval Message').first().json.sprint } }));
+```
 
 </details>
 

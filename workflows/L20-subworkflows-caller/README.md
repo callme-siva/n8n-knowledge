@@ -108,7 +108,22 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 10 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 10 lines, shown below) |
+
+**Code:**
+
+```javascript
+// Sheet columns: name | email | birthday (YYYY-MM-DD) | joined (YYYY-MM-DD)
+const today = new Date(); const md = d => d && d.slice(5, 10);
+const tmd = today.toISOString().slice(5, 10);
+const out = [];
+for (const { json: p } of $input.all()) {
+  if (md(p.birthday) === tmd) out.push({ json: { to: p.email, title: `Happy birthday, ${p.name}! 🎂`, body_html: `<p>Wishing you a fantastic year ahead, ${p.name}. Cake is on the team today!</p>`, cta_text: '', cta_url: '' } });
+  if (md(p.joined) === tmd) { const yrs = today.getFullYear() - Number(p.joined.slice(0, 4));
+    if (yrs > 0) out.push({ json: { to: p.email, title: `Happy ${yrs}-year work anniversary, ${p.name}! 🎉`, body_html: `<p>Thank you for ${yrs} great year${yrs > 1 ? 's' : ''} with us.</p>`, cta_text: '', cta_url: '' } }); }
+}
+return out;
+```
 
 </details>
 

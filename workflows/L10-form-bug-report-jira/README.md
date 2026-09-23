@@ -99,7 +99,17 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `mode` | runOnceForEachItem |
-| `jsCode` | (JavaScript, 5 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 5 lines, shown below) |
+
+**Code:**
+
+```javascript
+const sev = $json['Severity'] || '';
+const priority = sev.startsWith('Blocker') ? 'Highest' : sev.startsWith('Major') ? 'High' : 'Low';
+return { json: { ...$json, priority,
+  summary: `[${$json['Page / module'] || 'General'}] ${$json['What is broken?']}`.slice(0, 250),
+  description: `*Reported by:* ${$json['Your email']}\n*Severity:* ${sev}\n\n*Steps to reproduce:*\n${$json['Steps to reproduce']}\n\n_Created automatically by n8n_` } };
+```
 
 </details>
 

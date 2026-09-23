@@ -128,7 +128,30 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsonSchemaExample` | (JSON schema, 18 lines. See workflow.json) |
+| `jsonSchemaExample` | (JSON schema, 18 lines, shown below) |
+
+**Schema example:**
+
+```json
+{
+  "items": [
+    {
+      "category": "Risk",
+      "description": "Third-party vendor may miss the integration deadline.",
+      "owner": "Jane Doe",
+      "impact": "Could delay go-live by two weeks.",
+      "mitigation": "Escalate to vendor account manager and prepare fallback."
+    },
+    {
+      "category": "Dependency",
+      "description": "Release depends on the security team completing the pen test.",
+      "owner": "Security Team",
+      "impact": "Blocks production deployment until resolved.",
+      "mitigation": "Book pen-test slot for next sprint."
+    }
+  ]
+}
+```
 
 </details>
 

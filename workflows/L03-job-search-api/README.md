@@ -131,7 +131,24 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 12 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 12 lines, shown below) |
+
+**Code:**
+
+```javascript
+const cfg = $('⚙️ Config').first().json;
+const jobs = ($input.first().json.jobs_results || []).slice(0, cfg.max_jobs);
+const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const rows = jobs.map(j => {
+  const link = j.apply_options?.[0]?.link || j.share_link || '#';
+  return `<tr><td><a href="${link}">${esc(j.title)}</a></td><td>${esc(j.company_name)}</td><td>${esc(j.location)}</td><td>${esc(j.detected_extensions?.posted_at || '')}</td></tr>`;
+}).join('');
+const html = jobs.length
+  ? `<h2>${jobs.length} new jobs · ${today}</h2><table border="1" cellpadding="6" style="border-collapse:collapse"><tr><th>Role</th><th>Company</th><th>Location</th><th>Posted</th></tr>${rows}</table>`
+  : `<p>No new jobs today for <b>${esc(cfg.query)}</b>. Try widening the query.</p>`;
+return [{ json: { subject: `Job digest: ${jobs.length} × ${cfg.query} (${today})`, html, count: jobs.length } }];
+```
 
 </details>
 

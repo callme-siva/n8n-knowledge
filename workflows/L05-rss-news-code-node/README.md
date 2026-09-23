@@ -151,7 +151,25 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 13 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 13 lines, shown below) |
+
+**Code:**
+
+```javascript
+const cutoff = Date.now() - 24 * 3600 * 1000;
+const seen = new Set();
+const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').slice(0, 60);
+const articles = $input.all().map(i => i.json)
+  .filter(a => a.title && a.link)
+  .map(a => ({ title: a.title.trim(), link: a.link, source: a.creator || (a.link.match(/https?:\/\/(?:www\.)?([^/]+)/) || [])[1] || 'unknown', ts: Date.parse(a.isoDate || a.pubDate || '') || 0 }))
+  .filter(a => a.ts >= cutoff)
+  .filter(a => { const k = norm(a.title); if (seen.has(k)) return false; seen.add(k); return true; })
+  .sort((a, b) => b.ts - a.ts)
+  .slice(0, 25);
+const li = articles.map(a => `<li><a href="${a.link}">${a.title}</a> <small>(${a.source})</small></li>`).join('');
+const listText = articles.map((a, i) => `${i + 1}. ${a.title} — ${a.link}`).join('\n');
+return [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];
+```
 
 </details>
 

@@ -106,7 +106,17 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 5 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 5 lines, shown below) |
+
+**Code:**
+
+```javascript
+return [
+  { url: 'https://n8n.io', name: 'n8n website' },
+  { url: 'https://api.github.com', name: 'GitHub API' },
+  { url: 'https://httpstat.us/503', name: 'Demo: always down' },
+].map(s => ({ json: { ...s, started: Date.now() } }));
+```
 
 </details>
 
@@ -130,7 +140,26 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 14 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 14 lines, shown below) |
+
+**Code:**
+
+```javascript
+const state = $getWorkflowStaticData('global');
+state.sites = state.sites || {};
+const sites = $('Sites to Watch').all();
+return $input.all().map((r, i) => {
+  const site = sites[i].json;
+  const code = r.json.statusCode || 0;
+  const ms = Date.now() - site.started;
+  const up = code >= 200 && code < 400;
+  const prev = state.sites[site.url]?.up;
+  const changed = prev !== undefined && prev !== up;
+  const since = changed || prev === undefined ? new Date().toISOString() : state.sites[site.url].since;
+  state.sites[site.url] = { up, since };
+  return { json: { time: new Date().toISOString(), name: site.name, url: site.url, status: up ? 'UP' : 'DOWN', code, ms, changed, since, error: r.json.error?.message || '' } };
+});
+```
 
 </details>
 

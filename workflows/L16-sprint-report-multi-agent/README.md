@@ -119,7 +119,19 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 7 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 7 lines, shown below) |
+
+**Code:**
+
+```javascript
+const cfg = $('Config').first().json;
+let login = String(cfg.org || '').trim();
+// Accept a full URL, an @handle, or a bare login and reduce to the bare login
+login = login.replace(/^https?:\/\/github\.com\//i, '').replace(/^@/, '').split('/')[0].trim();
+const number = parseInt(String(cfg.projectNumber || '').trim(), 10);
+const query = 'query($login:String!,$number:Int!){ repositoryOwner(login:$login){ ... on ProjectV2Owner { projectV2(number:$number){ title items(first:100){ nodes{ content{ ... on Issue{title state} ... on PullRequest{title state} } fieldValues(first:20){ nodes{ ... on ProjectV2ItemFieldSingleSelectValue{name field{... on ProjectV2FieldCommon{name}}} ... on ProjectV2ItemFieldNumberValue{number field{... on ProjectV2FieldCommon{name}}} ... on ProjectV2ItemFieldIterationValue{title startDate duration field{... on ProjectV2FieldCommon{name}}} } } } } } } } }';
+return [{ json: { body: JSON.stringify({ query, variables: { login, number } }) } }];
+```
 
 </details>
 
@@ -146,7 +158,45 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 33 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 33 lines, shown below) |
+
+**Code:**
+
+```javascript
+const resp = $input.first().json;
+const owner = resp && resp.data && (resp.data.repositoryOwner || resp.data.organization);
+const project = (owner && owner.projectV2) || {};
+const nodes = (project.items && project.items.nodes) || [];
+let totalItems = 0, done = 0, inProgress = 0, todo = 0;
+let totalPoints = 0, donePoints = 0, iterationTitle = '', iterationStart = '', iterationDuration = 0;
+for (const it of nodes) {
+  totalItems++;
+  let status = '';
+  let points = 0;
+  const fvs = (it.fieldValues && it.fieldValues.nodes) || [];
+  for (const fv of fvs) {
+    const fname = fv && fv.field && fv.field.name ? String(fv.field.name).toLowerCase() : '';
+    if (fv && typeof fv.name === 'string' && fname === 'status') status = fv.name;
+    if (fv && typeof fv.number === 'number' && (fname.includes('point') || fname.includes('estimate') || fname.includes('size'))) points = fv.number;
+    if (fv && typeof fv.title === 'string' && fv.startDate) { iterationTitle = fv.title; iterationStart = fv.startDate; iterationDuration = fv.duration || 0; }
+  }
+  const s = status.toLowerCase();
+  totalPoints += points;
+  if (s.includes('done') || s.includes('closed')) { done++; donePoints += points; }
+  else if (s.includes('progress') || s.includes('review')) { inProgress++; }
+  else { todo++; }
+}
+const remainingPoints = totalPoints - donePoints;
+const pctComplete = totalPoints > 0 ? Math.round((donePoints / totalPoints) * 100) : (totalItems > 0 ? Math.round((done / totalItems) * 100) : 0);
+let dayOfSprint = 0, sprintLength = iterationDuration;
+if (iterationStart) {
+  const start = new Date(iterationStart);
+  const now = new Date();
+  dayOfSprint = Math.max(0, Math.round((now - start) / 86400000));
+}
+const timeElapsedPct = sprintLength > 0 ? Math.round((dayOfSprint / sprintLength) * 100) : 0;
+return [{ json: { projectTitle: project.title || '', iteration: iterationTitle, iterationStart, sprintLength, dayOfSprint, timeElapsedPct, totalItems, todo, inProgress, done, totalPoints, donePoints, remainingPoints, pctComplete, reportDate: $now.toFormat('yyyy-MM-dd') } }];
+```
 
 </details>
 

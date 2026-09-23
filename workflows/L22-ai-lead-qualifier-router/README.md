@@ -139,7 +139,19 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsonSchemaExample` | (JSON schema, 7 lines. See workflow.json) |
+| `jsonSchemaExample` | (JSON schema, 7 lines, shown below) |
+
+**Schema example:**
+
+```json
+{
+  "score": 78,
+  "tier": "hot",
+  "reason": "Clear need, 51-200 team, starting this month.",
+  "use_case": "Invoice processing",
+  "suggested_reply": "Hi Asha, thanks — invoice automation is a sweet spot for us..."
+}
+```
 
 </details>
 

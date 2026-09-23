@@ -149,8 +149,22 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsonSchemaExample` | (JSON schema, 1 lines. See workflow.json) |
+| `jsonSchemaExample` | (JSON schema, 1 lines, shown below) |
 | `autoFix` | ✅ on |
+
+**Schema example:**
+
+```json
+{
+  "category": "shipping",
+  "urgency": "high",
+  "sentiment": "negative",
+  "product": "Wireless Headphones",
+  "order_id": "ORD-1234",
+  "customer_email": "customer@example.com",
+  "summary": "Order arrived damaged and late."
+}
+```
 
 </details>
 
@@ -196,8 +210,36 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `schemaType` | manual |
-| `inputSchema` | (JSON schema, 1 lines. See workflow.json) |
+| `inputSchema` | (JSON schema, 1 lines, shown below) |
 | `autoFix` | ✅ on |
+
+**JSON schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "known_facts": {
+      "type": "string"
+    },
+    "missing_info": {
+      "type": "string"
+    },
+    "recommended_lookups": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "known_facts",
+    "missing_info",
+    "recommended_lookups",
+    "confidence"
+  ]
+}
+```
 
 </details>
 
@@ -243,8 +285,32 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `schemaType` | manual |
-| `inputSchema` | (JSON schema, 1 lines. See workflow.json) |
+| `inputSchema` | (JSON schema, 1 lines, shown below) |
 | `autoFix` | ✅ on |
+
+**JSON schema:**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "resolution_workflow": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "string"
+    },
+    "policy_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "resolution_workflow",
+    "steps",
+    "policy_notes"
+  ]
+}
+```
 
 </details>
 
@@ -289,8 +355,19 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsonSchemaExample` | (JSON schema, 1 lines. See workflow.json) |
+| `jsonSchemaExample` | (JSON schema, 1 lines, shown below) |
 | `autoFix` | ✅ on |
+
+**Schema example:**
+
+```json
+{
+  "escalate": true,
+  "priority": "high",
+  "reason": "High-value order with damaged product and negative sentiment.",
+  "route_to": "senior-support"
+}
+```
 
 </details>
 

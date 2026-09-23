@@ -107,7 +107,20 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `mode` | runOnceForEachItem |
-| `jsCode` | (JavaScript, 8 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 8 lines, shown below) |
+
+**Code:**
+
+```javascript
+const b = $json.body || {};
+const allowed = ['food', 'travel', 'office', 'software', 'other'];
+const errors = [];
+const amount = Number(b.amount);
+if (!Number.isFinite(amount) || amount <= 0) errors.push('amount must be a positive number');
+if (!allowed.includes(String(b.category || '').toLowerCase())) errors.push(`category must be one of ${allowed.join(', ')}`);
+return { json: { valid: errors.length === 0, errors,
+  row: { date: b.date || new Date().toISOString().slice(0, 10), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };
+```
 
 </details>
 

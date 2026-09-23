@@ -106,7 +106,20 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 8 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 8 lines, shown below) |
+
+**Code:**
+
+```javascript
+// Every node receives items and returns items.
+return $input.all().map(item => ({
+  json: {
+    ...item.json,
+    greeting: `Hello ${item.json.name} from ${item.json.city}! You finished ${item.json.tasks_done} tasks today.`,
+    generated_at: new Date().toISOString(),
+  }
+}));
+```
 
 </details>
 

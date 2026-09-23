@@ -95,7 +95,21 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 9 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 9 lines, shown below) |
+
+**Code:**
+
+```javascript
+const e = $input.first().json;
+const ex = e.execution || {}; const wf = e.workflow || {};
+const msg = ex.error?.message || e.trigger?.error?.message || 'Unknown error';
+const node = ex.lastNodeExecuted || 'trigger';
+const hint = /401|403|credential|unauthori/i.test(msg) ? 'Check / reconnect the credential.'
+  : /429|rate|quota/i.test(msg) ? 'Rate limit — add Retry on Fail or slow the schedule.'
+  : /timeout|ETIMEDOUT|ECONNRESET/i.test(msg) ? 'Network/API timeout — enable retries.'
+  : 'Open the execution to debug.';
+return [{ json: { time: new Date().toISOString(), workflow: wf.name, workflow_id: wf.id, node, message: msg.slice(0, 500), hint, url: ex.url || '', mode: ex.mode || '' } }];
+```
 
 </details>
 

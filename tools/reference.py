@@ -90,7 +90,7 @@ def _flatten(obj, prefix=""):
             if k in ("jsCode", "jsonSchemaExample", "inputSchema"):
                 lines = str(v).count("\n") + 1
                 label = "JavaScript" if k == "jsCode" else "JSON schema"
-                yield f"{prefix}{k}", f"({label}, {lines} lines. See workflow.json)"
+                yield f"{prefix}{k}", f"({label}, {lines} lines, shown below)"
                 continue
             if k in ("schema", "matchingColumns") and not v:
                 continue
@@ -147,6 +147,15 @@ def node_reference(wf):
                 L.append(f"| … | {len(rows) - 24} more in workflow.json |")
         else:
             L.append("*No settings. This node works with its defaults.*")
+        for key, lang, title in (("jsCode", "javascript", "Code"), ("jsonSchemaExample", "json", "Schema example"), ("inputSchema", "json", "JSON schema")):
+            src = n["parameters"].get(key)
+            if src:
+                if lang == "json":
+                    try:
+                        src = json.dumps(json.loads(src), indent=2, ensure_ascii=False)
+                    except ValueError:
+                        pass
+                L += ["", f"**{title}:**", "", f"```{lang}", src.rstrip(), "```"]
         L += ["", "</details>", ""]
     L += ["> [!TIP]", "> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.", ""]
     return "\n".join(L)

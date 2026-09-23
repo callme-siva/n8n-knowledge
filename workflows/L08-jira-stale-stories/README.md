@@ -128,7 +128,25 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 13 lines. See workflow.json) |
+| `jsCode` | (JavaScript, 13 lines, shown below) |
+
+**Code:**
+
+```javascript
+const cfg = $('⚙️ Config').first().json;
+const issues = $input.all().map(i => i.json).filter(j => j && j.key);
+const days = d => Math.floor((Date.now() - Date.parse(d)) / 86400000);
+const rows = issues.map(i => {
+  const f = i.fields || {};
+  return { key: i.key, summary: f.summary, assignee: f.assignee?.displayName || 'Unassigned', status: f.status?.name, days: days(f.updated) };
+}).sort((a, b) => b.days - a.days);
+const tr = rows.map(r => `<tr><td><a href="${cfg.jira_base_url}/browse/${r.key}">${r.key}</a></td><td>${r.summary}</td><td>${r.assignee}</td><td>${r.status}</td><td style="color:${r.days > 7 ? 'red' : 'inherit'}">${r.days}</td></tr>`).join('');
+const byPerson = rows.reduce((m, r) => (m[r.assignee] = (m[r.assignee] || 0) + 1, m), {});
+const summary = Object.entries(byPerson).map(([p, n]) => `${p}: ${n}`).join(' · ');
+return [{ json: { count: rows.length,
+  subject: rows.length ? `⚠️ ${rows.length} stale stories in ${cfg.project_key}` : `✅ No stale stories in ${cfg.project_key}`,
+  html: rows.length ? `<p>${summary}</p><table border=1 cellpadding=6 style="border-collapse:collapse"><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>Status</th><th>Days idle</th></tr>${tr}</table>` : '<p>Everything moved in the last few days. 🎉</p>' } }];
+```
 
 </details>
 
