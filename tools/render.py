@@ -250,3 +250,109 @@ def mermaid(wf):
         L.append(f"  classDef {c} fill:{fill},stroke:{stroke},stroke-width:2px,color:#1F2937")
     L.append("```")
     return "\n".join(L)
+
+
+# ---------------------------------------------------------------- System-context diagram
+from urllib.parse import urlparse
+
+TRIGGER_ACTOR = {
+    "manualTrigger": ("You (manual run)", "person", "starts"), "scheduleTrigger": ("⏰ Schedule", "time", "fires"),
+    "formTrigger": ("👤 Person filling the form", "person", "form submission"), "webhook": ("🌐 Calling app / service", "ext", "HTTPS POST"),
+    "gmailTrigger": ("📧 Gmail inbox", "saas", "new emails"), "telegramTrigger": ("✈️ Telegram user", "person", "chat message"),
+    "chatTrigger": ("💬 Chat user", "person", "question"), "errorTrigger": ("⚠️ Any failing workflow", "time", "error details"),
+    "executeWorkflowTrigger": ("↗ Calling workflow", "time", "inputs"), "mcpTrigger": ("🤖 AI assistant (MCP client)", "ai", "tool calls"),
+}
+SAAS = {"gmail": "📧 Gmail", "googleSheets": "📊 Google Sheets", "googleDrive": "📁 Google Drive", "googleCalendar": "📅 Google Calendar",
+        "jira": "🧭 Jira", "slack": "💬 Slack", "telegram": "✈️ Telegram"}
+AI_TYPES = {"chainLlm", "agent", "informationExtractor", "textClassifier", "lmChatGoogleGemini", "embeddingsGoogleGemini"}
+
+
+def _host(url):
+    url = str(url or "")
+    if url.startswith("=") and "{{" in url.split("//")[0] + "x":
+        return None
+    try:
+        h = urlparse(url.lstrip("=")).hostname
+    except ValueError:
+        h = None
+    return h if h and "{" not in h else None
+
+
+def _verb(n):
+    s, p = short(n["type"]), n["parameters"]
+    op = p.get("operation", "")
+    if s == "gmail":
+        return {"sendAndWait": "approval request ⇄ decision", "getAll": "searches mailbox", "addLabels": "applies labels",
+                "markAsRead": "marks as read"}.get(op, "creates draft" if p.get("resource") == "draft" else "sends email")
+    if s == "googleSheets":
+        return "reads rows" if op in ("", "read") else "writes rows"
+    if s == "jira":
+        return {"getAll": "JQL search", "update": "updates issues"}.get(op, "creates issues")
+    if s == "googleCalendar":
+        return "reads events" if op == "getAll" else "creates events"
+    return {"googleDrive": "uploads files", "slack": "posts messages", "telegram": "sends messages"}.get(s, "uses")
+
+
+def context_mermaid(wf):
+    nodes = [n for n in wf["nodes"] if "stickyNote" not in n["type"]]
+    left, right = {}, {}          # label -> (class, set(verbs), needs_cred)
+    has_state = False
+    for n in nodes:
+        s, p = short(n["type"]), n["parameters"]
+        if s in TRIGGER_ACTOR:
+            lab, cls, verb = TRIGGER_ACTOR[s]
+            left.setdefault(lab, [cls, set(), s in ("gmailTrigger", "telegramTrigger")])[1].add(verb)
+            continue
+        if "getWorkflowStaticData" in str(p.get("jsCode", "")) or (s == "removeDuplicates" and "PreviousExecutions" in p.get("operation", "")):
+            has_state = True
+        if s == "gmail" and p.get("operation") == "sendAndWait":
+            right.setdefault("🧑 Approver", ["person", set(), False])[1].add("approve / decline")
+            right.setdefault(SAAS["gmail"], ["saas", set(), True])[1].add("approval email")
+        elif s in SAAS:
+            right.setdefault(SAAS[s], ["saas", set(), True])[1].add(_verb(n))
+        elif s in AI_TYPES:
+            what = "text → vectors" if s.startswith("embeddings") else "prompt + data → answer"
+            right.setdefault("✦ Google Gemini", ["ai", set(), True])[1].add(what)
+        elif s in ("httpRequest", "rssFeedRead", "toolHttpRequest"):
+            host = _host(p.get("url"))
+            lab = f"🌐 {host}" if host else "🌐 URLs from data"
+            cred = bool(p.get("authentication"))
+            right.setdefault(lab, ["ext", set(), cred])[1].add("reads feed" if s == "rssFeedRead" else ("agent tool call" if s.startswith("tool") else "HTTPS request"))
+        elif s == "toolSerpApi":
+            right.setdefault("🔍 Google Search (SerpAPI)", ["ext", set(), True])[1].add("agent searches")
+        elif s == "toolWikipedia":
+            right.setdefault("📖 Wikipedia", ["ext", set(), False])[1].add("agent looks up")
+        elif s == "quickChart":
+            right.setdefault("🌐 quickchart.io", ["ext", set(), False])[1].add("data → chart PNG")
+        elif s in ("executeWorkflow", "toolWorkflow"):
+            right.setdefault("↗ Sub-workflow", ["time", set(), False])[1].add("calls with inputs")
+        elif s == "vectorStoreInMemory":
+            has_state = True
+    name = wf["name"].split(" (")[0].replace('"', "'")
+    L = ["```mermaid", "flowchart LR"]
+    ids = {}
+    def nid(label):
+        ids.setdefault(label, f"s{len(ids)}")
+        return ids[label]
+    for lab, (cls, verbs, cred) in left.items():
+        L.append(f'  {nid(lab)}(["{lab}{" 🔑" if cred else ""}"]):::{cls}')
+    L.append(f'  core{{{{"⚙️ n8n workflow<br/><small>{len(nodes)} nodes</small>"}}}}:::n8n')
+    if has_state:
+        L.append('  state[("🗄️ memory<br/>between runs")]:::store')
+        L.append("  core -.- state")
+    for lab, (cls, verbs, cred) in right.items():
+        shape = f'(["{lab}"])' if cls == "person" else f'["{lab}{" 🔑" if cred else ""}"]'
+        L.append(f"  {nid(lab)}{shape}:::{cls}")
+    for lab, (cls, verbs, cred) in left.items():
+        L.append(f'  {nid(lab)} -->|"{" · ".join(sorted(verbs))}"| core')
+    for lab, (cls, verbs, cred) in right.items():
+        arrow = "<-->" if any(v.startswith(("reads", "searches", "JQL", "agent", "HTTPS", "prompt", "text", "approve")) for v in verbs) else "-->"
+        L.append(f'  core {arrow}|"{" · ".join(sorted(verbs))}"| {nid(lab)}')
+    L += ["  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937",
+          "  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937",
+          "  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937",
+          "  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937",
+          "  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937",
+          "  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937",
+          "  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937", "```"]
+    return "\n".join(L)

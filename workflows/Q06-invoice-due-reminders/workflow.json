@@ -61,7 +61,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Columns: invoice_no | client | email | amount | due_date (YYYY-MM-DD) | status (paid/unpaid) | last_reminded\nconst today = new Date().toISOString().slice(0, 10);\nconst daysTo = d => Math.round((Date.parse(d) - Date.parse(today)) / 86400000);\nreturn $input.all().map(i => i.json)\n  .filter(r => String(r.status).toLowerCase() !== 'paid' && r.due_date && r.last_reminded !== today)\n  .map(r => ({ ...r, days: daysTo(r.due_date) }))\n  .filter(r => r.days === 3 || r.days < 0 && (-r.days) % 7 === 1)   // 3 days before, then weekly once overdue\n  .map(r => ({ json: { ...r, stage: r.days >= 0 ? 'upcoming' : 'overdue' } }));"
+        "jsCode": "// Columns: invoice_no | client | email | amount | due_date (YYYY-MM-DD) | status (paid/unpaid) | last_reminded\n// $today follows the workflow timezone. new Date() is UTC-based and is off by a day near midnight.\nconst today = $today.toISODate();\nconst daysTo = d => Math.round(DateTime.fromISO(String(d).slice(0, 10), { zone: $today.zoneName }).diff($today, 'days').days);\nreturn $input.all().map(i => i.json)\n  .filter(r => String(r.status).toLowerCase() !== 'paid' && r.due_date && r.last_reminded !== today)\n  .map(r => ({ ...r, days: daysTo(r.due_date) }))\n  .filter(r => r.days === 3 || r.days < 0 && (-r.days) % 7 === 1)   // 3 days before, then weekly once overdue\n  .map(r => ({ json: { ...r, stage: r.days >= 0 ? 'upcoming' : 'overdue' } }));"
       },
       "id": "ab5f2a49-eec5-5d8c-9d25-048aa447251f",
       "name": "Who Needs a Reminder?",

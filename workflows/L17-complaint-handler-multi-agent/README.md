@@ -2,7 +2,7 @@
 
 # L17 · Customer complaint handler (5 agents)
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 20](https://img.shields.io/badge/nodes-20-7C3AED?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 20](https://img.shields.io/badge/nodes-20-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Support teams spend the first 10 minutes of every complaint just working out what it is. This pipeline classifies it (category, urgency, sentiment), investigates, proposes a resolution and a goodwill gesture, decides whether to escalate, and drafts an empathetic reply.
+
+## 💡 Concept first
+
+**📌 Key idea:** Every agent step returns **validated JSON**, and a fix-model repairs malformed output automatically.
+
+**🧠 Mental model:** A factory line with an inspector after every station, sending faulty parts back for rework.
+
+**🚫 When *not* to use it:** Don't auto-send AI-written customer emails until you've measured accuracy. Add L15's approval step first.
 
 ## 🎯 What you'll learn
 
@@ -19,6 +27,28 @@
 - Designing escalation rules as explicit JSON (`escalate`, `priority`, `route_to`)
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["👤 Person filling the form"]):::person
+  core{{"⚙️ n8n workflow<br/><small>20 nodes</small>"}}:::n8n
+  s1["✦ Google Gemini 🔑"]:::ai
+  s2["📧 Gmail 🔑"]:::saas
+  s0 -->|"form submission"| core
+  core <-->|"prompt + data → answer"| s1
+  core -->|"sends email"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -70,6 +100,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -423,6 +455,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Try an angry high-value complaint (it should escalate) and a mild one (it shouldn't).
 

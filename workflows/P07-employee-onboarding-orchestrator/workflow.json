@@ -145,7 +145,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const f = $('New Joiner Form (HR)').first().json;\nconst at = (h, m) => { const d = new Date(f['Start date']); d.setHours(h, m, 0, 0); return d.toISOString(); };\nreturn [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch with the team', 13, 0, 60], ['1:1 with manager', 16, 0, 30]]\n  .map(([t, h, m, dur]) => ({ json: { title: `${t}: ${f['Full name']}`, start: at(h, m), end: new Date(Date.parse(at(h, m)) + dur * 60000).toISOString(), attendee: f['Manager email'] } }));"
+        "jsCode": "const f = $('New Joiner Form (HR)').first().json;\n// Build times in the workflow timezone so a 10:00 session is 10:00 for the team, not 10:00 UTC.\nconst at = (h, m) => DateTime.fromISO(String(f['Start date']).slice(0, 10), { zone: $now.zoneName }).set({ hour: h, minute: m }).toISO();\nreturn [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch with the team', 13, 0, 60], ['1:1 with manager', 16, 0, 30]]\n  .map(([t, h, m, dur]) => ({ json: { title: `${t}: ${f['Full name']}`, start: at(h, m), end: DateTime.fromISO(at(h, m)).plus({ minutes: dur }).toISO(), attendee: f['Manager email'] } }));"
       },
       "id": "344c582a-8f5f-56e1-81fe-80c3b685aae6",
       "name": "Day-1 Sessions",

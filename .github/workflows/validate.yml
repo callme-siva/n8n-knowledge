@@ -8,3 +8,25 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: python3 tools/validate.py
+
+  e2e:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: Cache n8n
+        uses: actions/cache@v4
+        with:
+          path: ~/n8n/node_modules
+          key: n8n-2.40.5-${{ runner.os }}
+      - name: Install n8n 2.40.5
+        run: mkdir -p ~/n8n && cd ~/n8n && ( [ -x node_modules/.bin/n8n ] || (npm init -y >/dev/null && npm i n8n@2.40.5 --no-audit --no-fund --loglevel=error) )
+      - name: Check nodes, parameters and option values against n8n
+        run: cd ~/n8n && node $GITHUB_WORKSPACE/tools/check-nodes.js $GITHUB_WORKSPACE/workflows/*/workflow.json
+      - name: Execute every workflow end-to-end
+        run: N8N_DIR=$HOME/n8n python3 tests/harness.py

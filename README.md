@@ -7,7 +7,7 @@
 ![workflows](https://img.shields.io/badge/workflows-42-7C3AED?style=flat-square)
 ![n8n](https://img.shields.io/badge/tested_on-n8n_2.40-EA4B71?style=flat-square)
 ![AI](https://img.shields.io/badge/AI-Gemini_free_tier-4285F4?style=flat-square)
-![CI](https://img.shields.io/badge/CI-validated-2EA44F?style=flat-square)
+[![CI](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml/badge.svg)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 ![license](https://img.shields.io/badge/license-MIT-334155?style=flat-square)
 
 **Learn n8n by building 42 real workflows: a 22-lesson core path, 8 quick wins, and 12 production-grade projects companies actually run.**
@@ -56,8 +56,8 @@ Google Gemini free tier, free public APIs and free tiers of Google, Jira and Git
 </td>
 <td valign="top">
 
-### ✅ Verified
-Every workflow is checked against a real n8n install, and CI blocks credentials and personal data.
+### ✅ Tested end-to-end
+Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, and blocks leaked credentials, personal data and unauthenticated webhooks.
 
 </td>
 </tr>
@@ -103,7 +103,7 @@ Every workflow is checked against a real n8n install, and CI blocks credentials 
 | **L06** | [Gmail PDF attachments → Google Drive](workflows/L06-gmail-pdf-to-drive/README.md) | Admin / finance | Gmail Trigger · Working with binary data | 20 min |
 | **L07** | [Lead capture form → Sheets → welcome email](workflows/L07-lead-capture-sheets/README.md) | Sales / marketing | n8n Form Trigger · Cleaning input | 20 min |
 | **L08** | [Daily stale Jira stories report](workflows/L08-jira-stale-stories/README.md) | Agile / Scrum | Jira Software node + JQL queries · Cron expression for weekdays only | 20 min |
-| **L09** | [Expense logger API with Webhook](workflows/L09-webhook-expense-api/README.md) | Finance / developer | Webhook node · Respond to Webhook for custom status codes | 25 min |
+| **L09** | [Expense logger API with Webhook](workflows/L09-webhook-expense-api/README.md) | Finance / developer | Webhook node · Header Auth | 25 min |
 | **L10** | [Bug report form → Jira issue](workflows/L10-form-bug-report-jira/README.md) | Agile / product support | Form fields with dropdowns and validation · Mapping business language to system values | 20 min |
 
 ### 🟠 Level 3 · AI
@@ -263,11 +263,12 @@ Every workflow is checked against a real n8n install, and CI blocks credentials 
 | Production-grade projects | a few | rarely | ✅ 12 (approvals, sync, incidents, MCP, PII) |
 | Explains *why* | ❌ | ✅ in video | ✅ written + on canvas |
 | Build-it-yourself steps | ❌ | ✅ | ✅ |
-| Architecture diagram per workflow | ❌ | ❌ | ✅ |
+| Concept-first + system-context architecture per workflow | ❌ | ❌ | ✅ |
+| Design decisions & trade-offs | ❌ | rarely | ✅ all 12 projects |
 | Test data + test checklist | ❌ | sometimes | ✅ |
 | Troubleshooting per workflow | ❌ | ❌ | ✅ |
 | Production practices | rarely | rarely | ✅ |
-| Verified against real n8n | ❌ | n/a | ✅ |
+| Every workflow executed in CI | ❌ | n/a | ✅ 44 workflows · 61 behaviour checks |
 
 If you want *any* template for a niche app, the big collections are great. This repo is for **learning to design workflows yourself**.
 
@@ -283,7 +284,7 @@ If you want *any* template for a niche app, the big collections are great. This 
 | 🏗️ [Architecture](docs/architecture.md) | Platform, AI blocks, RAG, multi-agent, reliability, deployment |
 | 🧬 [Workflow anatomy](docs/workflow-anatomy.md) | Every property inside a workflow.json, plus an expressions cheat sheet |
 | 🧯 [Common mistakes](docs/common-mistakes.md) | 40+ mistakes with fixes, a debugging flowchart and a pre-flight checklist |
-| 🧪 [Testing](docs/testing.md) | Test in the editor, validate, check against real n8n |
+| 🧪 [Testing](docs/testing.md) · [E2E tests](tests/README.md) | Test in the editor, validate, and the automated end-to-end harness |
 | 🧾 [Sample data](docs/sample-data.md) | Made-up inputs for every AI lesson |
 
 <details>

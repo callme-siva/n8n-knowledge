@@ -2,7 +2,7 @@
 
 # Q07 · Gmail AI auto-labeler
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Productivity / support](https://img.shields.io/badge/domain-Productivity_/_support-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Productivity / support](https://img.shields.io/badge/domain-Productivity_/_support-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** A shared inbox (support@, info@) mixes invoices, customer problems, sales enquiries and noise. Labelling them automatically means each person only looks at their own label, and nothing gets missed or sent by mistake because the AI only *labels*.
+
+## 💡 Concept first
+
+**📌 Key idea:** The **Text Classifier** routes each item to one output per category; category descriptions are the prompt.
+
+**🧠 Mental model:** A mail-room clerk sorting envelopes into pigeonholes by reading the first few lines.
+
+**🚫 When *not* to use it:** Don't let a classifier *act* (reply, delete) at first. Label only, then measure accuracy.
 
 ## 🎯 What you'll learn
 
@@ -19,6 +27,28 @@
 - A marker label (`ai-labeled`) so each email is processed once
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["📧 Gmail inbox 🔑"]):::saas
+  core{{"⚙️ n8n workflow<br/><small>8 nodes</small>"}}:::n8n
+  s1["✦ Google Gemini 🔑"]:::ai
+  s2["📧 Gmail 🔑"]:::saas
+  s0 -->|"new emails"| core
+  core <-->|"prompt + data → answer"| s1
+  core -->|"applies labels"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -46,6 +76,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -200,6 +232,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 3/7 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Send yourself test emails: a fake invoice, a "your app is broken", a "can I get pricing?". Check the labels.
 

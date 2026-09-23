@@ -413,12 +413,13 @@ def L20(root):
         "sheetName": {"__rl": True, "mode": "name", "value": "Team"}, "options": {}}, (220, 0))
     w.add("Who Celebrates Today?", "code", 2, {"jsCode":
         "// Sheet columns: name | email | birthday (YYYY-MM-DD) | joined (YYYY-MM-DD)\n"
-        "const today = new Date(); const md = d => d && d.slice(5, 10);\n"
-        "const tmd = today.toISOString().slice(5, 10);\n"
+        "// $today follows the workflow timezone (Settings → Timezone), unlike new Date() which is UTC-based.\n"
+        "const md = d => d && d.slice(5, 10);\n"
+        "const tmd = $today.toFormat('MM-dd');\n"
         "const out = [];\n"
         "for (const { json: p } of $input.all()) {\n"
         "  if (md(p.birthday) === tmd) out.push({ json: { to: p.email, title: `Happy birthday, ${p.name}! 🎂`, body_html: `<p>Wishing you a fantastic year ahead, ${p.name}. Cake is on the team today!</p>`, cta_text: '', cta_url: '' } });\n"
-        "  if (md(p.joined) === tmd) { const yrs = today.getFullYear() - Number(p.joined.slice(0, 4));\n"
+        "  if (md(p.joined) === tmd) { const yrs = $today.year - Number(p.joined.slice(0, 4));\n"
         "    if (yrs > 0) out.push({ json: { to: p.email, title: `Happy ${yrs}-year work anniversary, ${p.name}! 🎉`, body_html: `<p>Thank you for ${yrs} great year${yrs > 1 ? 's' : ''} with us.</p>`, cta_text: '', cta_url: '' } }); }\n"
         "}\n"
         "return out;"}, (440, 0))

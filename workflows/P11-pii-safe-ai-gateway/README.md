@@ -2,7 +2,7 @@
 
 # P11 · PII-safe AI gateway
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Security / compliance / platform](https://img.shields.io/badge/domain-Security_/_compliance_/_platform-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Security / compliance / platform](https://img.shields.io/badge/domain-Security_/_compliance_/_platform-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) ![e2e test: passed · 6 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_6_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Staff paste customer data into AI tools every day: emails, phone numbers, Aadhaar, card numbers. That's a real compliance risk (India's **DPDP Act 2023**, GDPR, PCI-DSS). Companies solve it with an internal **AI gateway**: one authenticated endpoint that strips personal data before it reaches the model, blocks obvious prompt-injection, and logs every request **without** storing the raw PII.
+
+## 💡 Concept first
+
+**📌 Key idea:** An **AI gateway** minimises data: redact PII before the model sees it, block obvious abuse, log without raw PII.
+
+**🧠 Mental model:** Posting a letter with the address blacked out. The courier (model) can still deliver the message, but can't read who it's for.
+
+**🚫 When *not* to use it:** Don't rely on keyword injection filters alone. They're a first layer, not a security boundary.
 
 ## 🎯 What you'll learn
 
@@ -21,6 +29,28 @@
 - Audit logging that stays compliant: redacted text plus counts only
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["🌐 Calling app / service"]):::ext
+  core{{"⚙️ n8n workflow<br/><small>10 nodes</small>"}}:::n8n
+  s1["✦ Google Gemini 🔑"]:::ai
+  s2["📊 Google Sheets 🔑"]:::saas
+  s0 -->|"HTTPS POST"| core
+  core <-->|"prompt + data → answer"| s1
+  core -->|"writes rows"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -54,6 +84,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -63,6 +95,17 @@ POST /ai/ask (header auth) → Redact PII → Injection screen → blocked?
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| Redact with **reversible tokens** (`[EMAIL_1]`) | The model never sees raw PII, yet the caller gets a usable answer | The token map lives only in the execution; don't log it |
+| Luhn-check card numbers before redacting | Cuts false positives on long IDs and phone-like numbers | Other identifiers (names, addresses) need NER models |
+| Keyword injection screen → 403 | Blocks the laziest attacks cheaply | Easy to bypass; it's a first layer, not a boundary |
+| Audit only redacted text + PII counts | Compliance evidence without creating a new PII store | Harder to debug a specific user's issue (by design) |
 
 ## 🔑 Credentials
 
@@ -257,6 +300,9 @@ return { json: { answer, user: src.user, counts: src.counts, redacted_prompt: sr
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 9/9 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 6 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] ```bash
 curl -X POST https://<n8n>/webhook/ai/ask -H 'X-API-Key: <key>' -H 'Content-Type: application/json' -d '{"user":"asha","text":"Draft a polite reply to Rahul (rahul@example.com, 9876543210) about refund to card 4111 1111 1111 1111"}'

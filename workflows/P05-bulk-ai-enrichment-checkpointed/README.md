@@ -2,7 +2,7 @@
 
 # P05 · Bulk AI enrichment with batches and checkpoints
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales ops / data](https://img.shields.io/badge/domain-Sales_ops_/_data-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales ops / data](https://img.shields.io/badge/domain-Sales_ops_/_data-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Real data jobs are big: 5,000 leads to score, 20,000 products to categorise, 3,000 tickets to tag. Beginners send them all at once, hit rate limits, crash halfway, and can't tell which rows were done. Professionals use **batches, a pause between them, per-row error handling and a status column as a checkpoint**, so a run can stop at any point and resume safely.
+
+## 💡 Concept first
+
+**📌 Key idea:** Process big lists with **batches + checkpoints + rate limits**, so any run can stop and resume safely.
+
+**🧠 Mental model:** Marking exam papers in piles of ten, ticking each one, so a fire drill doesn't make you start over.
+
+**🚫 When *not* to use it:** Don't read the summary from `$('node').all()` inside loops (it's the last batch only). Use the loop's done output.
 
 ## 🎯 What you'll learn
 
@@ -21,6 +29,28 @@
 - Idempotent re-runs: only pending rows are read
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["You (manual run)"]):::person
+  core{{"⚙️ n8n workflow<br/><small>11 nodes</small>"}}:::n8n
+  s1["📊 Google Sheets 🔑"]:::saas
+  s2["✦ Google Gemini 🔑"]:::ai
+  s0 -->|"starts"| core
+  core <-->|"reads rows · writes rows"| s1
+  core <-->|"prompt + data → answer"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -57,6 +87,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -66,6 +98,18 @@ Trigger → Sheets (status = pending) → Limit 500 → Loop (10) ─ loop → I
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| Read only `status = pending` rows | Makes every run **resumable** and idempotent | The status column is critical; protect it from manual edits |
+| Batches of 10 + a 2 s wait | Stays under API rate limits and keeps memory flat | Slower than full speed. Tune the batch size to your API tier |
+| Per-row error output → `status = error` with reason | One bad row never stops the other 999 | Errors need a periodic review and re-queue |
+| Limit 500 per run | Caps cost and runtime of a single execution | Big lists take several runs (schedule it nightly) |
+| Summary counts from the loop's **done** output | `$('node').all()` inside a loop returns only the last batch (a real bug we caught in testing) | None; this is simply the correct way |
 
 ## 🔑 Credentials
 
@@ -94,6 +138,7 @@ Nodes that need a credential selected after import: **Google Gemini Chat Model**
 2. Import it and connect the credentials.
 3. Run it. Watch the sheet fill in batch by batch.
 4. Stop the execution halfway, then run again. It continues with the remaining pending rows only.
+5. Check the *Summary* node: `processed`, `done` and `errors` should add up to the rows you fed in.
 
 ## 🔍 Node-by-node reference
 
@@ -243,13 +288,16 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 2 lines, shown below) |
+| `jsCode` | (JavaScript, 5 lines, shown below) |
 
 **Code:**
 
 ```javascript
-const n = $('Checkpoint to Sheet').all().length;
-return [{ json: { processed: n, finished_at: new Date().toISOString(), note: 'Re-run to continue with remaining pending rows.' } }];
+// The loop's *done* output carries every item from every batch.
+// (Careful: $('Checkpoint to Sheet').all() would only return the LAST batch.)
+const rows = $input.all().map(i => i.json);
+const errors = rows.filter(r => r.status === 'error').length;
+return [{ json: { processed: rows.length, done: rows.length - errors, errors, finished_at: $now.toISO(), note: 'Re-run to continue with remaining pending rows.' } }];
 ```
 
 </details>
@@ -259,11 +307,20 @@ return [{ json: { processed: n, finished_at: new Date().toISOString(), note: 'Re
 
 ## ✅ Test it
 
+> [!TIP]
+> **Automated end-to-end test: passed.** 9/10 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
+
 - [ ] Break one row on purpose (empty description) → `status = error` with a reason, and the rest continue.
 
 ## 🧯 Troubleshooting
 
 Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
+
+<details><summary><b>Summary shows only the last batch's count</b></summary>
+
+Inside loops, `$('Node').all()` returns the node's **last run** only. Count from the loop's *done* output (`$input.all()`), as this workflow does.
+
+</details>
 
 <details><summary><b>Loop runs forever</b></summary>
 

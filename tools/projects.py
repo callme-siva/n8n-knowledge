@@ -7,7 +7,7 @@ CFG = "$('⚙️ Config').item.json"
 
 def P01(root):
     w = WF("P01-invoice-processing-pipeline", "P01 · Accounts-payable invoice pipeline (extract → validate → dedupe → approve → ledger)")
-    w.note("## 🧾 P01 · Accounts payable, automated\nPDF invoices arrive by email → text extracted → **Gemini extracts fields** → **maths & GSTIN validated in code** → duplicates blocked → big invoices need **human approval** → ledger row + Drive archive. Bad ones go to an Exceptions sheet.", (0, 0), 560)
+    w.note("## 🧾 P01 · Accounts payable, automated\nPDF invoices arrive by email → text extracted → **Gemini extracts fields** → **maths & GSTIN validated in code** → duplicates blocked → big invoices need **human approval** → ledger row. Bad ones go to an Exceptions sheet.", (0, 0), 560)
     w.add("Invoice Email", "gmailTrigger", 1.2, {"pollTimes": {"item": [{"mode": "everyX", "value": 10, "unit": "minutes"}]}, "simple": False,
         "filters": {"q": "has:attachment filename:pdf label:invoices", "readStatus": "unread"},
         "options": {"downloadAttachments": True, "dataPropertyAttachmentsPrefixName": "attachment_"}}, (0, 0))
@@ -138,7 +138,7 @@ def P02(root):
 def P03(root):
     w = WF("P03-incident-response-orchestrator", "P03 · Incident response orchestrator (alerts → dedupe → Jira + Slack → AI postmortem)")
     w.note("## 🚨 P03 · From alert storm to one incident\nReceives Alertmanager/Grafana-style webhooks. Groups repeats by **fingerprint** (state kept between runs), opens **one** Jira incident per problem, pages on critical, suppresses repeats, and on *resolved* closes the loop with an **AI postmortem draft**.", (0, 0), 580)
-    w.add("POST /alerts", "webhook", 2, {"httpMethod": "POST", "path": "alerts", "responseMode": "onReceived", "options": {}}, (0, 0))
+    w.add("POST /alerts", "webhook", 2, {"httpMethod": "POST", "path": "alerts", "authentication": "headerAuth", "responseMode": "onReceived", "options": {}}, (0, 0))
     w.add("One Item per Alert", "splitOut", 1, {"fieldToSplitOut": "body.alerts", "options": {}}, (200, 0))
     w.add("Decide Action", "code", 2, {"jsCode":
         "// Alertmanager payload: alerts[] { status, fingerprint, labels{alertname,severity,service}, annotations{summary,description}, startsAt, endsAt }\n"
@@ -184,15 +184,16 @@ def P03(root):
     w.chain("Draft Postmortem", "Post Postmortem Draft"); w.ai("Gemini", "Draft Postmortem", "ai_languageModel")
     write(root, w, readme("P03", "Incident response orchestrator", P, "SRE / DevOps / IT ops", "60 min",
         "When production breaks, monitoring fires the same alert every minute and on-call engineers drown in noise. Mature SRE teams use an orchestrator that **deduplicates alerts into one incident**, pages only for critical problems, keeps Slack and Jira in sync, and makes writing the postmortem easy. This is a small, understandable version of what PagerDuty and incident.io do.",
-        ["Receiving real monitoring webhooks (Alertmanager / Grafana format)", "**Split Out** a batch payload into items",
+        ["Receiving real monitoring webhooks (Alertmanager / Grafana format) **with Header Auth**, since anyone who can post fake alerts can page your on-call", "**Split Out** a batch payload into items",
          "**Stateful deduplication by fingerprint** with workflow static data", "A severity-based action matrix in a Switch (page / notify / resolve / suppress)",
          "Storing the Jira key so the resolve event can refer back to it", "AI **postmortem draft** with strict \"no invented facts\" rules"],
         "Webhook /alerts → Split Out alerts → Code (state by fingerprint → action) → Switch\n  ├ page     → Jira incident → remember key → email on-call + Slack\n  ├ notify   → Slack\n  ├ resolved → LLM postmortem draft ⇐ Gemini → Slack\n  └ repeat   → suppress",
-        ["Jira Software Cloud API token", "Slack API", "Gmail OAuth2", "Google Gemini API key"],
+        ["Header Auth credential (e.g. `Authorization: Bearer <long random>`)", "Jira Software Cloud API token", "Slack API", "Gmail OAuth2", "Google Gemini API key"],
         ["Import it and set the Jira project and issue-type IDs (an *Incident* or *Bug* type).",
+         "Create a **Header Auth** credential on the webhook. Alertmanager: `http_config.authorization.credentials`; Grafana contact point: *Authorization header*.",
          "**Activate** it (static data and production webhooks need an active workflow).",
          "Point Alertmanager (`webhook_configs.url`) or a Grafana contact point at `https://<n8n>/webhook/alerts`, or simulate one with curl (below)."],
-        ["```bash\ncurl -X POST https://<n8n>/webhook/alerts -H 'Content-Type: application/json' -d '{\"alerts\":[{\"status\":\"firing\",\"fingerprint\":\"abc\",\"labels\":{\"alertname\":\"HighErrorRate\",\"severity\":\"critical\",\"service\":\"payments\"},\"annotations\":{\"summary\":\"5xx > 5% for 5m\"},\"startsAt\":\"2026-09-23T10:00:00Z\"}]}'\n```",
+        ["```bash\ncurl -X POST https://<n8n>/webhook/alerts -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"alerts\":[{\"status\":\"firing\",\"fingerprint\":\"abc\",\"labels\":{\"alertname\":\"HighErrorRate\",\"severity\":\"critical\",\"service\":\"payments\"},\"annotations\":{\"summary\":\"5xx > 5% for 5m\"},\"startsAt\":\"2026-09-23T10:00:00Z\"}]}'\n```",
          "Send the same payload 3 times: only **one** Jira issue and one page.",
          "Send it again with `\"status\":\"resolved\"` and `\"endsAt\"`: you should get a postmortem draft in Slack."],
         [("Every alert creates a new incident", "The workflow isn't active (static data isn't saved in manual runs), or the fingerprint changes between sends."),
@@ -279,7 +280,12 @@ def P05(root):
     w.add("Mark Error", "set", 3.4, assign(row_id="={{ $('Loop in Batches of 10').item.json.row_id }}", status="error", reason="={{ $json.error?.message || 'unknown error' }}", processed_at="={{ $now.toISO() }}"), (1080, 80))
     w.add("Checkpoint to Sheet", "googleSheets", 4.5, sheet_upsert("Companies", "row_id"), (1300, 0))
     w.add("Pause 2s (rate limit)", "wait", 1.1, {"resume": "timeInterval", "amount": 2, "unit": "seconds"}, (1500, 0))
-    w.add("Summary", "code", 2, {"jsCode": "const n = $('Checkpoint to Sheet').all().length;\nreturn [{ json: { processed: n, finished_at: new Date().toISOString(), note: 'Re-run to continue with remaining pending rows.' } }];"}, (840, -300))
+    w.add("Summary", "code", 2, {"jsCode":
+        "// The loop's *done* output carries every item from every batch.\n"
+        "// (Careful: $('Checkpoint to Sheet').all() would only return the LAST batch.)\n"
+        "const rows = $input.all().map(i => i.json);\n"
+        "const errors = rows.filter(r => r.status === 'error').length;\n"
+        "return [{ json: { processed: rows.length, done: rows.length - errors, errors, finished_at: $now.toISO(), note: 'Re-run to continue with remaining pending rows.' } }];"}, (840, -300))
     w.chain("Run Manually or Nightly", "Pending Rows Only", "Max 500 per Run", "Loop in Batches of 10")
     w.link("Loop in Batches of 10", "Summary", 0); w.link("Loop in Batches of 10", "Classify Company", 1)
     w.link("Classify Company", "Mark Done", 0); w.link("Classify Company", "Mark Error", 1)
@@ -295,9 +301,11 @@ def P05(root):
         ["Google Sheets OAuth2 (tab `Companies`: row_id, company, website, description, status, industry, b2b, icp_score, reason, processed_at)", "Google Gemini API key"],
         ["Create `Companies` with 50+ rows and `status = pending` (a unique `row_id` per row, e.g. `=ROW()` pasted as values).",
          "Import it and connect the credentials.", "Run it. Watch the sheet fill in batch by batch.",
-         "Stop the execution halfway, then run again. It continues with the remaining pending rows only."],
+         "Stop the execution halfway, then run again. It continues with the remaining pending rows only.",
+         "Check the *Summary* node: `processed`, `done` and `errors` should add up to the rows you fed in."],
         ["Break one row on purpose (empty description) → `status = error` with a reason, and the rest continue."],
-        [("Loop runs forever", "The last node must connect back into **Loop Over Items**, and *Pending Rows Only* must not be inside the loop."),
+        [("Summary shows only the last batch's count", "Inside loops, `$('Node').all()` returns the node's **last run** only. Count from the loop's *done* output (`$input.all()`), as this workflow does."),
+         ("Loop runs forever", "The last node must connect back into **Loop Over Items**, and *Pending Rows Only* must not be inside the loop."),
          ("429 errors from Gemini", "Increase the Wait, lower the batch size, or use a paid tier. Retries (3 × 5 s) are already on."),
          ("Wrong rows updated", "`row_id` must be unique and must be the upsert *matching column*.")],
         ["Run it nightly with a Schedule Trigger.", "Send a Slack summary when all rows are done.", "Swap the sheet for Postgres for 100k+ rows."]))
@@ -313,7 +321,7 @@ def P06(root):
     w.add("⚙️ Config", "set", 3.4, assign(finance_email=EMAIL, finance_threshold=100000), (200, 0))
     w.add("Create Request", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "const f = $('Purchase Request Form').item.json;\n"
-        "const id = 'PR-' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();\n"
+        "const id = 'PR-' + $today.toFormat('yyMMdd') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();\n"
         "return { json: { request_id: id, requester: f['Your email'], manager: f['Manager email'], item: f['Item / service'], amount: Number(f['Amount (INR)']),\n"
         "  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: new Date().toISOString() } };"}, (400, 0))
     w.add("Audit: Created", "googleSheets", 4.5, sheet_upsert("Requests", "request_id"), (600, 0))
@@ -372,9 +380,10 @@ def P07(root):
     w.add("Collect Jira Keys", "aggregate", 1, {"aggregate": "aggregateIndividualFields", "fieldsToAggregate": {"fieldToAggregate": [{"fieldToAggregate": "key"}]}, "options": {}}, (660, -140))
     w.add("Day-1 Sessions", "code", 2, {"jsCode":
         "const f = $('New Joiner Form (HR)').first().json;\n"
-        "const at = (h, m) => { const d = new Date(f['Start date']); d.setHours(h, m, 0, 0); return d.toISOString(); };\n"
+        "// Build times in the workflow timezone so a 10:00 session is 10:00 for the team, not 10:00 UTC.\n"
+        "const at = (h, m) => DateTime.fromISO(String(f['Start date']).slice(0, 10), { zone: $now.zoneName }).set({ hour: h, minute: m }).toISO();\n"
         "return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch with the team', 13, 0, 60], ['1:1 with manager', 16, 0, 30]]\n"
-        "  .map(([t, h, m, dur]) => ({ json: { title: `${t}: ${f['Full name']}`, start: at(h, m), end: new Date(Date.parse(at(h, m)) + dur * 60000).toISOString(), attendee: f['Manager email'] } }));"}, (440, 120))
+        "  .map(([t, h, m, dur]) => ({ json: { title: `${t}: ${f['Full name']}`, start: at(h, m), end: DateTime.fromISO(at(h, m)).plus({ minutes: dur }).toISO(), attendee: f['Manager email'] } }));"}, (440, 120))
     w.add("Book Calendar Event", "googleCalendar", 1.3, {"calendar": {"__rl": True, "mode": "id", "value": "primary"}, "start": "={{ $json.start }}", "end": "={{ $json.end }}",
         "additionalFields": {"summary": "={{ $json.title }}", "attendees": ["={{ $json.attendee }}"]}}, (660, 120))
     w.add("Collect Events", "aggregate", 1, {"aggregate": "aggregateIndividualFields", "fieldsToAggregate": {"fieldToAggregate": [{"fieldToAggregate": "htmlLink"}]}, "options": {}}, (880, 120))

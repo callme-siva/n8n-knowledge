@@ -62,7 +62,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Sheet columns: date (YYYY-MM-DD) | revenue | orders\nconst weekKey = d => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.toISOString().slice(0, 10); };\nconst weeks = {};\nfor (const { json: r } of $input.all()) { if (!r.date) continue; const k = weekKey(r.date); weeks[k] ??= { revenue: 0, orders: 0 }; weeks[k].revenue += Number(r.revenue) || 0; weeks[k].orders += Number(r.orders) || 0; }\nconst keys = Object.keys(weeks).sort().slice(-8);\nconst rev = keys.map(k => Math.round(weeks[k].revenue));\nconst last = rev.at(-1) || 0, prev = rev.at(-2) || 0;\nconst change = prev ? Math.round((last - prev) / prev * 1000) / 10 : 0;\nreturn [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, change } }];"
+        "jsCode": "// Sheet columns: date (YYYY-MM-DD) | revenue | orders\nconst weekKey = d => DateTime.fromISO(String(d).slice(0, 10), { zone: 'utc' }).startOf('week').toISODate();  // Monday of that week\nconst weeks = {};\nfor (const { json: r } of $input.all()) { if (!r.date) continue; const k = weekKey(r.date); weeks[k] ??= { revenue: 0, orders: 0 }; weeks[k].revenue += Number(r.revenue) || 0; weeks[k].orders += Number(r.orders) || 0; }\nconst keys = Object.keys(weeks).sort().slice(-8);\nconst rev = keys.map(k => Math.round(weeks[k].revenue));\nconst last = rev.at(-1) || 0, prev = rev.at(-2) || 0;\nconst change = prev ? Math.round((last - prev) / prev * 1000) / 10 : 0;\nreturn [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, change } }];"
       },
       "id": "4985390a-0deb-5388-829a-cffc67f333a7",
       "name": "Group by Week",

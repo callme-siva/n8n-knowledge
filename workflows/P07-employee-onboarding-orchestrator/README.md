@@ -2,7 +2,7 @@
 
 # P07 · Employee onboarding orchestrator
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: HR / people ops / IT](https://img.shields.io/badge/domain-HR_/_people_ops_/_IT-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: HR / people ops / IT](https://img.shields.io/badge/domain-HR_/_people_ops_/_IT-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** A bad first day (no laptop, no accounts, nobody expecting you) is the number-one cause of early attrition. Onboarding touches HR, IT, the manager and the team, so it's a classic **orchestration** problem: one trigger fans out to many systems, and a summary brings it back together.
+
+## 💡 Concept first
+
+**📌 Key idea:** **Fan-out / fan-in**: one trigger starts parallel branches; Merge waits for all of them before the summary.
+
+**🧠 Mental model:** A wedding planner who calls caterer, florist and venue in parallel, then confirms with the couple once all say yes.
+
+**🚫 When *not* to use it:** Don't Merge branches that may produce 0 items. Aggregate first, so each branch returns exactly one item.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,32 @@
 - Referring to the trigger from anywhere with `$('…').first()`
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["👤 Person filling the form"]):::person
+  core{{"⚙️ n8n workflow<br/><small>11 nodes</small>"}}:::n8n
+  s1["🧭 Jira 🔑"]:::saas
+  s2["📅 Google Calendar 🔑"]:::saas
+  s3["📧 Gmail 🔑"]:::saas
+  s4["💬 Slack 🔑"]:::saas
+  s0 -->|"form submission"| core
+  core -->|"creates issues"| s1
+  core -->|"creates events"| s2
+  core -->|"sends email"| s3
+  core -->|"posts messages"| s4
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -55,6 +89,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -64,6 +100,17 @@ HR form ─┬→ Build checklist (role-based) → Jira create ×N → aggregate
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| Checklist generated from data (common + per-role tasks) | HR edits a list, not a workflow; new roles are one line | Lives in code for now; a sheet makes it fully no-code |
+| Two parallel branches joined by Merge (combine by position) | Jira and Calendar don't depend on each other, so run them in parallel | Each branch must output exactly one item (hence Aggregate) |
+| Welcome email **after** tasks and events exist | The summary can include real links, and nothing is announced that failed | If Jira is down, the welcome waits. Add Retry on Fail and the error workflow |
+| Session times built in the workflow timezone | 10:00 must mean 10:00 for the team, not UTC | Distributed teams need per-person timezones |
 
 ## 🔑 Credentials
 
@@ -161,15 +208,16 @@ return [...common, ...(byRole[f.Role] || [])].map(([owner, task]) => ({ json: { 
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 4 lines, shown below) |
+| `jsCode` | (JavaScript, 5 lines, shown below) |
 
 **Code:**
 
 ```javascript
 const f = $('New Joiner Form (HR)').first().json;
-const at = (h, m) => { const d = new Date(f['Start date']); d.setHours(h, m, 0, 0); return d.toISOString(); };
+// Build times in the workflow timezone so a 10:00 session is 10:00 for the team, not 10:00 UTC.
+const at = (h, m) => DateTime.fromISO(String(f['Start date']).slice(0, 10), { zone: $now.zoneName }).set({ hour: h, minute: m }).toISO();
 return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch with the team', 13, 0, 60], ['1:1 with manager', 16, 0, 30]]
-  .map(([t, h, m, dur]) => ({ json: { title: `${t}: ${f['Full name']}`, start: at(h, m), end: new Date(Date.parse(at(h, m)) + dur * 60000).toISOString(), attendee: f['Manager email'] } }));
+  .map(([t, h, m, dur]) => ({ json: { title: `${t}: ${f['Full name']}`, start: at(h, m), end: DateTime.fromISO(at(h, m)).plus({ minutes: dur }).toISO(), attendee: f['Manager email'] } }));
 ```
 
 </details>
@@ -254,6 +302,9 @@ return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 11/11 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] 7 Jira tasks, 4 calendar events, a welcome email, a Slack post and an HR summary.
 - [ ] Try each role and check the checklists differ.

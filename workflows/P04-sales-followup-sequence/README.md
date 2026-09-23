@@ -2,7 +2,7 @@
 
 # P04 · Multi-touch sales follow-up sequence
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** 80% of sales need 5+ touches, but most people follow up once and give up, or keep emailing people who already replied (which is embarrassing). Tools like Outreach and Apollo charge per seat for this. With **Wait nodes** and **reply detection**, n8n runs the whole sequence per lead and stops the moment they reply.
+
+## 💡 Concept first
+
+**📌 Key idea:** **Long-running executions**: Wait nodes pause one lead's journey for days; stop as soon as they reply.
+
+**🧠 Mental model:** A patient salesperson with a follow-up diary who crosses a name off the moment the customer calls back.
+
+**🚫 When *not* to use it:** Don't run multi-day waits on a laptop or SQLite. Use an always-on server with Postgres.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,30 @@
 - Operational reality: long waits need Postgres and an always-on instance
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["👤 Person filling the form"]):::person
+  core{{"⚙️ n8n workflow<br/><small>17 nodes</small>"}}:::n8n
+  s1["📊 Google Sheets 🔑"]:::saas
+  s2["📧 Gmail 🔑"]:::saas
+  s3["💬 Slack 🔑"]:::saas
+  s0 -->|"form submission"| core
+  core -->|"writes rows"| s1
+  core <-->|"searches mailbox · sends email"| s2
+  core -->|"posts messages"| s3
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -66,6 +98,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -75,6 +109,17 @@ Form → Set lead → CRM add → Email 1 → ⏸ 3 days → reply? ─ yes → 
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| One long-running execution per lead, using **Wait** nodes | The whole sequence is readable in one place; state lives in the execution | Needs Postgres + an always-on instance; thousands of waiting executions use DB space |
+| Reply detection by Gmail search (`from:lead after:start`) | No extra tools or tracking pixels needed | Only sees replies to the sending mailbox; misses replies from colleagues' addresses |
+| Separate short branch per stage (`replied_after_email_N`) | No crossing flows, plus you learn which email converts | Slight duplication of the CRM + Slack pair per stage |
+| CRM updates map values inline (append-or-update by email) | Fewer nodes; the row key is explicit | Column names must match the sheet exactly |
 
 ## 🔑 Credentials
 
@@ -396,6 +441,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 13/17 nodes executed in real n8n (12 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Reply → no Email 2, the row shows `replied_after_email_1`, and there's a Slack alert.
 - [ ] Don't reply → you get Email 2, then Email 3, and the row shows `no_reply_closed`.

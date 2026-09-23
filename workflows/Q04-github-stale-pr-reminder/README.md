@@ -2,7 +2,7 @@
 
 # Q04 · Stale pull-request reminder
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Engineering / DevOps](https://img.shields.io/badge/domain-Engineering_/_DevOps-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 6](https://img.shields.io/badge/nodes-6-7C3AED?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Engineering / DevOps](https://img.shields.io/badge/domain-Engineering_/_DevOps-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 6](https://img.shields.io/badge/nodes-6-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Code review is the most common hidden bottleneck in software teams. PRs sit for days and nobody notices until the sprint ends. One daily nudge in the team channel with the owner and reviewers named cuts review time dramatically.
+
+## 💡 Concept first
+
+**📌 Key idea:** Surface **stuck work** where the team already is, with names, so it gets unblocked.
+
+**🧠 Mental model:** A polite colleague who walks the floor at 10 AM asking "who's waiting on a review?".
+
+**🚫 When *not* to use it:** Don't nudge on drafts or weekends. Filter the noise, or people mute the channel.
 
 ## 🎯 What you'll learn
 
@@ -19,6 +27,28 @@
 - Only posting when there's something to say
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>6 nodes</small>"}}:::n8n
+  s1["🌐 api.github.com 🔑"]:::ext
+  s2["💬 Slack 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"HTTPS request"| s1
+  core -->|"posts messages"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -42,6 +72,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -165,6 +197,9 @@ return [{ json: { count: prs.length, text: `:hourglass: *${prs.length} PRs waiti
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 6/6 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Point it at a busy public repo (the default `n8n-io/n8n`) with `stale_days = 1`. You should see a list.
 

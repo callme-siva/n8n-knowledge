@@ -2,7 +2,7 @@
 
 # Q06 · Invoice due & overdue reminders
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Finance / freelancers / SMB](https://img.shields.io/badge/domain-Finance_/_freelancers_/_SMB-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Finance / freelancers / SMB](https://img.shields.io/badge/domain-Finance_/_freelancers_/_SMB-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Freelancers and small businesses lose real money to late payments simply because nobody follows up. A polite, consistent, automatic reminder schedule is one of the highest-ROI automations there is.
+
+## 💡 Concept first
+
+**📌 Key idea:** **State in the sheet** (`last_reminded`) makes a scheduled job safe to run again and again.
+
+**🧠 Mental model:** A ledger where you tick "reminded today", so you never call a client twice in one day.
+
+**🚫 When *not* to use it:** Don't compute "today" with `new Date()` (UTC). Use `$today`, which respects the workflow timezone.
 
 ## 🎯 What you'll learn
 
@@ -19,6 +27,28 @@
 - Preventing duplicates with a `last_reminded` column
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>8 nodes</small>"}}:::n8n
+  s1["📊 Google Sheets 🔑"]:::saas
+  s2["📧 Gmail 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"reads rows · writes rows"| s1
+  core -->|"sends email"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -47,6 +77,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -117,14 +149,15 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 8 lines, shown below) |
+| `jsCode` | (JavaScript, 9 lines, shown below) |
 
 **Code:**
 
 ```javascript
 // Columns: invoice_no | client | email | amount | due_date (YYYY-MM-DD) | status (paid/unpaid) | last_reminded
-const today = new Date().toISOString().slice(0, 10);
-const daysTo = d => Math.round((Date.parse(d) - Date.parse(today)) / 86400000);
+// $today follows the workflow timezone. new Date() is UTC-based and is off by a day near midnight.
+const today = $today.toISODate();
+const daysTo = d => Math.round(DateTime.fromISO(String(d).slice(0, 10), { zone: $today.zoneName }).diff($today, 'days').days);
 return $input.all().map(i => i.json)
   .filter(r => String(r.status).toLowerCase() !== 'paid' && r.due_date && r.last_reminded !== today)
   .map(r => ({ ...r, days: daysTo(r.due_date) }))
@@ -206,6 +239,9 @@ return $input.all().map(i => i.json)
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (4 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Add a row due in exactly 3 days with your own email, then run it. You should get one email, and `last_reminded` should be filled in.
 - [ ] Run again the same day. There should be no second email.

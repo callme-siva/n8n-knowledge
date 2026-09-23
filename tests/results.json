@@ -1,0 +1,719 @@
+{
+  "L01-hello-n8n": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 1,
+    "nodes_ran": 4,
+    "ran": [
+      "Build Greeting",
+      "Send to Yourself",
+      "Set Your Data",
+      "When clicking 'Execute workflow'"
+    ],
+    "real_nodes": 3,
+    "status": "passed"
+  },
+  "L02-daily-weather-email": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 1,
+    "nodes_ran": 4,
+    "ran": [
+      "Email Summary",
+      "Every Morning 7 AM",
+      "Fetch Weather",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 3,
+    "status": "passed"
+  },
+  "L03-job-search-api": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 5,
+    "ran": [
+      "Every Morning 8 AM",
+      "Format Email",
+      "Search Google Jobs",
+      "Send Digest",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 3,
+    "status": "passed"
+  },
+  "L04-currency-alert-switch": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 7,
+    "ran": [
+      "API OK?",
+      "Alert: Rate High",
+      "Every Hour",
+      "Extract Rate",
+      "Get Exchange Rate",
+      "Which Zone?",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 8,
+    "status": "passed"
+  },
+  "L05-rss-news-code-node": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 1,
+    "nodes_ran": 8,
+    "ran": [
+      "Anything New?",
+      "Email Digest",
+      "Every Morning 8 AM",
+      "Filter \u00b7 Dedupe \u00b7 Sort",
+      "Google News \u00b7 AI",
+      "Merge Feeds",
+      "TechCrunch \u00b7 AI",
+      "The Verge \u00b7 AI"
+    ],
+    "real_nodes": 7,
+    "status": "passed"
+  },
+  "L06-gmail-pdf-to-drive": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 4,
+    "ran": [
+      "Mark Email as Read",
+      "New Email with Attachment",
+      "Split PDF Attachments",
+      "Upload to Drive"
+    ],
+    "real_nodes": 1,
+    "status": "passed"
+  },
+  "L07-lead-capture-sheets": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 4,
+    "ran": [
+      "Append to Leads Sheet",
+      "Clean Lead",
+      "Lead Form",
+      "Welcome Email"
+    ],
+    "real_nodes": 1,
+    "status": "passed"
+  },
+  "L08-jira-stale-stories": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 5,
+    "ran": [
+      "Build Report",
+      "Email Scrum Master",
+      "Search Stale Stories",
+      "Weekdays 9 AM",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 3,
+    "status": "passed"
+  },
+  "L09-webhook-expense-api": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 6,
+    "ran": [
+      "201 Created",
+      "Append to Expenses Sheet",
+      "POST /expense",
+      "Prepare Row",
+      "Valid?",
+      "Validate"
+    ],
+    "real_nodes": 5,
+    "status": "passed"
+  },
+  "L10-form-bug-report-jira": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 4,
+    "ran": [
+      "Bug Report Form",
+      "Confirm to Reporter",
+      "Create Jira Bug",
+      "Map Severity \u2192 Priority"
+    ],
+    "real_nodes": 1,
+    "status": "passed"
+  },
+  "L11-ai-news-digest-llm-chain": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 8,
+    "ran": [
+      "Email Briefing",
+      "Every Morning 8 AM",
+      "Filter \u00b7 Dedupe \u00b7 Sort",
+      "Google News \u00b7 AI",
+      "Merge Feeds",
+      "TechCrunch \u00b7 AI",
+      "The Verge \u00b7 AI",
+      "Write Briefing"
+    ],
+    "real_nodes": 6,
+    "status": "passed"
+  },
+  "L12-meeting-transcript-raid-log": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 5,
+    "ran": [
+      "Append RAID to Sheet",
+      "Build RAID Row",
+      "Extract RAID",
+      "Split RAID Items",
+      "Submit Meeting Transcript"
+    ],
+    "real_nodes": 2,
+    "status": "passed"
+  },
+  "L13-rag-policy-chatbot": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 4,
+    "nodes_ran": 2,
+    "ran": [
+      "Store in Vector DB",
+      "Upload Policy PDFs"
+    ],
+    "real_nodes": 0,
+    "status": "passed"
+  },
+  "L14-ai-agent-with-tools": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 2,
+    "ran": [
+      "Assistant Agent",
+      "Chat"
+    ],
+    "real_nodes": 0,
+    "status": "passed"
+  },
+  "L15-retro-ai-approval-jira": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 4,
+    "nodes_ran": 7,
+    "ran": [
+      "Analyze Retro",
+      "Approved?",
+      "Ask Scrum Master",
+      "Build Approval Message",
+      "Create Jira Task",
+      "Restore Items",
+      "Retrospective Form"
+    ],
+    "real_nodes": 4,
+    "status": "passed"
+  },
+  "L16-sprint-report-multi-agent": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 6,
+    "nodes_ran": 10,
+    "ran": [
+      "Backlog Health Agent",
+      "Build GraphQL Request",
+      "Burndown Tracking Agent",
+      "Capacity Planning Agent",
+      "Compute Sprint Metrics",
+      "Config",
+      "Coordinator Agent",
+      "Email Daily Report",
+      "Fetch GitHub Project",
+      "Weekdays 9 AM"
+    ],
+    "real_nodes": 4,
+    "status": "passed"
+  },
+  "L17-complaint-handler-multi-agent": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 7,
+    "nodes_ran": 7,
+    "ran": [
+      "Check Escalation",
+      "Complaint Form",
+      "Determine Resolution",
+      "Draft Response",
+      "Investigate Customer/Order",
+      "Send Response Email",
+      "Understand Complaint"
+    ],
+    "real_nodes": 0,
+    "status": "passed"
+  },
+  "L18-resume-job-fit-multi-agent": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 7,
+    "nodes_ran": 7,
+    "ran": [
+      "Candidate Submission",
+      "Extract Resume Text",
+      "Interview Question Generator",
+      "Job Fit Analyst",
+      "Learning Plan Builder",
+      "Resume Analyst",
+      "Send Analysis Email"
+    ],
+    "real_nodes": 0,
+    "status": "passed"
+  },
+  "L19-global-error-handler": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 4,
+    "ran": [
+      "Email Alert",
+      "Log to Error Sheet",
+      "On Any Workflow Error",
+      "Shape Error"
+    ],
+    "real_nodes": 1,
+    "status": "passed"
+  },
+  "L20-subworkflows-caller": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 4,
+    "ran": [
+      "Call: Send Branded Email",
+      "Every Day 9 AM",
+      "Read Team Sheet",
+      "Who Celebrates Today?"
+    ],
+    "real_nodes": 2,
+    "status": "passed"
+  },
+  "L20a-subworkflow-send-branded-email": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 4,
+    "ran": [
+      "Return Result",
+      "Send",
+      "When Called by Another Workflow",
+      "Wrap in Template"
+    ],
+    "real_nodes": 2,
+    "status": "passed"
+  },
+  "L21-website-uptime-monitor": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 6,
+    "ran": [
+      "Check Site",
+      "Compare with Last State",
+      "Every 5 Minutes",
+      "Log Every Check",
+      "Sites to Watch",
+      "State Changed?"
+    ],
+    "real_nodes": 5,
+    "status": "passed"
+  },
+  "L22-ai-lead-qualifier-router": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 6,
+    "nodes_ran": 7,
+    "ran": [
+      "Build CRM Row",
+      "Enquiry Form",
+      "Personal Reply (Hot/Warm)",
+      "Qualify Lead",
+      "Route by Tier",
+      "Save to CRM Sheet",
+      "\ud83d\udd25 Alert Sales Now"
+    ],
+    "real_nodes": 2,
+    "status": "passed"
+  },
+  "P01-invoice-processing-pipeline": {
+    "checks": 6,
+    "error": "",
+    "mocked_nodes": 8,
+    "nodes_ran": 16,
+    "ran": [
+      "Append to Exceptions",
+      "Append to Ledger",
+      "Approved?",
+      "Ask Approver",
+      "Block Duplicates",
+      "Extract Invoice Fields",
+      "Invoice Email",
+      "Ledger Row",
+      "Log Exception",
+      "Needs Approval?",
+      "One Item per PDF",
+      "PDF \u2192 Text",
+      "Tell AP Team",
+      "Valid?",
+      "Validate",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 8,
+    "status": "passed"
+  },
+  "P02-support-inbox-copilot": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 7,
+    "nodes_ran": 8,
+    "ran": [
+      "Confident?",
+      "Create Gmail Draft",
+      "Draft Answer",
+      "FAQ as Text",
+      "Load FAQ",
+      "Mark ai-drafted",
+      "Support Email",
+      "Triage"
+    ],
+    "real_nodes": 3,
+    "status": "passed"
+  },
+  "P03-incident-response-orchestrator": {
+    "checks": 4,
+    "error": "",
+    "mocked_nodes": 6,
+    "nodes_ran": 9,
+    "ran": [
+      "Decide Action",
+      "One Item per Alert",
+      "Open Jira Incident",
+      "POST /alerts",
+      "Page On-call",
+      "Remember Jira Key",
+      "Route",
+      "Slack #incidents",
+      "Suppress"
+    ],
+    "real_nodes": 5,
+    "status": "passed"
+  },
+  "P04-sales-followup-sequence": {
+    "checks": 3,
+    "error": "",
+    "mocked_nodes": 12,
+    "nodes_ran": 13,
+    "ran": [
+      "CRM: Add Lead",
+      "CRM: Closed, No Reply",
+      "Check Reply #1",
+      "Check Reply #2",
+      "Email 1: Intro",
+      "Email 2: Value",
+      "Email 3: Close the Loop",
+      "Lead Record",
+      "New Lead",
+      "Replied? #1",
+      "Replied? #2",
+      "Wait 3 Days",
+      "Wait 4 Days"
+    ],
+    "real_nodes": 5,
+    "status": "passed"
+  },
+  "P05-bulk-ai-enrichment-checkpointed": {
+    "checks": 3,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 9,
+    "ran": [
+      "Checkpoint to Sheet",
+      "Classify Company",
+      "Loop in Batches of 10",
+      "Mark Done",
+      "Max 500 per Run",
+      "Pause 2s (rate limit)",
+      "Pending Rows Only",
+      "Run Manually or Nightly",
+      "Summary"
+    ],
+    "real_nodes": 7,
+    "status": "passed"
+  },
+  "P06-purchase-approval-multilevel": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 7,
+    "nodes_ran": 12,
+    "ran": [
+      "Audit: Created",
+      "Audit: Decision",
+      "Create Request",
+      "Final: Approved",
+      "Finance Approval",
+      "Finance Approved?",
+      "Manager Approval",
+      "Manager Decision",
+      "Needs Finance?",
+      "Notify Requester",
+      "Purchase Request Form",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 8,
+    "status": "passed"
+  },
+  "P07-employee-onboarding-orchestrator": {
+    "checks": 3,
+    "error": "",
+    "mocked_nodes": 6,
+    "nodes_ran": 11,
+    "ran": [
+      "Book Calendar Event",
+      "Build Checklist",
+      "Collect Events",
+      "Collect Jira Keys",
+      "Create Jira Task",
+      "Day-1 Sessions",
+      "New Joiner Form (HR)",
+      "Summary to HR",
+      "Tell the Team",
+      "Wait for Both",
+      "Welcome Email"
+    ],
+    "real_nodes": 5,
+    "status": "passed"
+  },
+  "P08-sheets-jira-sync-hashing": {
+    "checks": 3,
+    "error": "",
+    "mocked_nodes": 4,
+    "nodes_ran": 11,
+    "ran": [
+      "Content Hash",
+      "Created \u2192 Write Back",
+      "Decide Create / Update / Skip",
+      "Every 15 Minutes",
+      "Jira: Create",
+      "Jira: Update",
+      "Operation",
+      "Read Backlog Sheet",
+      "Save Key + Hash",
+      "Unchanged",
+      "Updated \u2192 Write Back"
+    ],
+    "real_nodes": 7,
+    "status": "passed"
+  },
+  "P09-deep-research-agent": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 3,
+    "ran": [
+      "Email Report",
+      "Research Agent",
+      "Research Request"
+    ],
+    "real_nodes": 0,
+    "status": "passed"
+  },
+  "P10-mcp-server-business-tools": {
+    "reason": "MCP server trigger (called by AI clients, not runnable from CLI)",
+    "status": "structure-only"
+  },
+  "P10a-tool-lookup-customer": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 3,
+    "ran": [
+      "Find Customer",
+      "Shape Answer",
+      "When Called as Tool"
+    ],
+    "real_nodes": 1,
+    "status": "passed"
+  },
+  "P11-pii-safe-ai-gateway": {
+    "checks": 6,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 9,
+    "ran": [
+      "Answer",
+      "Audit Log (no raw PII)",
+      "Audit Row",
+      "Blocked?",
+      "Injection Screen",
+      "POST /ai/ask",
+      "Redact PII",
+      "Respond",
+      "Restore Tokens for Caller"
+    ],
+    "real_nodes": 6,
+    "status": "passed"
+  },
+  "P12-weekly-exec-kpi-report": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 5,
+    "nodes_ran": 13,
+    "ran": [
+      "Chart",
+      "Chart + Narrative",
+      "Compute KPIs",
+      "Count Jira",
+      "Email CEO",
+      "GitHub: Merged PRs 7d",
+      "Jira: Done Last 7d",
+      "Join Sources",
+      "Mondays 8:00",
+      "Sheets: Revenue",
+      "Sum Revenue",
+      "Write Narrative",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 8,
+    "status": "passed"
+  },
+  "Q01-daily-agenda-calendar": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 4,
+    "ran": [
+      "Build Agenda",
+      "Email Me",
+      "Today's Events",
+      "Weekdays 7:30"
+    ],
+    "real_nodes": 2,
+    "status": "passed"
+  },
+  "Q02-price-drop-tracker": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 1,
+    "nodes_ran": 6,
+    "ran": [
+      "Compare with Last Price",
+      "Every 6 Hours",
+      "Extract Price",
+      "Fetch Page",
+      "Worth Alerting?",
+      "\u2699\ufe0f Products"
+    ],
+    "real_nodes": 6,
+    "status": "passed"
+  },
+  "Q03-telegram-capture-bot": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 3,
+    "nodes_ran": 5,
+    "ran": [
+      "On Telegram Message",
+      "Parse Command",
+      "Reply",
+      "Save to Inbox Sheet",
+      "Valid Command?"
+    ],
+    "real_nodes": 2,
+    "status": "passed"
+  },
+  "Q04-github-stale-pr-reminder": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 6,
+    "ran": [
+      "Any Stale?",
+      "Find Stale",
+      "Open PRs",
+      "Post to Slack",
+      "Weekdays 10:00",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 4,
+    "status": "passed"
+  },
+  "Q05-weekly-kpi-chart-email": {
+    "checks": 1,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 5,
+    "ran": [
+      "Draw Chart",
+      "Email Report",
+      "Group by Week",
+      "Mondays 8:00",
+      "Read Daily Sales"
+    ],
+    "real_nodes": 3,
+    "status": "passed"
+  },
+  "Q06-invoice-due-reminders": {
+    "checks": 3,
+    "error": "",
+    "mocked_nodes": 4,
+    "nodes_ran": 8,
+    "ran": [
+      "Daily 10:00",
+      "Firm Reminder",
+      "Friendly Nudge",
+      "Mark Reminded",
+      "Read Invoices",
+      "Stage",
+      "Who Needs a Reminder?",
+      "Write Back"
+    ],
+    "real_nodes": 4,
+    "status": "passed"
+  },
+  "Q07-gmail-ai-auto-labeler": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 7,
+    "nodes_ran": 3,
+    "ran": [
+      "Classify",
+      "Label: Billing",
+      "New Unread Email"
+    ],
+    "real_nodes": 0,
+    "status": "passed"
+  },
+  "Q08-rss-to-telegram-dedupe": {
+    "checks": 0,
+    "error": "",
+    "mocked_nodes": 1,
+    "nodes_ran": 5,
+    "ran": [
+      "Every 30 Minutes",
+      "Max 5 per Run",
+      "Only New Links",
+      "Post to Channel",
+      "Read Feed"
+    ],
+    "real_nodes": 4,
+    "status": "passed"
+  }
+}

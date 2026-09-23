@@ -115,7 +115,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const f = $('Purchase Request Form').item.json;\nconst id = 'PR-' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();\nreturn { json: { request_id: id, requester: f['Your email'], manager: f['Manager email'], item: f['Item / service'], amount: Number(f['Amount (INR)']),\n  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: new Date().toISOString() } };"
+        "jsCode": "const f = $('Purchase Request Form').item.json;\nconst id = 'PR-' + $today.toFormat('yyMMdd') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();\nreturn { json: { request_id: id, requester: f['Your email'], manager: f['Manager email'], item: f['Item / service'], amount: Number(f['Amount (INR)']),\n  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: new Date().toISOString() } };"
       },
       "id": "b7d62a4f-8541-5ff0-84dc-984cee65efac",
       "name": "Create Request",

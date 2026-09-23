@@ -244,7 +244,7 @@ def L06(root):
         "  for (const [key, bin] of Object.entries(item.binary || {})) {\n"
         "    const name = bin.fileName || key;\n"
         "    if (bin.mimeType === 'application/pdf' || name.toLowerCase().endsWith('.pdf')) {\n"
-        "      const date = new Date(item.json.date || Date.now()).toISOString().slice(0, 10);\n"
+        "      const date = (item.json.date ? DateTime.fromISO(new Date(item.json.date).toISOString()) : $now).setZone($now.zoneName).toISODate();\n"
         "      out.push({ json: { fileName: `${date}_${name}`, from: item.json.from?.text || '', subject: item.json.subject || '', messageId: item.json.id }, binary: { data: bin } });\n"
         "    }\n"
         "  }\n"
@@ -356,8 +356,8 @@ def L08(root):
 
 def L09(root):
     w = WF("L09-webhook-expense-api", "L09 · Expense logger API (Webhook + validation + response)")
-    w.note("## 🔌 L09 · Build your own API\nPOST JSON to the webhook URL:\n```\ncurl -X POST <url> -H 'Content-Type: application/json' \\\n -d '{\"amount\":450,\"category\":\"food\",\"note\":\"team lunch\"}'\n```\nInvalid input → HTTP 400 with a reason.", (-60, -360), 480, 260, 5)
-    w.add("POST /expense", "webhook", 2, {"httpMethod": "POST", "path": "expense", "responseMode": "responseNode", "options": {}}, (0, 0))
+    w.note("## 🔌 L09 · Build your own API\nProtected by **Header Auth**: every call must send `X-API-Key`.\n```\ncurl -X POST <url> -H 'X-API-Key: <your key>' \\\n -H 'Content-Type: application/json' \\\n -d '{\"amount\":450,\"category\":\"food\"}'\n```\nNo/wrong key → 403 · invalid body → 400.", (-60, -360), 480, 260, 5)
+    w.add("POST /expense", "webhook", 2, {"httpMethod": "POST", "path": "expense", "authentication": "headerAuth", "responseMode": "responseNode", "options": {}}, (0, 0))
     w.add("Validate", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "const b = $json.body || {};\n"
         "const allowed = ['food', 'travel', 'office', 'software', 'other'];\n"
@@ -366,7 +366,7 @@ def L09(root):
         "if (!Number.isFinite(amount) || amount <= 0) errors.push('amount must be a positive number');\n"
         "if (!allowed.includes(String(b.category || '').toLowerCase())) errors.push(`category must be one of ${allowed.join(', ')}`);\n"
         "return { json: { valid: errors.length === 0, errors,\n"
-        "  row: { date: b.date || new Date().toISOString().slice(0, 10), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };"}, (220, 0))
+        "  row: { date: b.date || $today.toISODate(), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };"}, (220, 0))
     w.add("Valid?", "if", 2.2, {"conditions": conditions(cond("={{ $json.valid }}", "boolean", "true")), "options": {}}, (440, 0))
     w.add("Prepare Row", "set", 3.4, {"mode": "raw", "jsonOutput": "={{ JSON.stringify($json.row) }}", "options": {}}, (660, -100))
     w.add("Append to Expenses Sheet", "googleSheets", 4.5, sheet_append("Expenses"), (880, -100))
@@ -377,22 +377,24 @@ def L09(root):
     w.chain("Prepare Row", "Append to Expenses Sheet", "201 Created")
     r = readme("L09", "Expense logger API with Webhook", I, "Finance / developer", "25 min",
         "You want to log expenses from anywhere: an iPhone Shortcut, a Telegram bot, a Google Form or another app. A webhook turns n8n into your own small API with validation and proper HTTP status codes.",
-        ["**Webhook** node (POST, JSON body in `$json.body`)", "*Respond to Webhook* for custom status codes (201 / 400)",
+        ["**Webhook** node (POST, JSON body in `$json.body`)", "**Header Auth**: never expose an unauthenticated webhook to the internet", "*Respond to Webhook* for custom status codes (201 / 400)",
          "Input validation in Code (*Run once for each item*)", "Set node in raw JSON mode", "Test URL and Production URL"],
         "Webhook POST /expense → Code validate → IF valid\n  ├─ true  → Set row → Sheets append → Respond 201\n  └─ false → Respond 400 {errors}",
-        ["Google Sheets OAuth2"],
+        ["Google Sheets OAuth2", "Header Auth credential: name `X-API-Key`, value = a long random string (e.g. `openssl rand -hex 24`)"],
         ["Create a sheet tab *Expenses* with headers `date, amount, category, note, submitted_by`.",
          "Add **Webhook**: method POST, path `expense`, Respond = *Using 'Respond to Webhook' node*.",
+         "Webhook → Authentication → **Header Auth** → create the credential (`X-API-Key` + random value). Unauthenticated calls are rejected with 403 before your workflow even runs.",
          "Click *Listen for test event*, then run the curl command from the sticky note using the **Test URL**.",
          "Add the **Validate** Code node (mode: *Run once for each item*).",
          "Add **IF** `valid is true`, then on the true branch Set (raw JSON) → Sheets append → **Respond to Webhook** (201).",
          "On the false branch, **Respond to Webhook** with 400."],
-        ["`curl ... -d '{\"amount\":450,\"category\":\"food\"}'` should return 201.", "`curl ... -d '{\"amount\":-5,\"category\":\"pizza\"}'` should return 400 with 2 errors.",
+        ["`curl ... -H 'X-API-Key: <key>' -d '{\"amount\":450,\"category\":\"food\"}'` should return 201.", "`curl ... -H 'X-API-Key: <key>' -d '{\"amount\":-5,\"category\":\"pizza\"}'` should return 400 with 2 errors.",
+         "The same call **without** the header should return 403.",
          "iPhone: Shortcuts app → *Get contents of URL* → POST JSON. That gives you a one-tap expense logger."],
         [("`Webhook node not correctly configured`", "Respond mode must be *Using Respond to Webhook node* when you use that node."),
          ("404 on the production URL", "The workflow isn't active. Test URLs use `/webhook-test/`, production uses `/webhook/`."),
-         ("Anyone can post to my webhook", "Add *Header Auth* in the Webhook authentication option.")],
-        ["Add Header Auth with a secret token.", "Add a daily 9 PM summary: *Sheets get rows* → sum by category → email."])
+         ("403 Forbidden", "The header name or value doesn't match the credential exactly (names are case-insensitive, values are not).")],
+        ["Rotate the key: create a second credential, update clients, then delete the old one.", "Add a daily 9 PM summary: *Sheets get rows* → sum by category → email."])
     write(root, w, r)
 
 

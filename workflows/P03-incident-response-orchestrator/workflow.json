@@ -21,6 +21,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "alerts",
+        "authentication": "headerAuth",
         "responseMode": "onReceived",
         "options": {}
       },

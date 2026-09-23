@@ -2,7 +2,7 @@
 
 # L22 · AI lead qualifier & router (capstone)
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 40 min](https://img.shields.io/badge/build_time-40_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 40 min](https://img.shields.io/badge/build_time-40_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Sales teams waste hours on tyre-kickers while hot leads go cold. This capstone scores every enquiry with AI (BANT), logs it to a CRM sheet, alerts sales straight away for hot leads, sends a personalised reply, and sends cold leads a nurture email.
+
+## 💡 Concept first
+
+**📌 Key idea:** Combine it all: **form → AI decision with reasons → route → store → act**.
+
+**🧠 Mental model:** A receptionist who reads each enquiry, scores it, files it, and calls sales for the hot ones.
+
+**🚫 When *not* to use it:** Don't let the score be a black box. Store the `reason` next to the score, so humans can audit and tune.
 
 ## 🎯 What you'll learn
 
@@ -19,6 +27,30 @@
 - Designing the fallback path (cold leads still get a reply)
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["👤 Person filling the form"]):::person
+  core{{"⚙️ n8n workflow<br/><small>10 nodes</small>"}}:::n8n
+  s1["✦ Google Gemini 🔑"]:::ai
+  s2["📊 Google Sheets 🔑"]:::saas
+  s3["📧 Gmail 🔑"]:::saas
+  s0 -->|"form submission"| core
+  core <-->|"prompt + data → answer"| s1
+  core -->|"writes rows"| s2
+  core -->|"sends email"| s3
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -51,6 +83,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -249,6 +283,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 7/8 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Submit the 3 sample leads in [docs/sample-data.md](../../docs/sample-data.md#sales-leads): one each should come out hot, warm and cold.
 

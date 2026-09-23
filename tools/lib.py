@@ -138,31 +138,66 @@ def readme(num, title, level, domain, time, story, learn, flow, creds, steps, te
 REGISTRY = []
 
 
+def _test_result(slug):
+    path = os.path.join(os.path.dirname(__file__), "..", "tests", "results.json")
+    try:
+        return json.load(open(path)).get(slug)
+    except (OSError, ValueError):
+        return None
+
+
 def render_readme(r, data, diagram):
     REGISTRY.append(dict(r, name=data['name']))
+    from render import context_mermaid
+    from concepts import CONCEPTS
+    from decisions import DECISIONS
+    from reference import node_reference, placeholders
     lvl_name, color = LEVELS[r["level"][0]]
     nodes = [n for n in data["nodes"] if "stickyNote" not in n["type"]]
+    t = _test_result(r.get("slug", ""))
+    if t and t.get("status") == "passed":
+        tbadge = badge("e2e test", f"passed · {t.get('checks', 0)} checks", "2EA44F")
+    elif t and t.get("status") == "structure-only":
+        tbadge = badge("e2e test", "structure only", "64748B")
+    else:
+        tbadge = badge("e2e test", "not run", "9CA3AF")
     L = ['<div align="center">', "", f"# {r['num']} · {r['title']}", "",
          " ".join([badge("level", lvl_name, color), badge("domain", r["domain"], "334155"),
-                   badge("build time", r["time"], "0EA5E9"), badge("nodes", str(len(nodes)), "7C3AED")]), "",
+                   badge("build time", r["time"], "0EA5E9"), badge("nodes", str(len(nodes)), "7C3AED"), tbadge]), "",
          "<img src=\"canvas.svg\" alt=\"Workflow canvas snapshot\" width=\"100%\">", "",
          "</div>", "",
-         "> [!NOTE]", f"> **The real-world problem.** {r['story']}", "",
-         "## 🎯 What you'll learn", "", *[f"- {x}" for x in r["learn"]], "",
-         "## 🏗️ Architecture", "", diagram, "",
-         "<details><summary>Plain-text flow</summary>", "", "```", r["flow"].strip("\n"), "```", "", "</details>", "",
-         "## 🔑 Credentials", "", "| You need | Where to get it |", "|---|---|"]
+         "> [!NOTE]", f"> **The real-world problem.** {r['story']}", ""]
+    c = CONCEPTS.get(r["num"])
+    if c:
+        L += ["## 💡 Concept first", "",
+              f"**📌 Key idea:** {c[0]}", "",
+              f"**🧠 Mental model:** {c[1]}", "",
+              f"**🚫 When *not* to use it:** {c[2]}", ""]
+    L += ["## 🎯 What you'll learn", "", *[f"- {x}" for x in r["learn"]], "",
+          "## 🏗️ Architecture", "",
+          "**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.", "",
+          context_mermaid(data), "",
+          "<details><summary><b>Node-level flow</b> (every node and branch)</summary>", "", diagram, "", "</details>", "",
+          "<details><summary>Plain-text flow</summary>", "", "```", r["flow"].strip("\n"), "```", "", "</details>", ""]
+    d = DECISIONS.get(r["num"])
+    if d:
+        L += ["## ⚖️ Design decisions & trade-offs", "", "Why it's built this way, and what it costs.", "",
+              "| Decision | Why | Trade-off / alternative |", "|---|---|---|", *[f"| {a} | {b} | {c_} |" for a, b, c_ in d], ""]
+    L += ["## 🔑 Credentials", "", "| You need | Where to get it |", "|---|---|"]
     if r["creds"]:
         for c in r["creds"]:
             name, _, rest = c.partition(": ")
             L.append(f"| {name.strip()} | {rest.strip() or '[docs/credentials.md](../../docs/credentials.md)'} |")
     else:
         L.append("| Nothing | Runs with zero setup |")
-    from reference import node_reference, placeholders
     L += ["", placeholders(data), "## 🛠️ Build it step by step", "",
           "> [!TIP]", "> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.", ""]
     L += [f"{i}. {s}" for i, s in enumerate(r["steps"], 1)]
-    L += ["", node_reference(data), "## ✅ Test it", "", *[f"- [ ] {t}" for t in r["test"]], "",
+    L += ["", node_reference(data), "## ✅ Test it", ""]
+    if t and t.get("status") == "passed":
+        L += ["> [!TIP]", f"> **Automated end-to-end test: passed.** {t.get('nodes_ran')}/{t.get('real_nodes', 0) + t.get('mocked_nodes', 0)} nodes executed in real n8n "
+              f"({t.get('mocked_nodes')} credentialed nodes replaced by realistic mocks), {t.get('checks', 0)} behaviour checks. See [tests/](../../tests/README.md).", ""]
+    L += [*[f"- [ ] {x}" for x in r["test"]], "",
           "## 🧯 Troubleshooting", "",
           "Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).", ""]
     for a, b in r["errors"]:

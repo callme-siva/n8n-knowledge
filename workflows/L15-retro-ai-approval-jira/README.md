@@ -2,7 +2,7 @@
 
 # L15 · Retrospective → AI action items → human approval → Jira
 
-![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Agile / Scrum](https://img.shields.io/badge/domain-Agile_/_Scrum-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square)
+![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Agile / Scrum](https://img.shields.io/badge/domain-Agile_/_Scrum-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** AI is good at turning messy retro notes into clear action items. But you don't want it filling Jira with junk tickets on its own. The Scrum Master gets an email with the proposal and clicks **Approve** or **Decline**, and only approved items become tasks.
+
+## 💡 Concept first
+
+**📌 Key idea:** **Human-in-the-loop**: the AI proposes, a person approves, and the execution pauses until they decide.
+
+**🧠 Mental model:** A junior drafts, the manager signs. Nothing leaves the building without a signature.
+
+**🚫 When *not* to use it:** Don't add approvals to low-risk, high-volume steps. You'll create a bottleneck and people will approve blindly.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,32 @@
 - Responsible-AI design: the AI proposes and a human decides
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["👤 Person filling the form"]):::person
+  core{{"⚙️ n8n workflow<br/><small>10 nodes</small>"}}:::n8n
+  s1["✦ Google Gemini 🔑"]:::ai
+  s2(["🧑 Approver"]):::person
+  s3["📧 Gmail 🔑"]:::saas
+  s4["🧭 Jira 🔑"]:::saas
+  s0 -->|"form submission"| core
+  core <-->|"prompt + data → answer"| s1
+  core <-->|"approve / decline"| s2
+  core -->|"approval email"| s3
+  core -->|"creates issues"| s4
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -51,6 +85,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -249,6 +285,9 @@ return $('Build Approval Message').first().json.action_items.map(a => ({ json: {
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 7/8 nodes executed in real n8n (4 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Submit a retro from [docs/sample-data.md](../../docs/sample-data.md#retro-feedback). You should get an approval email and see the execution *Waiting*.
 - [ ] Click **Approve**: 1–3 Jira tasks should appear. Try again and click **Decline**: no tasks.

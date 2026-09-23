@@ -2,7 +2,7 @@
 
 # L02 · Daily weather email
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** You want a short weather summary in your inbox every morning, before you leave home. This is the "hello world" of scheduled automation, and it calls a real public API.
+
+## 💡 Concept first
+
+**📌 Key idea:** Triggers decide **when** a workflow runs; a Config node decides **with what settings**.
+
+**🧠 Mental model:** An alarm clock (Schedule) wakes a worker who first reads the sticky note on the fridge (Config) before starting the day.
+
+**🚫 When *not* to use it:** Don't schedule every minute "just in case". Choose the slowest schedule the business can live with, since APIs rate-limit and executions cost money.
 
 ## 🎯 What you'll learn
 
@@ -21,6 +29,28 @@
 - Inline JavaScript in expressions (`? :` ternary)
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>4 nodes</small>"}}:::n8n
+  s1["🌐 api.open-meteo.com"]:::ext
+  s2["📧 Gmail 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"HTTPS request"| s1
+  core -->|"sends email"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart LR
@@ -40,6 +70,8 @@ flowchart LR
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -144,6 +176,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Click *Execute workflow*. A schedule workflow can always be run manually for testing.
 - [ ] Check **Executions** (left sidebar) the next morning to see the automatic run.

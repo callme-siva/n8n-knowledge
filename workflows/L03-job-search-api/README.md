@@ -2,7 +2,7 @@
 
 # L03 · Daily job search digest
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Career / HR](https://img.shields.io/badge/domain-Career_/_HR-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 5](https://img.shields.io/badge/nodes-5-7C3AED?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Career / HR](https://img.shields.io/badge/domain-Career_/_HR-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 5](https://img.shields.io/badge/nodes-5-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Job hunting means checking portals every day. This workflow searches Google Jobs every morning and emails you one clean table of today's postings.
+
+## 💡 Concept first
+
+**📌 Key idea:** Every API is just a URL + method + auth + parameters; the hard part is **reading the JSON it returns**.
+
+**🧠 Mental model:** Ordering from a restaurant menu: the endpoint is the dish, the query parameters are your customisations, the credential is your membership card.
+
+**🚫 When *not* to use it:** Don't scrape a site when it has an official API. APIs are stable, legal and structured.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,28 @@
 - Escaping HTML so a job title can't break your email
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>5 nodes</small>"}}:::n8n
+  s1["🌐 serpapi.com 🔑"]:::ext
+  s2["📧 Gmail 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"HTTPS request"| s1
+  core -->|"sends email"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart LR
@@ -41,6 +71,8 @@ flowchart LR
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -170,6 +202,9 @@ return [{ json: { subject: `Job digest: ${jobs.length} × ${cfg.query} (${today}
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Change `query` to your own role and run it manually.
 - [ ] Set `location` to a city (for example `Bengaluru, Karnataka, India`).

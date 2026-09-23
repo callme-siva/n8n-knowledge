@@ -2,7 +2,7 @@
 
 # L01 · Hello n8n — your first workflow
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: General](https://img.shields.io/badge/domain-General-334155?style=flat-square) ![build time: 10 min](https://img.shields.io/badge/build_time-10_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: General](https://img.shields.io/badge/domain-General-334155?style=flat-square) ![build time: 10 min](https://img.shields.io/badge/build_time-10_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Everyone starts here. Before automating anything real, you need to understand how data moves between nodes. This workflow takes some values, builds a message and emails it to you.
+
+## 💡 Concept first
+
+**📌 Key idea:** A workflow is a pipeline of nodes; each node receives a **list of items** (JSON objects) and returns a list of items.
+
+**🧠 Mental model:** An assembly line: each station (node) takes the trays (items) coming in, does one job, and passes trays on.
+
+**🚫 When *not* to use it:** Don't reach for the Code node for things a Set or IF node can do. Visual nodes are easier for the next person to read.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,26 @@
 - Reading the INPUT and OUTPUT panels
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["You (manual run)"]):::person
+  core{{"⚙️ n8n workflow<br/><small>4 nodes</small>"}}:::n8n
+  s1["📧 Gmail 🔑"]:::saas
+  s0 -->|"starts"| core
+  core -->|"sends email"| s1
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart LR
@@ -39,6 +67,8 @@ flowchart LR
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -141,6 +171,9 @@ return $input.all().map(item => ({
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Click each node and open the **OUTPUT** tab: Table, JSON and Schema views show the same data in different shapes.
 - [ ] Change `tasks_done` to 10 and run again.

@@ -2,7 +2,7 @@
 
 # P06 · Purchase request with multi-level approval
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / operations / HR](https://img.shields.io/badge/domain-Finance_/_operations_/_HR-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 15](https://img.shields.io/badge/nodes-15-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / operations / HR](https://img.shields.io/badge/domain-Finance_/_operations_/_HR-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 15](https://img.shields.io/badge/nodes-15-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Every company has approval flows: purchases, leave, discounts, travel, contract exceptions. They usually run on email threads that get lost, and nobody can later say who approved what. This workflow gives you **routing by amount, timeouts with escalation, notifications and a full audit trail** without buying an approvals tool.
+
+## 💡 Concept first
+
+**📌 Key idea:** **Routing rules + timeouts + audit trail** make approvals trustworthy without an approvals product.
+
+**🧠 Mental model:** A relay race: the baton (request) passes manager → finance, with a referee (timeout) and a scoreboard (audit sheet).
+
+**🚫 When *not* to use it:** Don't model every exception as a new branch. Keep rules few and visible in the Config node.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,30 @@
 - An **audit trail**: upsert the same row as the status changes
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["👤 Person filling the form"]):::person
+  core{{"⚙️ n8n workflow<br/><small>15 nodes</small>"}}:::n8n
+  s1["📊 Google Sheets 🔑"]:::saas
+  s2(["🧑 Approver"]):::person
+  s3["📧 Gmail 🔑"]:::saas
+  s0 -->|"form submission"| core
+  core -->|"writes rows"| s1
+  core <-->|"approve / decline"| s2
+  core -->|"approval email · sends email"| s3
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -66,6 +98,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -77,6 +111,17 @@ Form → Config → Create ID → Audit row → Manager approval ⏸3d → Switc
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| Chained Send-and-Wait approvals with **3-day limits** | Approvals can't hang forever; timeouts escalate | Email-based approvals depend on a reachable n8n (`WEBHOOK_URL`) |
+| Switch on approved / rejected / **missing** decision | A timeout is a distinct outcome and must not be read as "rejected" | One more branch to design and test |
+| Threshold rule in the Config node | Finance can change the policy without editing logic | More complex rule sets (per cost centre) outgrow a Set node; use a lookup sheet |
+| Upsert the same audit row as status changes | One row per request = an easy audit trail and reporting | No history of intermediate states; add an append-only log if auditors need it |
 
 ## 🔑 Credentials
 
@@ -146,7 +191,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 ```javascript
 const f = $('Purchase Request Form').item.json;
-const id = 'PR-' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+const id = 'PR-' + $today.toFormat('yyMMdd') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
 return { json: { request_id: id, requester: f['Your email'], manager: f['Manager email'], item: f['Item / service'], amount: Number(f['Amount (INR)']),
   cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: new Date().toISOString() } };
 ```
@@ -323,6 +368,9 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 12/15 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Each request's row goes from `pending_manager` to its final status.
 - [ ] The requester gets exactly one final email.

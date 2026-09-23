@@ -14,11 +14,11 @@ def Q01(root):
         "const DAY_START = 9, DAY_END = 18, MIN_FOCUS = 45; // hours, hours, minutes\n"
         "const ev = $input.all().map(i => i.json).filter(e => e.start?.dateTime && e.status !== 'cancelled');\n"
         "const t = d => new Date(d);\n"
-        "const fmt = d => t(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });\n"
+        "const fmt = d => t(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: $now.zoneName });  // workflow timezone\n"
         "const mins = ev.reduce((s, e) => s + (t(e.end.dateTime) - t(e.start.dateTime)) / 60000, 0);\n"
         "// find gaps between meetings inside working hours\n"
-        "const base = new Date(); base.setHours(0, 0, 0, 0);\n"
-        "let cursor = new Date(base.getTime() + DAY_START * 3600e3); const end = new Date(base.getTime() + DAY_END * 3600e3);\n"
+        "// $today = midnight in the workflow timezone, so 9:00–18:00 means your local working day.\n"
+        "let cursor = $today.set({ hour: DAY_START }).toJSDate(); const end = $today.set({ hour: DAY_END }).toJSDate();\n"
         "const free = [];\n"
         "for (const e of ev) { const s = t(e.start.dateTime); if (s - cursor >= MIN_FOCUS * 60000) free.push([cursor, s]); if (t(e.end.dateTime) > cursor) cursor = t(e.end.dateTime); }\n"
         "if (end - cursor >= MIN_FOCUS * 60000) free.push([cursor, end]);\n"
@@ -41,7 +41,7 @@ def Q01(root):
          "Paste the Code node. Change `DAY_START`, `DAY_END` and `MIN_FOCUS` to suit your day.",
          "Gmail to yourself."],
         ["Run on a day with 2+ meetings and check that the gaps are right.", "Run on a weekend. You should get \"No meetings 🎉\"."],
-        [("Times are off by 5:30 h", "Set the workflow timezone to Asia/Kolkata, and keep `timeZone` in the Code `fmt()`."),
+        [("Times are off by a few hours", "Set *Workflow settings → Timezone* to your city. The code reads it via `$now.zoneName` and `$today`."),
          ("Recurring meetings missing", "Turn on *Single events* so recurrences are expanded.")],
         ["Auto-create a \"Focus\" event in the biggest free slot.", "Add tomorrow's first meeting so you can prepare the night before."]))
 
@@ -172,7 +172,7 @@ def Q05(root):
     w.add("Read Daily Sales", "googleSheets", 4.5, sheet_read("Sales"), (220, 0))
     w.add("Group by Week", "code", 2, {"jsCode":
         "// Sheet columns: date (YYYY-MM-DD) | revenue | orders\n"
-        "const weekKey = d => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.toISOString().slice(0, 10); };\n"
+        "const weekKey = d => DateTime.fromISO(String(d).slice(0, 10), { zone: 'utc' }).startOf('week').toISODate();  // Monday of that week\n"
         "const weeks = {};\n"
         "for (const { json: r } of $input.all()) { if (!r.date) continue; const k = weekKey(r.date); weeks[k] ??= { revenue: 0, orders: 0 }; weeks[k].revenue += Number(r.revenue) || 0; weeks[k].orders += Number(r.orders) || 0; }\n"
         "const keys = Object.keys(weeks).sort().slice(-8);\n"
@@ -209,8 +209,9 @@ def Q06(root):
     w.add("Read Invoices", "googleSheets", 4.5, sheet_read("Invoices"), (220, 0))
     w.add("Who Needs a Reminder?", "code", 2, {"jsCode":
         "// Columns: invoice_no | client | email | amount | due_date (YYYY-MM-DD) | status (paid/unpaid) | last_reminded\n"
-        "const today = new Date().toISOString().slice(0, 10);\n"
-        "const daysTo = d => Math.round((Date.parse(d) - Date.parse(today)) / 86400000);\n"
+        "// $today follows the workflow timezone. new Date() is UTC-based and is off by a day near midnight.\n"
+        "const today = $today.toISODate();\n"
+        "const daysTo = d => Math.round(DateTime.fromISO(String(d).slice(0, 10), { zone: $today.zoneName }).diff($today, 'days').days);\n"
         "return $input.all().map(i => i.json)\n"
         "  .filter(r => String(r.status).toLowerCase() !== 'paid' && r.due_date && r.last_reminded !== today)\n"
         "  .map(r => ({ ...r, days: daysTo(r.due_date) }))\n"

@@ -2,7 +2,7 @@
 
 # P02 · Support inbox copilot
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 13](https://img.shields.io/badge/nodes-13-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 13](https://img.shields.io/badge/nodes-13-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Support teams answer the same 30 questions all day. Fully automatic AI replies are risky (wrong answers, bad tone, hallucinated policies). The pattern that works in real companies is the **copilot**: the AI prepares a *draft* in the agent's own Gmail, grounded in an approved FAQ, with a confidence score. Anything it isn't sure about goes to a human straight away.
+
+## 💡 Concept first
+
+**📌 Key idea:** The **copilot pattern**: AI prepares a grounded draft with a confidence score; a human sends it.
+
+**🧠 Mental model:** An assistant who drafts replies from the company FAQ and leaves them in your outbox, never pressing send.
+
+**🚫 When *not* to use it:** Don't auto-send until you have weeks of accuracy data on a narrow category.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,32 @@
 - `executeOnce` so the FAQ is loaded once per run, not once per email
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["📧 Gmail inbox 🔑"]):::saas
+  core{{"⚙️ n8n workflow<br/><small>13 nodes</small>"}}:::n8n
+  s1["✦ Google Gemini 🔑"]:::ai
+  s2["📊 Google Sheets 🔑"]:::saas
+  s3["📧 Gmail 🔑"]:::saas
+  s4["💬 Slack 🔑"]:::saas
+  s0 -->|"new emails"| core
+  core <-->|"prompt + data → answer"| s1
+  core <-->|"reads rows"| s2
+  core -->|"applies labels · creates draft"| s3
+  core -->|"posts messages"| s4
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -60,6 +94,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -72,6 +108,17 @@ Gmail (to:support) → Text Classifier ⇐ Gemini
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| Classify first, answer only "Question" emails | Cheap triage avoids spending an LLM answer on spam or angry escalations | Two model calls per question email. Could merge into one prompt, at the cost of clarity |
+| Ground answers in a **Google Sheet FAQ** | Support leads can edit answers without touching the workflow | Doesn't scale past ~100 entries in one prompt; then move to RAG (L13) |
+| Create a **draft**, never send | Wrong answers never reach customers; agents stay in control | Saves less time than auto-send. That's the price of safety until accuracy is proven |
+| Gate on confidence ≥ 0.75 **and** `needs_human = false` | Models are overconfident; two signals are safer than one | Threshold chosen by judgement. Tune it with real data |
 
 ## 🔑 Credentials
 
@@ -279,6 +326,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 8/10 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] The FAQ question should produce a draft reply in the same Gmail thread, with confidence ≥ 0.75.
 - [ ] The uncovered question should go to Slack.

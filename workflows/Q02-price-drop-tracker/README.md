@@ -2,7 +2,7 @@
 
 # Q02 · Price drop tracker
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Shopping / e-commerce ops](https://img.shields.io/badge/domain-Shopping_/_e--commerce_ops-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Shopping / e-commerce ops](https://img.shields.io/badge/domain-Shopping_/_e--commerce_ops-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Waiting for a laptop to go on sale, watching a competitor's pricing, or checking a supplier's rates: all of it is "check a web page, remember a number, tell me when it changes". The same pattern works for stock availability, job postings and government notices.
+
+## 💡 Concept first
+
+**📌 Key idea:** **Scrape → extract → remember → compare**; alert on thresholds and on relative change.
+
+**🧠 Mental model:** A friend who checks the shop window every six hours and texts you only when the price drops.
+
+**🚫 When *not* to use it:** Don't scrape sites that forbid it or render prices with JavaScript. Use their API or a feed.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,30 @@
 - Two alert rules: absolute target and relative drop
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>7 nodes</small>"}}:::n8n
+  state[("🗄️ memory<br/>between runs")]:::store
+  core -.- state
+  s1["🌐 URLs from data"]:::ext
+  s2["📧 Gmail 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"HTTPS request"| s1
+  core -->|"sends email"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -45,6 +77,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -198,6 +232,9 @@ return $input.all().map((it, i) => {
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 6/7 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Set `target` above the current price, then run it. You should get an alert.
 - [ ] Check that a broken URL doesn't stop the other products (*On Error → Continue*).

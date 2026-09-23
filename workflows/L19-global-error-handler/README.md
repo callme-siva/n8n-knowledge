@@ -2,7 +2,7 @@
 
 # L19 · Global error handler
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Operations / reliability](https://img.shields.io/badge/domain-Operations_/_reliability-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Operations / reliability](https://img.shields.io/badge/domain-Operations_/_reliability-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Automation that fails silently is worse than none, because you think the reports are going out when they aren't. One error workflow can watch *all* your workflows, email you with a plain-English hint, and keep a log you can review every week.
+
+## 💡 Concept first
+
+**📌 Key idea:** One **error workflow** watches all others; failures become alerts with a human-readable hint.
+
+**🧠 Mental model:** A smoke detector wired to every room, calling you with "kitchen, probably toast".
+
+**🚫 When *not* to use it:** Don't alert on every retryable blip. Use Retry on Fail first, and alert when retries are exhausted.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,28 @@
 - The full reliability toolkit: Retry on Fail · Continue on Error · Stop and Error · Error workflow
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⚠️ Any failing workflow"]):::time
+  core{{"⚙️ n8n workflow<br/><small>4 nodes</small>"}}:::n8n
+  s1["📧 Gmail 🔑"]:::saas
+  s2["📊 Google Sheets 🔑"]:::saas
+  s0 -->|"error details"| core
+  core -->|"sends email"| s1
+  core -->|"writes rows"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart LR
@@ -39,6 +69,8 @@ flowchart LR
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -146,6 +178,9 @@ return [{ json: { time: new Date().toISOString(), workflow: wf.name, workflow_id
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Activate **L04** with `base = XYZ` (or disconnect a credential) and let it run. The alert should arrive within seconds.
 - [ ] Note: error workflows fire for **production** executions, not manual test runs.

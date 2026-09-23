@@ -1,6 +1,6 @@
 """Sanity-check every workflow.json before it is published.
 Checks: valid JSON, unique node names, every connection points to a real node,
-no credentials / pinned data, and no personal email addresses."""
+no credentials / pinned data, no personal email addresses, and no unauthenticated webhooks."""
 import json, glob, re, sys, os
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -31,6 +31,9 @@ for path in sorted(glob.glob(os.path.join(ROOT, "workflows", "*", "workflow.json
             errs.append(f"'{n['name']}' still has credentials attached")
         if not n.get("type") or "typeVersion" not in n:
             errs.append(f"'{n['name']}' missing type/typeVersion")
+    for n in wf["nodes"]:
+        if n["type"].endswith(".webhook") and n["parameters"].get("authentication", "none") == "none":
+            errs.append(f"webhook '{n['name']}' has no authentication (use headerAuth / basicAuth / jwtAuth)")
     if wf.get("pinData"):
         errs.append("pinData present (may leak real data)")
     for e in {x for x in EMAIL_RE.findall(raw) if not x.endswith("@example.com")} - ALLOWED_EMAILS:

@@ -2,7 +2,7 @@
 
 # L20 · Sub-workflows: reusable building blocks
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: HR / team culture](https://img.shields.io/badge/domain-HR_/_team_culture-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: HR / team culture](https://img.shields.io/badge/domain-HR_/_team_culture-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** After 10 workflows you'll have copy-pasted the same email template 10 times. Sub-workflows are functions for n8n: build *Send branded email* once and call it from anywhere. The example use is automatic birthday and work-anniversary wishes, which every HR and team lead wants.
+
+## 💡 Concept first
+
+**📌 Key idea:** **Sub-workflows are functions**: typed inputs, one job, a return value, reused everywhere.
+
+**🧠 Mental model:** A company stamp: design it once, every department uses the same one.
+
+**🚫 When *not* to use it:** Don't extract a sub-workflow used only once. Premature reuse makes debugging harder.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,28 @@
 - Designing for reuse: small, single-purpose workflows
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>4 nodes</small>"}}:::n8n
+  s1["📊 Google Sheets 🔑"]:::saas
+  s2["↗ Sub-workflow"]:::time
+  s0 -->|"fires"| core
+  core <-->|"reads rows"| s1
+  core -->|"calls with inputs"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart LR
@@ -39,6 +69,8 @@ flowchart LR
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -108,18 +140,19 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 10 lines, shown below) |
+| `jsCode` | (JavaScript, 11 lines, shown below) |
 
 **Code:**
 
 ```javascript
 // Sheet columns: name | email | birthday (YYYY-MM-DD) | joined (YYYY-MM-DD)
-const today = new Date(); const md = d => d && d.slice(5, 10);
-const tmd = today.toISOString().slice(5, 10);
+// $today follows the workflow timezone (Settings → Timezone), unlike new Date() which is UTC-based.
+const md = d => d && d.slice(5, 10);
+const tmd = $today.toFormat('MM-dd');
 const out = [];
 for (const { json: p } of $input.all()) {
   if (md(p.birthday) === tmd) out.push({ json: { to: p.email, title: `Happy birthday, ${p.name}! 🎂`, body_html: `<p>Wishing you a fantastic year ahead, ${p.name}. Cake is on the team today!</p>`, cta_text: '', cta_url: '' } });
-  if (md(p.joined) === tmd) { const yrs = today.getFullYear() - Number(p.joined.slice(0, 4));
+  if (md(p.joined) === tmd) { const yrs = $today.year - Number(p.joined.slice(0, 4));
     if (yrs > 0) out.push({ json: { to: p.email, title: `Happy ${yrs}-year work anniversary, ${p.name}! 🎉`, body_html: `<p>Thank you for ${yrs} great year${yrs > 1 ? 's' : ''} with us.</p>`, cta_text: '', cta_url: '' } }); }
 }
 return out;
@@ -165,6 +198,9 @@ return out;
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Look at the Execute Workflow output: it contains `sent: true` returned by the sub-workflow.
 - [ ] Change the header colour in L20a and run again. Every caller gets the new look.

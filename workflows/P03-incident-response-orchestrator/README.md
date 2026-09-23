@@ -2,7 +2,7 @@
 
 # P03 · Incident response orchestrator
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: SRE / DevOps / IT ops](https://img.shields.io/badge/domain-SRE_/_DevOps_/_IT_ops-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 12](https://img.shields.io/badge/nodes-12-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: SRE / DevOps / IT ops](https://img.shields.io/badge/domain-SRE_/_DevOps_/_IT_ops-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 12](https://img.shields.io/badge/nodes-12-7C3AED?style=flat-square) ![e2e test: passed · 4 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_4_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -11,9 +11,17 @@
 > [!NOTE]
 > **The real-world problem.** When production breaks, monitoring fires the same alert every minute and on-call engineers drown in noise. Mature SRE teams use an orchestrator that **deduplicates alerts into one incident**, pages only for critical problems, keeps Slack and Jira in sync, and makes writing the postmortem easy. This is a small, understandable version of what PagerDuty and incident.io do.
 
+## 💡 Concept first
+
+**📌 Key idea:** Turn an **alert storm into one incident**: dedupe by fingerprint, route by severity, close the loop on resolve.
+
+**🧠 Mental model:** A hospital triage nurse: one patient file per person, no matter how many times the alarm beeps.
+
+**🚫 When *not* to use it:** Don't page humans for warnings. Only critical alerts should wake someone up.
+
 ## 🎯 What you'll learn
 
-- Receiving real monitoring webhooks (Alertmanager / Grafana format)
+- Receiving real monitoring webhooks (Alertmanager / Grafana format) **with Header Auth**, since anyone who can post fake alerts can page your on-call
 - **Split Out** a batch payload into items
 - **Stateful deduplication by fingerprint** with workflow static data
 - A severity-based action matrix in a Switch (page / notify / resolve / suppress)
@@ -21,6 +29,34 @@
 - AI **postmortem draft** with strict "no invented facts" rules
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["🌐 Calling app / service"]):::ext
+  core{{"⚙️ n8n workflow<br/><small>12 nodes</small>"}}:::n8n
+  state[("🗄️ memory<br/>between runs")]:::store
+  core -.- state
+  s1["🧭 Jira 🔑"]:::saas
+  s2["📧 Gmail 🔑"]:::saas
+  s3["💬 Slack 🔑"]:::saas
+  s4["✦ Google Gemini 🔑"]:::ai
+  s0 -->|"HTTPS POST"| core
+  core -->|"creates issues"| s1
+  core -->|"sends email"| s2
+  core -->|"posts messages"| s3
+  core <-->|"prompt + data → answer"| s4
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -58,6 +94,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -70,10 +108,23 @@ Webhook /alerts → Split Out alerts → Code (state by fingerprint → action) 
 
 </details>
 
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| Dedupe by alert **fingerprint** kept in workflow static data | Monitoring re-fires every minute; one problem should be one incident | Static data is per-workflow and not shared across instances; use a DB table in HA setups |
+| Severity matrix in one Switch: page / notify / resolve / suppress | The policy is visible in one place and easy to change | Doesn't cover time-based escalation (add a Wait + acknowledgement check) |
+| Store the Jira key against the fingerprint | The resolve event must find the incident it belongs to | If static data is lost, resolves can't link back (they're ignored safely) |
+| AI writes a postmortem **draft** with "never invent facts" | Removes the blank-page problem; humans add root cause | Draft quality depends on alert annotations. Richer alerts give better drafts |
+| Header auth on the webhook | Anyone who can post alerts can page your on-call engineer | Monitoring tools must be configured with the token |
+
 ## 🔑 Credentials
 
 | You need | Where to get it |
 |---|---|
+| Header Auth credential (e.g. `Authorization | Bearer <long random>`) |
 | Jira Software Cloud API token | [docs/credentials.md](../../docs/credentials.md) |
 | Slack API | [docs/credentials.md](../../docs/credentials.md) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
@@ -97,8 +148,9 @@ Nodes that need a credential selected after import: **Gmail**, **Google Gemini C
 > In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
 
 1. Import it and set the Jira project and issue-type IDs (an *Incident* or *Bug* type).
-2. **Activate** it (static data and production webhooks need an active workflow).
-3. Point Alertmanager (`webhook_configs.url`) or a Grafana contact point at `https://<n8n>/webhook/alerts`, or simulate one with curl (below).
+2. Create a **Header Auth** credential on the webhook. Alertmanager: `http_config.authorization.credentials`; Grafana contact point: *Authorization header*.
+3. **Activate** it (static data and production webhooks need an active workflow).
+4. Point Alertmanager (`webhook_configs.url`) or a Grafana contact point at `https://<n8n>/webhook/alerts`, or simulate one with curl (below).
 
 ## 🔍 Node-by-node reference
 
@@ -112,6 +164,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 |---|---|
 | `httpMethod` | POST |
 | `path` | alerts |
+| `authentication` | headerAuth |
 | `responseMode` | onReceived |
 
 </details>
@@ -286,8 +339,11 @@ return { json: { ...a, jira_key: $json.key } };
 
 ## ✅ Test it
 
+> [!TIP]
+> **Automated end-to-end test: passed.** 9/11 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 4 behaviour checks. See [tests/](../../tests/README.md).
+
 - [ ] ```bash
-curl -X POST https://<n8n>/webhook/alerts -H 'Content-Type: application/json' -d '{"alerts":[{"status":"firing","fingerprint":"abc","labels":{"alertname":"HighErrorRate","severity":"critical","service":"payments"},"annotations":{"summary":"5xx > 5% for 5m"},"startsAt":"2026-09-23T10:00:00Z"}]}'
+curl -X POST https://<n8n>/webhook/alerts -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{"alerts":[{"status":"firing","fingerprint":"abc","labels":{"alertname":"HighErrorRate","severity":"critical","service":"payments"},"annotations":{"summary":"5xx > 5% for 5m"},"startsAt":"2026-09-23T10:00:00Z"}]}'
 ```
 - [ ] Send the same payload 3 times: only **one** Jira issue and one page.
 - [ ] Send it again with `"status":"resolved"` and `"endsAt"`: you should get a postmortem draft in Slack.

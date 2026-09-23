@@ -298,7 +298,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const n = $('Checkpoint to Sheet').all().length;\nreturn [{ json: { processed: n, finished_at: new Date().toISOString(), note: 'Re-run to continue with remaining pending rows.' } }];"
+        "jsCode": "// The loop's *done* output carries every item from every batch.\n// (Careful: $('Checkpoint to Sheet').all() would only return the LAST batch.)\nconst rows = $input.all().map(i => i.json);\nconst errors = rows.filter(r => r.status === 'error').length;\nreturn [{ json: { processed: rows.length, done: rows.length - errors, errors, finished_at: $now.toISO(), note: 'Re-run to continue with remaining pending rows.' } }];"
       },
       "id": "bb789ac6-039f-5928-a3f4-7c96e5a9c4d9",
       "name": "Summary",

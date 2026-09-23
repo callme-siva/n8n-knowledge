@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 🔌 L09 · Build your own API\nPOST JSON to the webhook URL:\n```\ncurl -X POST <url> -H 'Content-Type: application/json' \\\n -d '{\"amount\":450,\"category\":\"food\",\"note\":\"team lunch\"}'\n```\nInvalid input → HTTP 400 with a reason.",
+        "content": "## 🔌 L09 · Build your own API\nProtected by **Header Auth**: every call must send `X-API-Key`.\n```\ncurl -X POST <url> -H 'X-API-Key: <your key>' \\\n -H 'Content-Type: application/json' \\\n -d '{\"amount\":450,\"category\":\"food\"}'\n```\nNo/wrong key → 403 · invalid body → 400.",
         "width": 480,
         "height": 260,
         "color": 5
@@ -21,6 +21,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "expense",
+        "authentication": "headerAuth",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -36,7 +37,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const b = $json.body || {};\nconst allowed = ['food', 'travel', 'office', 'software', 'other'];\nconst errors = [];\nconst amount = Number(b.amount);\nif (!Number.isFinite(amount) || amount <= 0) errors.push('amount must be a positive number');\nif (!allowed.includes(String(b.category || '').toLowerCase())) errors.push(`category must be one of ${allowed.join(', ')}`);\nreturn { json: { valid: errors.length === 0, errors,\n  row: { date: b.date || new Date().toISOString().slice(0, 10), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };"
+        "jsCode": "const b = $json.body || {};\nconst allowed = ['food', 'travel', 'office', 'software', 'other'];\nconst errors = [];\nconst amount = Number(b.amount);\nif (!Number.isFinite(amount) || amount <= 0) errors.push('amount must be a positive number');\nif (!allowed.includes(String(b.category || '').toLowerCase())) errors.push(`category must be one of ${allowed.join(', ')}`);\nreturn { json: { valid: errors.length === 0, errors,\n  row: { date: b.date || $today.toISODate(), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };"
       },
       "id": "32c58371-a6e6-5b5f-9fa7-1ed649eef19d",
       "name": "Validate",

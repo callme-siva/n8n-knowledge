@@ -2,7 +2,7 @@
 
 # P08 · Sheets → Jira sync with change detection
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Agile / product ops](https://img.shields.io/badge/domain-Agile_/_product_ops-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Agile / product ops](https://img.shields.io/badge/domain-Agile_/_product_ops-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Product owners and business stakeholders live in spreadsheets; engineering lives in Jira. Copying between them by hand causes drift and duplicates. A proper **sync** needs three things beginners miss: a stable ID for each row, writing the created ID back, and **change detection** so unchanged rows aren't hammered every 15 minutes.
+
+## 💡 Concept first
+
+**📌 Key idea:** **Idempotent one-way sync**: create when there's no key, update when the hash changed, otherwise skip, and write the key back.
+
+**🧠 Mental model:** A librarian who stamps each book with a catalogue number and only re-files books whose cover changed.
+
+**🚫 When *not* to use it:** Don't start with two-way sync. Conflicts (both sides edited) need rules you must design first.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,28 @@
 - Why syncing one way is far simpler than two-way (and what two-way needs)
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>11 nodes</small>"}}:::n8n
+  s1["📊 Google Sheets 🔑"]:::saas
+  s2["🧭 Jira 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"reads rows · writes rows"| s1
+  core -->|"creates issues · updates issues"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -55,6 +85,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -65,6 +97,17 @@ Schedule 15m → Sheets read → SHA-256(summary, description, priority) → Cod
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| One-way sync (Sheet → Jira) | One source of truth avoids conflict resolution entirely | Edits made in Jira are overwritten on the next change in the sheet |
+| SHA-256 hash of business fields as change detector | Cheap, deterministic, no timestamps or history needed | Hash only business fields; including volatile ones causes endless updates |
+| Write `jira_key` + `sync_hash` back to the sheet | Makes the sync idempotent and restartable | Users can break it by deleting the key. Protect those columns |
+| Stable `row_id` as the upsert key | Row numbers shift when people sort; IDs don't | Someone must create IDs (a formula or a form) |
 
 ## 🔑 Credentials
 
@@ -253,6 +296,9 @@ return { json: { ...r, op } };
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 11/11 nodes executed in real n8n (4 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Delete a `jira_key` cell → it creates a new issue. Explain to your team why the key column must be protected (lock it in Sheets).
 

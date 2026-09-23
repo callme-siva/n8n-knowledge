@@ -2,7 +2,7 @@
 
 # L05 · Tech news digest with the Code node
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** You follow 3 news sites and see the same story three times. This merges the feeds, removes duplicates and sends one clean list.
+
+## 💡 Concept first
+
+**📌 Key idea:** The Code node is for **reshaping many items at once**: filter, dedupe, sort, group, and many→one.
+
+**🧠 Mental model:** A spreadsheet formula column plus a pivot table, written in a few lines of JavaScript.
+
+**🚫 When *not* to use it:** Don't hide business rules in 80 lines of code. If a non-developer must change it, use Set/IF/Switch or a Config node.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,32 @@
 - An IF guard so you don't get empty emails
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>8 nodes</small>"}}:::n8n
+  s1["🌐 news.google.com"]:::ext
+  s2["🌐 techcrunch.com"]:::ext
+  s3["🌐 www.theverge.com"]:::ext
+  s4["📧 Gmail 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"reads feed"| s1
+  core <-->|"reads feed"| s2
+  core <-->|"reads feed"| s3
+  core -->|"sends email"| s4
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -49,6 +83,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -201,6 +237,9 @@ return [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Run it and open the Code node output. `listText` is prepared for the AI version in L11.
 - [ ] Replace one feed URL with a broken one. The workflow should still finish.

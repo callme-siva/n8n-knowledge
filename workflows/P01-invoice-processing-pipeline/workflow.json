@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 🧾 P01 · Accounts payable, automated\nPDF invoices arrive by email → text extracted → **Gemini extracts fields** → **maths & GSTIN validated in code** → duplicates blocked → big invoices need **human approval** → ledger row + Drive archive. Bad ones go to an Exceptions sheet.",
+        "content": "## 🧾 P01 · Accounts payable, automated\nPDF invoices arrive by email → text extracted → **Gemini extracts fields** → **maths & GSTIN validated in code** → duplicates blocked → big invoices need **human approval** → ledger row. Bad ones go to an Exceptions sheet.",
         "width": 560,
         "height": 300,
         "color": 7

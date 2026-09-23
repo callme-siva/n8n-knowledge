@@ -2,7 +2,7 @@
 
 # L11 · AI news briefing with a Basic LLM Chain
 
-![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 9](https://img.shields.io/badge/nodes-9-7C3AED?style=flat-square)
+![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 9](https://img.shields.io/badge/nodes-9-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** 25 headlines is still too many to read. An LLM can turn them into 5 bullets that say *why each story matters*, which is what a good executive briefing does.
+
+## 💡 Concept first
+
+**📌 Key idea:** An LLM chain is a **function**: prompt + data in, text out. Control it with a clear system prompt and a low temperature.
+
+**🧠 Mental model:** A very fast intern: great at summarising, needs precise instructions, and should never be trusted with facts it wasn't given.
+
+**🚫 When *not* to use it:** Don't use an LLM for things code does exactly (sums, dates, filters). It's slower, costs money and can be wrong.
 
 ## 🎯 What you'll learn
 
@@ -20,6 +28,34 @@
 - Keeping the raw data in the email as a fallback, so the AI never hides the source
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>9 nodes</small>"}}:::n8n
+  s1["🌐 news.google.com"]:::ext
+  s2["🌐 techcrunch.com"]:::ext
+  s3["🌐 www.theverge.com"]:::ext
+  s4["✦ Google Gemini 🔑"]:::ai
+  s5["📧 Gmail 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"reads feed"| s1
+  core <-->|"reads feed"| s2
+  core <-->|"reads feed"| s3
+  core <-->|"prompt + data → answer"| s4
+  core -->|"sends email"| s5
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -51,6 +87,8 @@ flowchart TB
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -215,6 +253,9 @@ return [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Run it and compare the briefing to the raw headlines. Did the model invent anything?
 - [ ] Change the system prompt to *Explain like I'm a school student* and run it again.

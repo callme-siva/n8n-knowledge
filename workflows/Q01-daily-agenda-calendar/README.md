@@ -2,7 +2,7 @@
 
 # Q01 · Daily agenda + free focus slots
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Most people open their calendar and react. A 7:30 AM email showing today's meetings, how heavy the day is, and where the **focus slots** are lets you plan deep work before the first call.
+
+## 💡 Concept first
+
+**📌 Key idea:** Use **Luxon dates** (`$today`, `.plus()`) and simple algorithms to turn raw calendar data into a decision (where's my focus time?).
+
+**🧠 Mental model:** A personal assistant who reads your diary and says "your best hour is 11–12".
+
+**🚫 When *not* to use it:** Don't read the whole calendar. Always pass a time window.
 
 ## 🎯 What you'll learn
 
@@ -19,6 +27,28 @@
 - `alwaysOutputData` so empty days still send an email
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["⏰ Schedule"]):::time
+  core{{"⚙️ n8n workflow<br/><small>4 nodes</small>"}}:::n8n
+  s1["📅 Google Calendar 🔑"]:::saas
+  s2["📧 Gmail 🔑"]:::saas
+  s0 -->|"fires"| core
+  core <-->|"reads events"| s1
+  core -->|"sends email"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart LR
@@ -38,6 +68,8 @@ flowchart LR
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
+
+</details>
 
 <details><summary>Plain-text flow</summary>
 
@@ -121,11 +153,11 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 const DAY_START = 9, DAY_END = 18, MIN_FOCUS = 45; // hours, hours, minutes
 const ev = $input.all().map(i => i.json).filter(e => e.start?.dateTime && e.status !== 'cancelled');
 const t = d => new Date(d);
-const fmt = d => t(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });
+const fmt = d => t(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: $now.zoneName });  // workflow timezone
 const mins = ev.reduce((s, e) => s + (t(e.end.dateTime) - t(e.start.dateTime)) / 60000, 0);
 // find gaps between meetings inside working hours
-const base = new Date(); base.setHours(0, 0, 0, 0);
-let cursor = new Date(base.getTime() + DAY_START * 3600e3); const end = new Date(base.getTime() + DAY_END * 3600e3);
+// $today = midnight in the workflow timezone, so 9:00–18:00 means your local working day.
+let cursor = $today.set({ hour: DAY_START }).toJSDate(); const end = $today.set({ hour: DAY_END }).toJSDate();
 const free = [];
 for (const e of ev) { const s = t(e.start.dateTime); if (s - cursor >= MIN_FOCUS * 60000) free.push([cursor, s]); if (t(e.end.dateTime) > cursor) cursor = t(e.end.dateTime); }
 if (end - cursor >= MIN_FOCUS * 60000) free.push([cursor, end]);
@@ -157,6 +189,9 @@ return [{ json: { subject: `📅 ${ev.length} meetings · ${Math.round(mins / 60
 
 ## ✅ Test it
 
+> [!TIP]
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+
 - [ ] Run on a day with 2+ meetings and check that the gaps are right.
 - [ ] Run on a weekend. You should get "No meetings 🎉".
 
@@ -164,9 +199,9 @@ return [{ json: { subject: `📅 ${ev.length} meetings · ${Math.round(mins / 60
 
 Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
-<details><summary><b>Times are off by 5:30 h</b></summary>
+<details><summary><b>Times are off by a few hours</b></summary>
 
-Set the workflow timezone to Asia/Kolkata, and keep `timeZone` in the Code `fmt()`.
+Set *Workflow settings → Timezone* to your city. The code reads it via `$now.zoneName` and `$today`.
 
 </details>
 

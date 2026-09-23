@@ -2,7 +2,7 @@
 
 # P01 · Accounts-payable invoice pipeline
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / accounts payable](https://img.shields.io/badge/domain-Finance_/_accounts_payable-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / accounts payable](https://img.shields.io/badge/domain-Finance_/_accounts_payable-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square) ![e2e test: passed · 6 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_6_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** Accounts payable teams retype invoice data by hand, pay duplicates without noticing, and push large invoices through without anyone checking them. This is the most commonly automated back-office process in the world. The design principle that makes it safe: **the AI extracts, code validates, and a human approves above a threshold**.
+
+## 💡 Concept first
+
+**📌 Key idea:** **AI extracts, code validates, humans approve above a threshold**; bad inputs go to an exceptions queue.
+
+**🧠 Mental model:** A junior clerk types the invoice, a calculator re-checks the maths, the manager signs the big ones.
+
+**🚫 When *not* to use it:** Don't let the model's arithmetic or guesses reach your ledger unchecked, and don't auto-approve without a limit.
 
 ## 🎯 What you'll learn
 
@@ -21,6 +29,34 @@
 - An **exceptions queue** so bad inputs are never silently dropped
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["📧 Gmail inbox 🔑"]):::saas
+  core{{"⚙️ n8n workflow<br/><small>17 nodes</small>"}}:::n8n
+  state[("🗄️ memory<br/>between runs")]:::store
+  core -.- state
+  s1["✦ Google Gemini 🔑"]:::ai
+  s2(["🧑 Approver"]):::person
+  s3["📧 Gmail 🔑"]:::saas
+  s4["📊 Google Sheets 🔑"]:::saas
+  s0 -->|"new emails"| core
+  core <-->|"prompt + data → answer"| s1
+  core <-->|"approve / decline"| s2
+  core -->|"approval email · sends email"| s3
+  core -->|"writes rows"| s4
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -69,6 +105,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -80,6 +118,18 @@ Gmail (label:invoices, PDF) → Config → split PDFs → PDF text → Informati
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| AI extracts fields, **code** re-checks subtotal + tax = total and GSTIN format | LLMs misread digits and do arithmetic badly; a 10-line check catches it deterministically | Adds a validation step to maintain. Alternative: OCR-specialised invoice APIs (costlier, less flexible) |
+| Dedupe key = normalised vendor + invoice number, remembered across runs | Suppliers resend invoices; paying twice is the most expensive AP mistake | Same number reused by two vendors is fine; a vendor reusing numbers would be blocked (rare, shows in logs) |
+| Approval only **above a threshold** | Humans approve what matters; small invoices flow straight through | The threshold must be tuned. Too low creates a bottleneck; too high adds risk |
+| Bad invoices go to an **Exceptions** sheet + email, never silently dropped | Silent drops are how automations lose trust | Someone must own the exceptions queue daily |
+| Gmail label `invoices` as the entry point | Lets humans control what enters the pipeline with a normal Gmail filter | Relies on the filter being right; a dedicated AP mailbox is cleaner at scale |
 
 ## 🔑 Credentials
 
@@ -392,6 +442,9 @@ return { json: { logged_at: new Date().toISOString(), vendor: inv.vendor_name ||
 > ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
 
 ## ✅ Test it
+
+> [!TIP]
+> **Automated end-to-end test: passed.** 16/16 nodes executed in real n8n (8 credentialed nodes replaced by realistic mocks), 6 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Normal invoice → one ledger row, no approval.
 - [ ] Large invoice → approval email; *Approve* → ledger, *Decline* → exception.

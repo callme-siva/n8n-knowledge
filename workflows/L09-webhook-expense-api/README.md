@@ -2,7 +2,7 @@
 
 # L09 · Expense logger API with Webhook
 
-![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Finance / developer](https://img.shields.io/badge/domain-Finance_/_developer-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square)
+![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Finance / developer](https://img.shields.io/badge/domain-Finance_/_developer-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -11,15 +11,44 @@
 > [!NOTE]
 > **The real-world problem.** You want to log expenses from anywhere: an iPhone Shortcut, a Telegram bot, a Google Form or another app. A webhook turns n8n into your own small API with validation and proper HTTP status codes.
 
+## 💡 Concept first
+
+**📌 Key idea:** A webhook turns a workflow into **your own API**: validate input, authenticate the caller, return honest status codes.
+
+**🧠 Mental model:** A shop counter with a guard (auth), a checker (validation) and a receipt printer (201 / 400).
+
+**🚫 When *not* to use it:** Don't expose a webhook without authentication, and don't do slow work before responding if the caller has a timeout. Respond first, then process.
+
 ## 🎯 What you'll learn
 
 - **Webhook** node (POST, JSON body in `$json.body`)
+- **Header Auth**: never expose an unauthenticated webhook to the internet
 - *Respond to Webhook* for custom status codes (201 / 400)
 - Input validation in Code (*Run once for each item*)
 - Set node in raw JSON mode
 - Test URL and Production URL
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["🌐 Calling app / service"]):::ext
+  core{{"⚙️ n8n workflow<br/><small>7 nodes</small>"}}:::n8n
+  s1["📊 Google Sheets 🔑"]:::saas
+  s0 -->|"HTTPS POST"| core
+  core -->|"writes rows"| s1
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart TB
@@ -46,6 +75,8 @@ flowchart TB
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -61,6 +92,7 @@ Webhook POST /expense → Code validate → IF valid
 | You need | Where to get it |
 |---|---|
 | Google Sheets OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
+| Header Auth credential | name `X-API-Key`, value = a long random string (e.g. `openssl rand -hex 24`) |
 
 ## 📝 Before you run it
 
@@ -79,10 +111,11 @@ Nodes that need a credential selected after import: **Google Sheets**.
 
 1. Create a sheet tab *Expenses* with headers `date, amount, category, note, submitted_by`.
 2. Add **Webhook**: method POST, path `expense`, Respond = *Using 'Respond to Webhook' node*.
-3. Click *Listen for test event*, then run the curl command from the sticky note using the **Test URL**.
-4. Add the **Validate** Code node (mode: *Run once for each item*).
-5. Add **IF** `valid is true`, then on the true branch Set (raw JSON) → Sheets append → **Respond to Webhook** (201).
-6. On the false branch, **Respond to Webhook** with 400.
+3. Webhook → Authentication → **Header Auth** → create the credential (`X-API-Key` + random value). Unauthenticated calls are rejected with 403 before your workflow even runs.
+4. Click *Listen for test event*, then run the curl command from the sticky note using the **Test URL**.
+5. Add the **Validate** Code node (mode: *Run once for each item*).
+6. Add **IF** `valid is true`, then on the true branch Set (raw JSON) → Sheets append → **Respond to Webhook** (201).
+7. On the false branch, **Respond to Webhook** with 400.
 
 ## 🔍 Node-by-node reference
 
@@ -96,6 +129,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 |---|---|
 | `httpMethod` | POST |
 | `path` | expense |
+| `authentication` | headerAuth |
 | `responseMode` | responseNode |
 
 </details>
@@ -119,7 +153,7 @@ const amount = Number(b.amount);
 if (!Number.isFinite(amount) || amount <= 0) errors.push('amount must be a positive number');
 if (!allowed.includes(String(b.category || '').toLowerCase())) errors.push(`category must be one of ${allowed.join(', ')}`);
 return { json: { valid: errors.length === 0, errors,
-  row: { date: b.date || new Date().toISOString().slice(0, 10), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };
+  row: { date: b.date || $today.toISODate(), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };
 ```
 
 </details>
@@ -187,8 +221,12 @@ return { json: { valid: errors.length === 0, errors,
 
 ## ✅ Test it
 
-- [ ] `curl ... -d '{"amount":450,"category":"food"}'` should return 201.
-- [ ] `curl ... -d '{"amount":-5,"category":"pizza"}'` should return 400 with 2 errors.
+> [!TIP]
+> **Automated end-to-end test: passed.** 6/7 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+
+- [ ] `curl ... -H 'X-API-Key: <key>' -d '{"amount":450,"category":"food"}'` should return 201.
+- [ ] `curl ... -H 'X-API-Key: <key>' -d '{"amount":-5,"category":"pizza"}'` should return 400 with 2 errors.
+- [ ] The same call **without** the header should return 403.
 - [ ] iPhone: Shortcuts app → *Get contents of URL* → POST JSON. That gives you a one-tap expense logger.
 
 ## 🧯 Troubleshooting
@@ -207,15 +245,15 @@ The workflow isn't active. Test URLs use `/webhook-test/`, production uses `/web
 
 </details>
 
-<details><summary><b>Anyone can post to my webhook</b></summary>
+<details><summary><b>403 Forbidden</b></summary>
 
-Add *Header Auth* in the Webhook authentication option.
+The header name or value doesn't match the credential exactly (names are case-insensitive, values are not).
 
 </details>
 
 ## 🚀 Level up
 
-- Add Header Auth with a secret token.
+- Rotate the key: create a second credential, update clients, then delete the old one.
 - Add a daily 9 PM summary: *Sheets get rows* → sum by category → email.
 
 ---

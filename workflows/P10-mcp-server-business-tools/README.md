@@ -2,7 +2,7 @@
 
 # P10 · MCP server for company tools
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: AI platform / internal tools](https://img.shields.io/badge/domain-AI_platform_/_internal_tools-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: AI platform / internal tools](https://img.shields.io/badge/domain-AI_platform_/_internal_tools-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: structure only](https://img.shields.io/badge/e2e_test-structure_only-64748B?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -10,6 +10,14 @@
 
 > [!NOTE]
 > **The real-world problem.** The **Model Context Protocol (MCP)** is how AI assistants (Claude, ChatGPT, Cursor, IDE agents) call external tools. Every company now wants its assistants to answer "what plan is this customer on?" or "raise a ticket" safely. With n8n's **MCP Server Trigger**, any workflow becomes a governed tool: authenticated, logged in Executions, and built by the ops team without a backend developer.
+
+## 💡 Concept first
+
+**📌 Key idea:** **MCP** lets AI assistants call your workflows as tools: authenticated, logged, and governed by you.
+
+**🧠 Mental model:** A staff-only door with a keycard reader: assistants can come in, but only to the rooms you allow.
+
+**🚫 When *not* to use it:** Don't expose write actions (refunds, deletes) as MCP tools without an approval step.
 
 ## 🎯 What you'll learn
 
@@ -19,6 +27,28 @@
 - Governance: auth, least-privilege tools, and read-only by default
 
 ## 🏗️ Architecture
+
+**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.
+
+```mermaid
+flowchart LR
+  s0(["🤖 AI assistant (MCP client)"]):::ai
+  core{{"⚙️ n8n workflow<br/><small>4 nodes</small>"}}:::n8n
+  s1["↗ Sub-workflow"]:::time
+  s2["🌐 open.er-api.com"]:::ext
+  s0 -->|"tool calls"| core
+  core -->|"calls with inputs"| s1
+  core <-->|"agent tool call"| s2
+  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
+  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
+  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
+  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
+  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
+  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
+```
+
+<details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
 flowchart LR
@@ -39,6 +69,8 @@ flowchart LR
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
+</details>
+
 <details><summary>Plain-text flow</summary>
 
 ```
@@ -49,6 +81,16 @@ MCP client (Claude / Cursor / ChatGPT) ⇄ MCP Server Trigger /mcp/business-tool
 ```
 
 </details>
+
+## ⚖️ Design decisions & trade-offs
+
+Why it's built this way, and what it costs.
+
+| Decision | Why | Trade-off / alternative |
+|---|---|---|
+| Expose tools through the **MCP Server Trigger** | One governed endpoint works with Claude, ChatGPT, Cursor and IDE agents | Clients must support HTTP MCP; the workflow must be active |
+| Tools as sub-workflows with `$fromAI()` parameters | Each tool is testable on its own and reusable in normal workflows | More workflows to manage (naming and IDs matter) |
+| Bearer auth + read-only tools first | Least privilege: assistants can look things up but not change data | Write actions need an approval pattern before exposure |
 
 ## 🔑 Credentials
 

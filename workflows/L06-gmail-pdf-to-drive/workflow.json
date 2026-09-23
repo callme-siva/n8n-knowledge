@@ -49,7 +49,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// One email can carry many files. Output one item per PDF.\nconst out = [];\nfor (const item of $input.all()) {\n  for (const [key, bin] of Object.entries(item.binary || {})) {\n    const name = bin.fileName || key;\n    if (bin.mimeType === 'application/pdf' || name.toLowerCase().endsWith('.pdf')) {\n      const date = new Date(item.json.date || Date.now()).toISOString().slice(0, 10);\n      out.push({ json: { fileName: `${date}_${name}`, from: item.json.from?.text || '', subject: item.json.subject || '', messageId: item.json.id }, binary: { data: bin } });\n    }\n  }\n}\nreturn out;"
+        "jsCode": "// One email can carry many files. Output one item per PDF.\nconst out = [];\nfor (const item of $input.all()) {\n  for (const [key, bin] of Object.entries(item.binary || {})) {\n    const name = bin.fileName || key;\n    if (bin.mimeType === 'application/pdf' || name.toLowerCase().endsWith('.pdf')) {\n      const date = (item.json.date ? DateTime.fromISO(new Date(item.json.date).toISOString()) : $now).setZone($now.zoneName).toISODate();\n      out.push({ json: { fileName: `${date}_${name}`, from: item.json.from?.text || '', subject: item.json.subject || '', messageId: item.json.id }, binary: { data: bin } });\n    }\n  }\n}\nreturn out;"
       },
       "id": "6bdf6f50-1c68-50f4-b794-eee78712f821",
       "name": "Split PDF Attachments",
