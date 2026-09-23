@@ -2,7 +2,7 @@
 
 # P04 · Multi-touch sales follow-up sequence
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 16](https://img.shields.io/badge/nodes-16-7C3AED?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -27,35 +27,35 @@ flowchart TB
   n1["Lead Record"]:::code
   n2["CRM: Add Lead"]:::data
   n3["Email 1: Intro"]:::msg
-  n4["Wait 3 Days"]:::msg
+  n4["Wait 3 Days"]:::logic
   n5["Check Reply #1"]:::msg
   n6{"Replied? #1"}:::logic
-  n7["Email 2: Value"]:::msg
-  n8["Wait 4 Days"]:::msg
-  n9["Check Reply #2"]:::msg
-  n10{"Replied? #2"}:::logic
-  n11["Email 3: Close the Loop"]:::msg
-  n12["Status: Replied"]:::code
-  n13["Status: Sequence Done"]:::code
-  n14["CRM: Update"]:::data
-  n15["Alert Sales: Reply!"]:::msg
+  n7["CRM: Replied after Email 1"]:::data
+  n8["Slack: Reply after Email 1"]:::msg
+  n9["Email 2: Value"]:::msg
+  n10["Wait 4 Days"]:::logic
+  n11["Check Reply #2"]:::msg
+  n12{"Replied? #2"}:::logic
+  n13["CRM: Replied after Email 2"]:::data
+  n14["Slack: Reply after Email 2"]:::msg
+  n15["Email 3: Close the Loop"]:::msg
+  n16["CRM: Closed, No Reply"]:::data
+  n7 --> n8
+  n13 --> n14
   n0 --> n1
   n1 --> n2
   n2 --> n3
   n3 --> n4
   n4 --> n5
   n5 --> n6
-  n6 -->|"true"| n12
-  n6 -->|"false"| n7
-  n7 --> n8
-  n8 --> n9
+  n6 -->|"true"| n7
+  n6 -->|"false"| n9
   n9 --> n10
-  n10 -->|"true"| n12
-  n10 -->|"false"| n11
-  n11 --> n13
-  n13 --> n14
-  n12 --> n14
-  n12 --> n15
+  n10 --> n11
+  n11 --> n12
+  n12 -->|"true"| n13
+  n12 -->|"false"| n15
+  n15 --> n16
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
   classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937
@@ -69,9 +69,9 @@ flowchart TB
 <details><summary>Plain-text flow</summary>
 
 ```
-Form → Set lead → CRM upsert → Email 1 → ⏸ 3 days → reply? ─ yes → status replied → CRM + Slack
-                                                    └ no → Email 2 → ⏸ 4 days → reply? ─ yes → (same)
-                                                                                     └ no → Email 3 → status closed → CRM
+Form → Set lead → CRM add → Email 1 → ⏸ 3 days → reply? ─ yes → CRM replied_after_email_1 → Slack
+                                                   └ no  → Email 2 → ⏸ 4 days → reply? ─ yes → CRM replied_after_email_2 → Slack
+                                                                                   └ no  → Email 3 → CRM no_reply_closed
 ```
 
 </details>
@@ -92,7 +92,9 @@ Replace these placeholder values with your own:
 |---|---|---|
 | CRM: Add Lead | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
 | Email 1: Intro | `message` | `<p>Hi {{ $('Lead Record').item.json.name }},</p><p>Thanks for reaching out about <i>{{ …` |
-| CRM: Update | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+| CRM: Replied after Email 1 | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+| CRM: Replied after Email 2 | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+| CRM: Closed, No Reply | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
@@ -200,7 +202,53 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>8. Email 2: Value</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>8. CRM: Replied after Email 1</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | appendOrUpdate |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Leads |
+| `columns.mappingMode` | defineBelow |
+| `columns.email` | `{{ $('Lead Record').item.json.email }}` |
+| `columns.status` | replied_after_email_1 |
+| `columns.updated` | `{{ $now.toISO() }}` |
+| `columns.matchingColumns` | email |
+| `columns.schema.1.displayName` | email |
+| `columns.schema.1.type` | string |
+| `columns.schema.1.required` | off |
+| `columns.schema.1.display` | ✅ on |
+| `columns.schema.1.canBeUsedToMatch` | ✅ on |
+| `columns.schema.1.defaultMatch` | off |
+| `columns.schema.1.removed` | off |
+| `columns.schema.2.displayName` | status |
+| `columns.schema.2.type` | string |
+| `columns.schema.2.required` | off |
+| `columns.schema.2.display` | ✅ on |
+| `columns.schema.2.canBeUsedToMatch` | ✅ on |
+| `columns.schema.2.defaultMatch` | off |
+| `columns.schema.2.removed` | off |
+| `columns.schema.3.displayName` | updated |
+| `columns.schema.3.type` | string |
+| … | 5 more in workflow.json |
+
+</details>
+
+<details><summary><b>9. Slack: Reply after Email 1</b> · <code>slack</code> v2.3</summary>
+
+
+
+| Property | Value |
+|---|---|
+| `select` | channel |
+| `channelId` | #sales |
+| `text` | `:tada: {{ $('Lead Record').item.json.name }} ({{ $('Lead Record').item.json.email }}) replied after email 1. Take it from here.` |
+
+</details>
+
+<details><summary><b>10. Email 2: Value</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
@@ -214,7 +262,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>9. Wait 4 Days</b> · <code>wait</code> v1.1</summary>
+<details><summary><b>11. Wait 4 Days</b> · <code>wait</code> v1.1</summary>
 
 
 
@@ -226,7 +274,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>10. Check Reply #2</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>12. Check Reply #2</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
@@ -240,7 +288,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>11. Replied? #2</b> · <code>If</code> v2.2</summary>
+<details><summary><b>13. Replied? #2</b> · <code>If</code> v2.2</summary>
 
 > Splits items into a **true** and a **false** branch.
 
@@ -250,7 +298,53 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>12. Email 3: Close the Loop</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>14. CRM: Replied after Email 2</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | appendOrUpdate |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Leads |
+| `columns.mappingMode` | defineBelow |
+| `columns.email` | `{{ $('Lead Record').item.json.email }}` |
+| `columns.status` | replied_after_email_2 |
+| `columns.updated` | `{{ $now.toISO() }}` |
+| `columns.matchingColumns` | email |
+| `columns.schema.1.displayName` | email |
+| `columns.schema.1.type` | string |
+| `columns.schema.1.required` | off |
+| `columns.schema.1.display` | ✅ on |
+| `columns.schema.1.canBeUsedToMatch` | ✅ on |
+| `columns.schema.1.defaultMatch` | off |
+| `columns.schema.1.removed` | off |
+| `columns.schema.2.displayName` | status |
+| `columns.schema.2.type` | string |
+| `columns.schema.2.required` | off |
+| `columns.schema.2.display` | ✅ on |
+| `columns.schema.2.canBeUsedToMatch` | ✅ on |
+| `columns.schema.2.defaultMatch` | off |
+| `columns.schema.2.removed` | off |
+| `columns.schema.3.displayName` | updated |
+| `columns.schema.3.type` | string |
+| … | 5 more in workflow.json |
+
+</details>
+
+<details><summary><b>15. Slack: Reply after Email 2</b> · <code>slack</code> v2.3</summary>
+
+
+
+| Property | Value |
+|---|---|
+| `select` | channel |
+| `channelId` | #sales |
+| `text` | `:tada: {{ $('Lead Record').item.json.name }} ({{ $('Lead Record').item.json.email }}) replied after email 2. Take it from here.` |
+
+</details>
+
+<details><summary><b>16. Email 3: Close the Loop</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
@@ -264,31 +358,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>13. Status: Replied</b> · <code>Edit Fields (Set)</code> v3.4</summary>
-
-> Creates, renames or overwrites fields without code.
-
-| Property | Value |
-|---|---|
-| `email` | `{{ $('Lead Record').item.json.email }}` |
-| `status` | replied |
-| `updated` | `{{ $now.toISO() }}` |
-
-</details>
-
-<details><summary><b>14. Status: Sequence Done</b> · <code>Edit Fields (Set)</code> v3.4</summary>
-
-> Creates, renames or overwrites fields without code.
-
-| Property | Value |
-|---|---|
-| `email` | `{{ $('Lead Record').item.json.email }}` |
-| `status` | no_reply_closed |
-| `updated` | `{{ $now.toISO() }}` |
-
-</details>
-
-<details><summary><b>15. CRM: Update</b> · <code>Google Sheets</code> v4.5</summary>
+<details><summary><b>17. CRM: Closed, No Reply</b> · <code>Google Sheets</code> v4.5</summary>
 
 > Reads, appends or updates rows in a spreadsheet.
 
@@ -297,20 +367,28 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `operation` | appendOrUpdate |
 | `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
 | `sheetName` | Leads |
-| `columns.mappingMode` | autoMapInputData |
+| `columns.mappingMode` | defineBelow |
+| `columns.email` | `{{ $('Lead Record').item.json.email }}` |
+| `columns.status` | no_reply_closed |
+| `columns.updated` | `{{ $now.toISO() }}` |
 | `columns.matchingColumns` | email |
-
-</details>
-
-<details><summary><b>16. Alert Sales: Reply!</b> · <code>slack</code> v2.3</summary>
-
-
-
-| Property | Value |
-|---|---|
-| `select` | channel |
-| `channelId` | #sales |
-| `text` | `:tada: {{ $json.email }} replied. Take it from here.` |
+| `columns.schema.1.displayName` | email |
+| `columns.schema.1.type` | string |
+| `columns.schema.1.required` | off |
+| `columns.schema.1.display` | ✅ on |
+| `columns.schema.1.canBeUsedToMatch` | ✅ on |
+| `columns.schema.1.defaultMatch` | off |
+| `columns.schema.1.removed` | off |
+| `columns.schema.2.displayName` | status |
+| `columns.schema.2.type` | string |
+| `columns.schema.2.required` | off |
+| `columns.schema.2.display` | ✅ on |
+| `columns.schema.2.canBeUsedToMatch` | ✅ on |
+| `columns.schema.2.defaultMatch` | off |
+| `columns.schema.2.removed` | off |
+| `columns.schema.3.displayName` | updated |
+| `columns.schema.3.type` | string |
+| … | 5 more in workflow.json |
 
 </details>
 
@@ -319,7 +397,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 ## ✅ Test it
 
-- [ ] Reply → no Email 2, the row shows `replied`, and there's a Slack alert.
+- [ ] Reply → no Email 2, the row shows `replied_after_email_1`, and there's a Slack alert.
 - [ ] Don't reply → you get Email 2, then Email 3, and the row shows `no_reply_closed`.
 - [ ] Open **Executions**: a waiting execution shows as *Waiting*.
 

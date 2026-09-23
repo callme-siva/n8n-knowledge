@@ -32,7 +32,7 @@ flowchart TB
   n5("Gemini"):::sub
   n6["Validate"]:::code
   n7{"Valid?"}:::logic
-  n8["Block Duplicates"]:::msg
+  n8["Block Duplicates"]:::logic
   n9{"Needs Approval?"}:::logic
   n10["Ask Approver"]:::msg
   n11{"Approved?"}:::logic

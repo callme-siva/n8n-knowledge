@@ -27,7 +27,7 @@ flowchart TB
   n1[["Triage"]]:::ai
   n2("Gemini (triage)"):::sub
   n3["Load FAQ"]:::data
-  n4["FAQ as Text"]:::msg
+  n4["FAQ as Text"]:::logic
   n5[["Draft Answer"]]:::ai
   n6("Gemini (answer)"):::sub
   n7("Answer Schema"):::sub

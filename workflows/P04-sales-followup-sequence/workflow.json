@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 📬 P04 · Follow-ups that stop when they reply\nNew lead → email 1 → **wait 3 days** → replied? stop : email 2 → **wait 4 days** → replied? stop : final email. Every step updates the CRM sheet.\n⚠️ Long waits need a persistent DB (Postgres) and an always-on n8n.",
+        "content": "## 📬 P04 · Follow-ups that stop when they reply\nThree stages: email → **wait** → replied?\n• yes → CRM `replied_after_email_N` + Slack alert, sequence stops\n• no → next email\nAfter email 3 the lead is closed as `no_reply_closed`.\n⚠️ Long waits need a persistent DB (Postgres) and an always-on n8n.",
         "width": 580,
         "height": 300,
         "color": 7
@@ -224,6 +224,93 @@
     },
     {
       "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Lead Record').item.json.email }}",
+            "status": "replied_after_email_1",
+            "updated": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "updated",
+              "displayName": "updated",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b298ec63-0efc-5bcc-96c1-b9334ee8d829",
+      "name": "CRM: Replied after Email 1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1400,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#sales"
+        },
+        "text": "=:tada: {{ $('Lead Record').item.json.name }} ({{ $('Lead Record').item.json.email }}) replied after email 1. Take it from here.",
+        "otherOptions": {}
+      },
+      "id": "d8f6bbe5-ad56-531d-b042-8f1edb5dba7c",
+      "name": "Slack: Reply after Email 1",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1600,
+        -220
+      ]
+    },
+    {
+      "parameters": {
         "sendTo": "={{ $('Lead Record').item.json.email }}",
         "subject": "=A 2-minute idea for {{ $('Lead Record').item.json.company || 'you' }}",
         "emailType": "html",
@@ -238,7 +325,7 @@
       "typeVersion": 2.1,
       "position": [
         1400,
-        100
+        0
       ]
     },
     {
@@ -253,7 +340,7 @@
       "typeVersion": 1.1,
       "position": [
         1600,
-        100
+        0
       ]
     },
     {
@@ -271,7 +358,7 @@
       "typeVersion": 2.1,
       "position": [
         1800,
-        100
+        0
       ],
       "alwaysOutputData": true
     },
@@ -305,7 +392,94 @@
       "typeVersion": 2.2,
       "position": [
         2000,
-        100
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Lead Record').item.json.email }}",
+            "status": "replied_after_email_2",
+            "updated": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "updated",
+              "displayName": "updated",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "caa00a60-46e3-55b3-84b2-6babb5c56ea1",
+      "name": "CRM: Replied after Email 2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2200,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#sales"
+        },
+        "text": "=:tada: {{ $('Lead Record').item.json.name }} ({{ $('Lead Record').item.json.email }}) replied after email 2. Take it from here.",
+        "otherOptions": {}
+      },
+      "id": "7a872121-fdef-5509-92b7-15d45c1b39bf",
+      "name": "Slack: Reply after Email 2",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2400,
+        -220
       ]
     },
     {
@@ -324,77 +498,7 @@
       "typeVersion": 2.1,
       "position": [
         2200,
-        200
-      ]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "a0",
-              "name": "email",
-              "value": "={{ $('Lead Record').item.json.email }}",
-              "type": "string"
-            },
-            {
-              "id": "a1",
-              "name": "status",
-              "value": "replied",
-              "type": "string"
-            },
-            {
-              "id": "a2",
-              "name": "updated",
-              "value": "={{ $now.toISO() }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "f4710d88-d474-504c-acfc-d78ef494f370",
-      "name": "Status: Replied",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        1400,
-        -140
-      ]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "a0",
-              "name": "email",
-              "value": "={{ $('Lead Record').item.json.email }}",
-              "type": "string"
-            },
-            {
-              "id": "a1",
-              "name": "status",
-              "value": "no_reply_closed",
-              "type": "string"
-            },
-            {
-              "id": "a2",
-              "name": "updated",
-              "value": "={{ $now.toISO() }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "3c06505e-9bbb-5860-a1d6-ae2cc22956cb",
-      "name": "Status: Sequence Done",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        2400,
-        200
+        0
       ]
     },
     {
@@ -411,46 +515,83 @@
           "value": "Leads"
         },
         "columns": {
-          "mappingMode": "autoMapInputData",
-          "value": {},
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Lead Record').item.json.email }}",
+            "status": "no_reply_closed",
+            "updated": "={{ $now.toISO() }}"
+          },
           "matchingColumns": [
             "email"
           ],
-          "schema": []
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "updated",
+              "displayName": "updated",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            }
+          ]
         },
         "options": {}
       },
-      "id": "383b06f8-1479-5986-ba98-3c822dbb2a71",
-      "name": "CRM: Update",
+      "id": "380e2404-8418-56f1-8cd7-7336246789de",
+      "name": "CRM: Closed, No Reply",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        2600,
+        2400,
         0
-      ]
-    },
-    {
-      "parameters": {
-        "select": "channel",
-        "channelId": {
-          "__rl": true,
-          "mode": "name",
-          "value": "#sales"
-        },
-        "text": "=:tada: {{ $json.email }} replied. Take it from here.",
-        "otherOptions": {}
-      },
-      "id": "4948ae5c-7c2a-5876-b3c1-da1b05f93dce",
-      "name": "Alert Sales: Reply!",
-      "type": "n8n-nodes-base.slack",
-      "typeVersion": 2.3,
-      "position": [
-        2800,
-        -140
       ]
     }
   ],
   "connections": {
+    "CRM: Replied after Email 1": {
+      "main": [
+        [
+          {
+            "node": "Slack: Reply after Email 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: Replied after Email 2": {
+      "main": [
+        [
+          {
+            "node": "Slack: Reply after Email 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "New Lead": {
       "main": [
         [
@@ -521,7 +662,7 @@
       "main": [
         [
           {
-            "node": "Status: Replied",
+            "node": "CRM: Replied after Email 1",
             "type": "main",
             "index": 0
           }
@@ -572,7 +713,7 @@
       "main": [
         [
           {
-            "node": "Status: Replied",
+            "node": "CRM: Replied after Email 2",
             "type": "main",
             "index": 0
           }
@@ -590,34 +731,7 @@
       "main": [
         [
           {
-            "node": "Status: Sequence Done",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Status: Sequence Done": {
-      "main": [
-        [
-          {
-            "node": "CRM: Update",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Status: Replied": {
-      "main": [
-        [
-          {
-            "node": "CRM: Update",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Alert Sales: Reply!",
+            "node": "CRM: Closed, No Reply",
             "type": "main",
             "index": 0
           }

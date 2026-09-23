@@ -202,7 +202,7 @@ def P03(root):
 
 def P04(root):
     w = WF("P04-sales-followup-sequence", "P04 · Multi-touch sales follow-up sequence (Wait nodes + reply detection)")
-    w.note("## 📬 P04 · Follow-ups that stop when they reply\nNew lead → email 1 → **wait 3 days** → replied? stop : email 2 → **wait 4 days** → replied? stop : final email. Every step updates the CRM sheet.\n⚠️ Long waits need a persistent DB (Postgres) and an always-on n8n.", (0, 0), 580)
+    w.note("## 📬 P04 · Follow-ups that stop when they reply\nThree stages: email → **wait** → replied?\n• yes → CRM `replied_after_email_N` + Slack alert, sequence stops\n• no → next email\nAfter email 3 the lead is closed as `no_reply_closed`.\n⚠️ Long waits need a persistent DB (Postgres) and an always-on n8n.", (0, 0), 580)
     w.add("New Lead", "formTrigger", 2.2, {"formTitle": "Request a callback", "formFields": {"values": [form_field("Name", required=True), form_field("Email", "email", True), form_field("Company"), form_field("What do you need?", "textarea")]}, "options": {}}, (0, 0))
     w.add("Lead Record", "set", 3.4, assign(email="={{ $json.Email.toLowerCase() }}", name="={{ $json.Name }}", company="={{ $json.Company || '' }}", need="={{ $json['What do you need?'] || '' }}",
         status="email_1_sent", started="={{ $now.toISO() }}"), (200, 0))
@@ -214,36 +214,45 @@ def P04(root):
         w.add(name, "gmail", 2.1, {"operation": "getAll", "limit": 5, "simple": True,
             "filters": {"q": "=from:{{ $('Lead Record').item.json.email }} after:{{ DateTime.fromISO($('Lead Record').item.json.started).toFormat('yyyy/MM/dd') }}"}},
             pos, alwaysOutputData=True)
+    lead = "$('Lead Record').item.json"
+    def replied_branch(n, x):  # one short branch per stage: mark the CRM row, tell sales
+        w.add(f"CRM: Replied after Email {n}", "googleSheets", 4.5,
+              sheet_set("Leads", "email", email=f"={{{{ {lead}.email }}}}", status=f"replied_after_email_{n}", updated="={{ $now.toISO() }}"), (x, -220))
+        w.add(f"Slack: Reply after Email {n}", "slack", 2.3,
+              slack_post("#sales", f"=:tada: {{{{ {lead}.name }}}} ({{{{ {lead}.email }}}}) replied after email {n}. Take it from here."), (x + 200, -220))
+        w.chain(f"CRM: Replied after Email {n}", f"Slack: Reply after Email {n}")
+    # stage 1
     check_reply("Check Reply #1", (1000, 0))
     w.add("Replied? #1", "if", 2.2, {"conditions": conditions(cond("={{ $json.id }}", "string", "exists")), "options": {}}, (1200, 0))
-    w.add("Email 2: Value", "gmail", 2.1, gmail_send("={{ $('Lead Record').item.json.email }}", "=A 2-minute idea for {{ $('Lead Record').item.json.company || 'you' }}",
-        "=<p>Hi {{ $('Lead Record').item.json.name }},</p><p>Teams like yours usually save 5–10 hours a week by automating the first step of <i>{{ $('Lead Record').item.json.need }}</i>. Happy to show you how. Just reply 'yes'.</p>"), (1400, 100))
-    w.add("Wait 4 Days", "wait", 1.1, {"resume": "timeInterval", "amount": 4, "unit": "days"}, (1600, 100))
-    check_reply("Check Reply #2", (1800, 100))
-    w.add("Replied? #2", "if", 2.2, {"conditions": conditions(cond("={{ $json.id }}", "string", "exists")), "options": {}}, (2000, 100))
-    w.add("Email 3: Close the Loop", "gmail", 2.1, gmail_send("={{ $('Lead Record').item.json.email }}", "=Should I close your file?",
-        "=<p>Hi {{ $('Lead Record').item.json.name }}, I haven't heard back, so I'll assume the timing isn't right. If that changes, just reply to this email. All the best!</p>"), (2200, 200))
-    w.add("Status: Replied", "set", 3.4, assign(email="={{ $('Lead Record').item.json.email }}", status="replied", updated="={{ $now.toISO() }}"), (1400, -140))
-    w.add("Status: Sequence Done", "set", 3.4, assign(email="={{ $('Lead Record').item.json.email }}", status="no_reply_closed", updated="={{ $now.toISO() }}"), (2400, 200))
-    w.add("CRM: Update", "googleSheets", 4.5, sheet_upsert("Leads", "email"), (2600, 0))
-    w.add("Alert Sales: Reply!", "slack", 2.3, slack_post("#sales", "=:tada: {{ $json.email }} replied. Take it from here."), (2800, -140))
+    replied_branch(1, 1400)
+    # stage 2
+    w.add("Email 2: Value", "gmail", 2.1, gmail_send(f"={{{{ {lead}.email }}}}", f"=A 2-minute idea for {{{{ {lead}.company || 'you' }}}}",
+        f"=<p>Hi {{{{ {lead}.name }}}},</p><p>Teams like yours usually save 5–10 hours a week by automating the first step of <i>{{{{ {lead}.need }}}}</i>. Happy to show you how. Just reply 'yes'.</p>"), (1400, 0))
+    w.add("Wait 4 Days", "wait", 1.1, {"resume": "timeInterval", "amount": 4, "unit": "days"}, (1600, 0))
+    check_reply("Check Reply #2", (1800, 0))
+    w.add("Replied? #2", "if", 2.2, {"conditions": conditions(cond("={{ $json.id }}", "string", "exists")), "options": {}}, (2000, 0))
+    replied_branch(2, 2200)
+    # stage 3
+    w.add("Email 3: Close the Loop", "gmail", 2.1, gmail_send(f"={{{{ {lead}.email }}}}", "=Should I close your file?",
+        f"=<p>Hi {{{{ {lead}.name }}}}, I haven't heard back, so I'll assume the timing isn't right. If that changes, just reply to this email. All the best!</p>"), (2200, 0))
+    w.add("CRM: Closed, No Reply", "googleSheets", 4.5,
+          sheet_set("Leads", "email", email=f"={{{{ {lead}.email }}}}", status="no_reply_closed", updated="={{ $now.toISO() }}"), (2400, 0))
     w.chain("New Lead", "Lead Record", "CRM: Add Lead", "Email 1: Intro", "Wait 3 Days", "Check Reply #1", "Replied? #1")
-    w.link("Replied? #1", "Status: Replied", 0); w.link("Replied? #1", "Email 2: Value", 1)
+    w.link("Replied? #1", "CRM: Replied after Email 1", 0); w.link("Replied? #1", "Email 2: Value", 1)
     w.chain("Email 2: Value", "Wait 4 Days", "Check Reply #2", "Replied? #2")
-    w.link("Replied? #2", "Status: Replied", 0); w.link("Replied? #2", "Email 3: Close the Loop", 1)
-    w.chain("Email 3: Close the Loop", "Status: Sequence Done", "CRM: Update")
-    w.link("Status: Replied", "CRM: Update"); w.link("Status: Replied", "Alert Sales: Reply!")
+    w.link("Replied? #2", "CRM: Replied after Email 2", 0); w.link("Replied? #2", "Email 3: Close the Loop", 1)
+    w.chain("Email 3: Close the Loop", "CRM: Closed, No Reply")
     write(root, w, readme("P04", "Multi-touch sales follow-up sequence", P, "Sales", "45 min",
         "80% of sales need 5+ touches, but most people follow up once and give up, or keep emailing people who already replied (which is embarrassing). Tools like Outreach and Apollo charge per seat for this. With **Wait nodes** and **reply detection**, n8n runs the whole sequence per lead and stops the moment they reply.",
         ["**Wait** node: pausing one execution for days", "Reply detection with a Gmail search (`from:x after:date`)",
          "`alwaysOutputData` + `exists` check to branch on \"found nothing\"", "Keeping a CRM row in sync with **append or update** by email",
          "Operational reality: long waits need Postgres and an always-on instance"],
-        "Form → Set lead → CRM upsert → Email 1 → ⏸ 3 days → reply? ─ yes → status replied → CRM + Slack\n                                                    └ no → Email 2 → ⏸ 4 days → reply? ─ yes → (same)\n                                                                                     └ no → Email 3 → status closed → CRM",
+        "Form → Set lead → CRM add → Email 1 → ⏸ 3 days → reply? ─ yes → CRM replied_after_email_1 → Slack\n                                                   └ no  → Email 2 → ⏸ 4 days → reply? ─ yes → CRM replied_after_email_2 → Slack\n                                                                                   └ no  → Email 3 → CRM no_reply_closed",
         ["Gmail OAuth2", "Google Sheets OAuth2 (tab `Leads`: email, name, company, need, status, started, updated)", "Slack API"],
         ["Create the `Leads` tab.", "Import it and connect the credentials.",
          "**For testing**, change both Wait nodes to *minutes* (e.g. 2 and 2).",
          "Submit the form with an email you control. Reply to Email 1 from that address before the wait ends."],
-        ["Reply → no Email 2, the row shows `replied`, and there's a Slack alert.", "Don't reply → you get Email 2, then Email 3, and the row shows `no_reply_closed`.",
+        ["Reply → no Email 2, the row shows `replied_after_email_1`, and there's a Slack alert.", "Don't reply → you get Email 2, then Email 3, and the row shows `no_reply_closed`.",
          "Open **Executions**: a waiting execution shows as *Waiting*."],
         [("Waits over ~65 s never resume", "They're saved to the database and need the instance running when they're due. Laptops that sleep miss them, so use a server."),
          ("Replies not detected", "The Gmail search runs on *your* mailbox, so the lead must reply to the same account that sent the email.")],

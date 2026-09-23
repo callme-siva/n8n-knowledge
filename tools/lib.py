@@ -196,3 +196,14 @@ def approval(to, subject, html, days=3):
     return {"operation": "sendAndWait", "sendTo": to, "subject": subject, "message": html,
             "approvalOptions": {"values": {"approvalType": "double"}},
             "options": {"limitWaitTime": {"values": {"limitType": "afterTimeInterval", "resumeAmount": days, "resumeUnit": "days"}}}}
+
+
+def sheet_set(sheet_name, key, **values):
+    """Append-or-update one row with explicitly mapped values (no Set node needed)."""
+    schema = [{"id": k, "displayName": k, "type": "string", "required": False, "display": True,
+               "canBeUsedToMatch": True, "defaultMatch": False, "removed": False} for k in values]
+    return {"operation": "appendOrUpdate",
+            "documentId": {"__rl": True, "mode": "url", "value": "PASTE_YOUR_GOOGLE_SHEET_URL"},
+            "sheetName": {"__rl": True, "mode": "name", "value": sheet_name},
+            "columns": {"mappingMode": "defineBelow", "value": values, "matchingColumns": [key], "schema": schema},
+            "options": {}}

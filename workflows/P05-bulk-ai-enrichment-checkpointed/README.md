@@ -26,14 +26,14 @@
 flowchart TB
   n0(["Run Manually or Nightly"]):::trigger
   n1["Pending Rows Only"]:::data
-  n2["Max 500 per Run"]:::msg
-  n3["Loop in Batches of 10"]:::msg
+  n2["Max 500 per Run"]:::logic
+  n3["Loop in Batches of 10"]:::logic
   n4[["Classify Company"]]:::ai
   n5("Gemini"):::sub
   n6["Mark Done"]:::code
   n7["Mark Error"]:::code
   n8["Checkpoint to Sheet"]:::data
-  n9["Pause 2s (rate limit)"]:::msg
+  n9["Pause 2s (rate limit)"]:::logic
   n10["Summary"]:::code
   n0 --> n1
   n1 --> n2

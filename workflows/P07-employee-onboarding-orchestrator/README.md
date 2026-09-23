@@ -26,10 +26,10 @@ flowchart TB
   n0(["New Joiner Form (HR)"]):::trigger
   n1["Build Checklist"]:::code
   n2["Create Jira Task"]:::data
-  n3["Collect Jira Keys"]:::msg
+  n3["Collect Jira Keys"]:::logic
   n4["Day-1 Sessions"]:::code
   n5["Book Calendar Event"]:::msg
-  n6["Collect Events"]:::msg
+  n6["Collect Events"]:::logic
   n7["Wait for Both"]:::logic
   n8["Welcome Email"]:::msg
   n9["Tell the Team"]:::msg

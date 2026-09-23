@@ -1,36 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -217 1260 1515" width="1260" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -251 1460 923" width="1400" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-80" y="-217" width="1260" height="1515" rx="14" fill="#F8FAFC"/>
-<rect x="-80" y="-217" width="1260" height="1515" rx="14" fill="url(#dots)"/>
-<rect x="-80" y="-217" width="1260" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-197" width="1260" height="16" fill="#1F2937"/>
-<circle cx="-60" cy="-199" r="5" fill="#FF5F57"/><circle cx="-42" cy="-199" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-199" r="5" fill="#28C840"/>
-<text x="-4" y="-194" font-size="13" fill="#E5E7EB" font-weight="600">P04 · Multi-touch sales follow-up sequence (Wait nodes + reply detection)</text>
-<rect x="-40" y="-141" width="580" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-26" y="-113" font-size="15" fill="#5B4B12" font-weight="700">📬 P04 · Follow-ups that stop when they reply</text>
-<text x="-26" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">New lead → email 1 → wait 3 days → replied? stop : email 2 → wait 4 days → replied?</text>
-<text x="-26" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">stop : final email. Every step updates the CRM sheet.</text>
+<rect x="-80" y="-251" width="1460" height="923" rx="14" fill="#F8FAFC"/>
+<rect x="-80" y="-251" width="1460" height="923" rx="14" fill="url(#dots)"/>
+<rect x="-80" y="-251" width="1460" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-231" width="1460" height="16" fill="#1F2937"/>
+<circle cx="-60" cy="-233" r="5" fill="#FF5F57"/><circle cx="-42" cy="-233" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-233" r="5" fill="#28C840"/>
+<text x="-4" y="-228" font-size="13" fill="#E5E7EB" font-weight="600">P04 · Multi-touch sales follow-up sequence (Wait nodes + reply detection)</text>
+<rect x="-40" y="-175" width="580" height="135" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-26" y="-147" font-size="15" fill="#5B4B12" font-weight="700">📬 P04 · Follow-ups that stop when they reply</text>
+<text x="-26" y="-125" font-size="12.5" fill="#5B4B12" font-weight="400">Three stages: email → wait → replied?</text>
+<text x="-26" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">• yes → CRM repliedafteremailN + Slack alert, sequence stops</text>
+<text x="-26" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">• no → next email</text>
+<text x="-26" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">After email 3 the lead is closed as noreplyclosed.</text>
 <text x="-26" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">⚠️ Long waits need a persistent DB (Postgres) and an always-on n8n.</text>
+<path d="M300,316.0 C350.0,316.0 350.0,316.0 396,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M1100,316.0 C1150.0,316.0 1150.0,316.0 1196,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M100,50.0 C150.0,50.0 150.0,50.0 196,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M300,50.0 C350.0,50.0 350.0,50.0 396,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M500,50.0 C550.0,50.0 550.0,50.0 596,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M700,50.0 C750.0,50.0 750.0,50.0 796,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M900,50.0 H924 Q934,50.0 934,60.0 V191 Q934,201 924,201 H-34 Q-44,201 -44,211 V446.0 Q-44,456.0 -34,456.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M100,456.0 C150.0,456.0 150.0,456.0 196,456.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M300,439.3333333333333 C350.0,439.3333333333333 350.0,316.0 396,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="308" y="434.3333333333333" font-size="11" fill="#64748B">true</text>
-<path d="M300,472.6666666666667 C350.0,472.6666666666667 350.0,556.0 396,556.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="308" y="467.6666666666667" font-size="11" fill="#64748B">false</text>
-<path d="M500,556.0 C550.0,556.0 550.0,556.0 596,556.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M700,556.0 H724 Q734,556.0 734,566.0 V697 Q734,707 724,707 H-34 Q-44,707 -44,717 V1052.0 Q-44,1062.0 -34,1062.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M100,1062.0 C150.0,1062.0 150.0,1062.0 196,1062.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M300,1045.3333333333333 H324 Q334,1045.3333333333333 334,1055.3333333333333 V191 Q334,201 324,201 H366 Q356,201 356,211 V306.0 Q356,316.0 366,316.0 H396" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="308" y="1040.3333333333333" font-size="11" fill="#64748B">true</text>
-<path d="M300,1078.6666666666667 C350.0,1078.6666666666667 350.0,1162.0 396,1162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<text x="308" y="1073.6666666666667" font-size="11" fill="#64748B">false</text>
-<path d="M500,1162.0 C550.0,1162.0 550.0,1162.0 596,1162.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M700,1162.0 C750.0,1162.0 750.0,962.0 796,962.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M500,316.0 H524 Q534,316.0 534,326.0 V697 Q534,707 524,707 H766 Q756,707 756,717 V952.0 Q756,962.0 766,962.0 H796" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-<path d="M500,316.0 H524 Q534,316.0 534,326.0 V697 Q534,707 524,707 H966 Q956,707 956,717 V812.0 Q956,822.0 966,822.0 H996" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M900,50.0 C950.0,50.0 950.0,50.0 996,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M1100,50.0 H1124 Q1134,50.0 1134,60.0 V191 Q1134,201 1124,201 H-34 Q-44,201 -44,211 V526.0 Q-44,536.0 -34,536.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M100,519.3333333333334 C150.0,519.3333333333334 150.0,316.0 196,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="514.3333333333334" font-size="11" fill="#64748B">true</text>
+<path d="M100,552.6666666666666 C150.0,552.6666666666666 150.0,536.0 196,536.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="108" y="547.6666666666666" font-size="11" fill="#64748B">false</text>
+<path d="M300,536.0 C350.0,536.0 350.0,536.0 396,536.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M500,536.0 C550.0,536.0 550.0,536.0 596,536.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M700,536.0 C750.0,536.0 750.0,536.0 796,536.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M900,519.3333333333334 C950.0,519.3333333333334 950.0,316.0 996,316.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="908" y="514.3333333333334" font-size="11" fill="#64748B">true</text>
+<path d="M900,552.6666666666666 C950.0,552.6666666666666 950.0,536.0 996,536.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text x="908" y="547.6666666666666" font-size="11" fill="#64748B">false</text>
+<path d="M1100,536.0 C1150.0,536.0 1150.0,536.0 1196,536.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <rect x="0" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2EA44F" stroke-width="2" filter="url(#sh)"/>
 <path d="M30,0 H10 A10,10 0 0 0 0,10 V90 A10,10 0 0 0 10,100 H30" fill="none" stroke="#2EA44F" stroke-width="5"/>
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
@@ -48,55 +49,62 @@
 <rect x="622" y="18" width="56" height="56" rx="12" fill="#FFEDEF"/>
 <text x="650" y="55" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
 <text x="650.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 1: Intro</text>
-<rect x="800" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="822" y="18" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="850" y="55" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<rect x="800" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="822" y="18" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="850" y="55" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⏸</text>
 <text x="850.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Wait 3 Days</text>
-<rect x="0" y="406" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="22" y="424" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="50" y="461" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="50.0" y="526" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Check Reply #1</text>
-<rect x="200" y="406" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="222" y="424" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="250" y="461" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
-<text x="250.0" y="526" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Replied? #1</text>
-<rect x="400" y="506" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="422" y="524" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="450" y="561" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="450.0" y="626" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 2: Value</text>
-<rect x="600" y="506" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="622" y="524" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="650" y="561" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="650.0" y="626" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Wait 4 Days</text>
-<rect x="400" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
-<rect x="422" y="284" width="56" height="56" rx="12" fill="#EEF2F7"/>
-<text x="450" y="321" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
-<text x="450.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Status: Replied</text>
-<rect x="0" y="1012" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="22" y="1030" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="50" y="1067" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="50.0" y="1132" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Check Reply #2</text>
-<rect x="200" y="1012" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
-<rect x="222" y="1030" width="56" height="56" rx="12" fill="#FFF4E5"/>
-<text x="250" y="1067" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
-<text x="250.0" y="1132" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Replied? #2</text>
-<rect x="400" y="1112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="422" y="1130" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="450" y="1167" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="450.0" y="1232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 3: Close the</text>
-<text x="450.0" y="1247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Loop</text>
-<rect x="600" y="1112" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
-<rect x="622" y="1130" width="56" height="56" rx="12" fill="#EEF2F7"/>
-<text x="650" y="1167" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
-<text x="650.0" y="1232" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Status: Sequence</text>
-<text x="650.0" y="1247" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Done</text>
-<rect x="800" y="912" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
-<rect x="822" y="930" width="56" height="56" rx="12" fill="#EAF3FF"/>
-<text x="850" y="967" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
-<text x="850.0" y="1032" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">CRM: Update</text>
-<rect x="1000" y="772" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="1022" y="790" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1050" y="827" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
-<text x="1050.0" y="892" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Alert Sales:</text>
-<text x="1050.0" y="907" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Reply!</text>
+<rect x="1000" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="1022" y="18" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="1050" y="55" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="1050.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Check Reply #1</text>
+<rect x="0" y="486" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="22" y="504" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="50" y="541" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
+<text x="50.0" y="606" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Replied? #1</text>
+<rect x="200" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="222" y="284" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="250" y="321" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
+<text x="250.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">CRM: Replied after</text>
+<text x="250.0" y="401" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 1</text>
+<rect x="400" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="422" y="284" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="450" y="321" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">#</text>
+<text x="450.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Slack: Reply after</text>
+<text x="450.0" y="401" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 1</text>
+<rect x="200" y="486" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="222" y="504" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="250" y="541" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="250.0" y="606" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 2: Value</text>
+<rect x="400" y="486" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="422" y="504" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="450" y="541" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⏸</text>
+<text x="450.0" y="606" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Wait 4 Days</text>
+<rect x="600" y="486" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="622" y="504" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="650" y="541" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="650.0" y="606" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Check Reply #2</text>
+<rect x="800" y="486" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="822" y="504" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="850" y="541" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⑂</text>
+<text x="850.0" y="606" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Replied? #2</text>
+<rect x="1000" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="1022" y="284" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="1050" y="321" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
+<text x="1050.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">CRM: Replied after</text>
+<text x="1050.0" y="401" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 2</text>
+<rect x="1200" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="1222" y="284" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="1250" y="321" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">#</text>
+<text x="1250.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Slack: Reply after</text>
+<text x="1250.0" y="401" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 2</text>
+<rect x="1000" y="486" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
+<rect x="1022" y="504" width="56" height="56" rx="12" fill="#FFEDEF"/>
+<text x="1050" y="541" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="1050.0" y="606" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Email 3: Close the</text>
+<text x="1050.0" y="621" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Loop</text>
+<rect x="1200" y="486" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#sh)"/>
+<rect x="1222" y="504" width="56" height="56" rx="12" fill="#EAF3FF"/>
+<text x="1250" y="541" font-size="24" text-anchor="middle" fill="#2563EB" font-weight="700">▦</text>
+<text x="1250.0" y="606" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">CRM: Closed, No</text>
+<text x="1250.0" y="621" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Reply</text>
 </svg>

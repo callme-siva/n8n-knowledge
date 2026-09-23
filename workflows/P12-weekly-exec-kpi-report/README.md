@@ -29,7 +29,7 @@ flowchart TB
   n2["Jira: Done Last 7d"]:::data
   n3["GitHub: Merged PRs 7d"]:::http
   n4["Sheets: Revenue"]:::data
-  n5["Count Jira"]:::msg
+  n5["Count Jira"]:::logic
   n6["Sum Revenue"]:::code
   n7["Join Sources"]:::logic
   n8["Compute KPIs"]:::code

@@ -57,7 +57,7 @@
 <text x="1290.0" y="-200" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Page On-call</text>
 <rect x="1240" y="-140" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
 <rect x="1262" y="-122" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1290" y="-85" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="1290" y="-85" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">#</text>
 <text x="1290.0" y="-20" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Slack #incidents</text>
 <rect x="840" y="260" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
 <rect x="862" y="278" width="56" height="56" rx="12" fill="#FFF4E5"/>
@@ -72,7 +72,7 @@
 <text x="872" y="364" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Gemini</text>
 <rect x="1100" y="80" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
 <rect x="1122" y="98" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="1150" y="135" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<text x="1150" y="135" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">#</text>
 <text x="1150.0" y="200" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Post Postmortem</text>
 <text x="1150.0" y="215" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Draft</text>
 </svg>

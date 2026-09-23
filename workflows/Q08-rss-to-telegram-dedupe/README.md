@@ -24,8 +24,8 @@
 flowchart LR
   n0(["Every 30 Minutes"]):::trigger
   n1["Read Feed"]:::http
-  n2["Only New Links"]:::msg
-  n3["Max 5 per Run"]:::msg
+  n2["Only New Links"]:::logic
+  n3["Max 5 per Run"]:::logic
   n4["Post to Channel"]:::msg
   n0 --> n1
   n1 --> n2
