@@ -57,6 +57,16 @@ Schedule → ⚙️ Config → HTTP (SerpAPI google_jobs) → Code (HTML table) 
 | SerpAPI key | free at serpapi.com. In n8n: Credentials → *SerpAPI* |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| ⚙️ Config | `email_to` | `you@example.com` |
+
+Nodes that need a credential selected after import: **Gmail**, **HTTP Request**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -69,12 +79,87 @@ Schedule → ⚙️ Config → HTTP (SerpAPI google_jobs) → Code (HTML table) 
 5. Add a **Code** node that loops over jobs and builds an HTML table (copy it from workflow.json).
 6. Add **Gmail** with subject/body = `{{ $json.subject }}` / `{{ $json.html }}`.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Every Morning 8 AM</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.triggerAtHour` | 8 |
+
+</details>
+
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `query` | Scrum Master OR Agile Coach |
+| `location` | India |
+| `email_to` | you@example.com |
+| `max_jobs` | 15 |
+
+</details>
+
+<details><summary><b>3. Search Google Jobs</b> · <code>HTTP Request</code> v4.2</summary>
+
+> Calls any REST API. Use it whenever there's no dedicated node.
+
+| Property | Value |
+|---|---|
+| `url` | https://serpapi.com/search.json |
+| `authentication` | predefinedCredentialType |
+| `nodeCredentialType` | serpApi |
+| `sendQuery` | ✅ on |
+| `queryParameters.engine` | google_jobs |
+| `queryParameters.q` | `{{ $json.query }}` |
+| `queryParameters.location` | `{{ $json.location }}` |
+| `queryParameters.chips` | date_posted:today |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 2 |
+
+</details>
+
+<details><summary><b>4. Format Email</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 12 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>5. Send Digest</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('⚙️ Config').item.json.email_to }}` |
+| `subject` | `{{ $json.subject }}` |
+| `emailType` | html |
+| `message` | `{{ $json.html }}` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Change `query` to your own role and run it manually.
 - [ ] Set `location` to a city (for example `Bengaluru, Karnataka, India`).
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>401 / Invalid API key</b></summary>
 

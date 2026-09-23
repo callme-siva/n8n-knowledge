@@ -70,6 +70,16 @@ Schedule (hourly) → Config → HTTP → IF ok?
 |---|---|
 | Gmail OAuth2 (open.er-api.com needs no key) | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| ⚙️ Config | `email_to` | `you@example.com` |
+
+Nodes that need a credential selected after import: **Gmail**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -84,12 +94,141 @@ Schedule (hourly) → Config → HTTP → IF ok?
 7. Connect a Gmail node to High and to Low, and a **No Operation** to Normal.
 8. On IF false, add **Stop and Error**.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Every Hour</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.field` | hours |
+| `rule.interval.hoursInterval` | 1 |
+
+</details>
+
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `base` | USD |
+| `target` | INR |
+| `high` | 88.5 |
+| `low` | 83.0 |
+| `email_to` | you@example.com |
+
+</details>
+
+<details><summary><b>3. Get Exchange Rate</b> · <code>HTTP Request</code> v4.2</summary>
+
+> Calls any REST API. Use it whenever there's no dedicated node.
+
+| Property | Value |
+|---|---|
+| `url` | `https://open.er-api.com/v6/latest/{{ $json.base }}` |
+| `⚙️ Retry on fail` | ✅ on |
+
+</details>
+
+<details><summary><b>4. API OK?</b> · <code>If</code> v2.2</summary>
+
+> Splits items into a **true** and a **false** branch.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $json.result }} = success` |
+
+</details>
+
+<details><summary><b>5. Extract Rate</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `rate` | `{{ $json.rates[$('⚙️ Config').item.json.target] }}` |
+| `updated` | `{{ $json.time_last_update_utc }}` |
+
+</details>
+
+<details><summary><b>6. Which Zone?</b> · <code>Switch</code> v3.2</summary>
+
+> Routes items to one of many named outputs.
+
+| Property | Value |
+|---|---|
+| `rule 1.condition` | `{{ $json.rate }} ≥ {{ $('⚙️ Config').item.json.high }}` |
+| `rule 1.renameOutput` | ✅ on |
+| `rule 1.outputKey` | High |
+| `rule 2.condition` | `{{ $json.rate }} ≤ {{ $('⚙️ Config').item.json.low }}` |
+| `rule 2.renameOutput` | ✅ on |
+| `rule 2.outputKey` | Low |
+| `fallbackOutput` | extra |
+| `renameFallbackOutput` | Normal |
+
+</details>
+
+<details><summary><b>7. Alert: Rate High</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('⚙️ Config').item.json.email_to }}` |
+| `subject` | `📈 {{ $('⚙️ Config').item.json.base }}→{{ $('⚙️ Config').item.json.target }} is HIGH: {{ $json.rate }}` |
+| `emailType` | html |
+| `message` | `<p>Rate is <b>{{ $json.rate }}</b>, above your threshold. Good time to send money home.</p><p>Updated: {{ $json.updated }}</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+<details><summary><b>8. Alert: Rate Low</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('⚙️ Config').item.json.email_to }}` |
+| `subject` | `📉 {{ $('⚙️ Config').item.json.base }}→{{ $('⚙️ Config').item.json.target }} is LOW: {{ $json.rate }}` |
+| `emailType` | html |
+| `message` | `<p>Rate is <b>{{ $json.rate }}</b>, below your threshold. Good time to buy USD.</p><p>Updated: {{ $json.updated }}</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+<details><summary><b>9. Normal — do nothing</b> · <code>No Operation</code> v1</summary>
+
+> Does nothing. Marks a branch that intentionally ends.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+<details><summary><b>10. API Failed — log it</b> · <code>Stop and Error</code> v1</summary>
+
+> Fails the execution on purpose with your message, which triggers the error workflow.
+
+| Property | Value |
+|---|---|
+| `errorMessage` | `Exchange-rate API returned: {{ $json['error-type'] \|\| 'unknown error' }}` |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Set `high` to 1 and run it. You should get the HIGH email.
 - [ ] Set `base` to `XYZ` and run it. You should hit the Stop and Error branch.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Switch always goes to Normal</b></summary>
 

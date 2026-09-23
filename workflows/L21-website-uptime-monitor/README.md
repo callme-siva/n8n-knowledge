@@ -63,6 +63,17 @@ Schedule (5 min) → Code (site list) → HTTP (full response, never error) → 
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 | Google Sheets OAuth2 (tab `Uptime` | time, name, url, status, code, ms, changed, since, error) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Log Every Check | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+| Alert | `sendTo` | `you@example.com` |
+
+Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -74,12 +85,104 @@ Schedule (5 min) → Code (site list) → HTTP (full response, never error) → 
 4. Filter `changed = true` → Gmail.
 5. **Activate** it (static data isn't saved in manual runs).
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Every 5 Minutes</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.field` | minutes |
+| `rule.interval.minutesInterval` | 5 |
+
+</details>
+
+<details><summary><b>2. Sites to Watch</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 5 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>3. Check Site</b> · <code>HTTP Request</code> v4.2</summary>
+
+> Calls any REST API. Use it whenever there's no dedicated node.
+
+| Property | Value |
+|---|---|
+| `url` | `{{ $json.url }}` |
+| `timeout` | 10000 |
+| `response.response.fullResponse` | ✅ on |
+| `response.response.neverError` | ✅ on |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>4. Compare with Last State</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 14 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>5. Log Every Check</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | append |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Uptime |
+| `columns.mappingMode` | autoMapInputData |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>6. State Changed?</b> · <code>Filter</code> v2.2</summary>
+
+> Keeps only items that match; drops the rest.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $json.changed }} is true` |
+
+</details>
+
+<details><summary><b>7. Alert</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | you@example.com |
+| `subject` | `{{ $json.status === 'DOWN' ? '🔴' : '🟢' }} {{ $json.name }} is {{ $json.status }}` |
+| `emailType` | html |
+| `message` | `<p><b>{{ $json.name }}</b> ({{ $json.url }}) is now <b>{{ $json.status }}</b>.</p><p>HTTP {{ $json.code }} · {{ $json.ms }} ms · since {{ $json.since }}</p><p>{{ $json.error }}</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] The `httpstat.us/503` demo site should alert DOWN on the second automatic run.
 - [ ] Replace it with `https://httpstat.us/200` and you should get an 🟢 recovery alert.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Alerts never fire</b></summary>
 

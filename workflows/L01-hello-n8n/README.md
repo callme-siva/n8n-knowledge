@@ -54,6 +54,16 @@ Manual Trigger → Set Your Data → Build Greeting (Code) → Send to Yourself 
 |---|---|
 | Gmail OAuth2 — see [docs/credentials.md](../../docs/credentials.md#gmail). *Optional* | delete the Gmail node and the workflow still teaches everything. |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Send to Yourself | `sendTo` | `you@example.com` |
+
+Nodes that need a credential selected after import: **Gmail**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -66,12 +76,65 @@ Manual Trigger → Set Your Data → Build Greeting (Code) → Send to Yourself 
 5. Add a **Gmail → Send message** node. In *To*, put your own email. In *Message*, drag `greeting` from the INPUT panel.
 6. Click **Execute workflow**.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. When clicking 'Execute workflow'</b> · <code>Manual Trigger</code> v1</summary>
+
+> Starts the workflow when you click *Execute workflow*. For testing only.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+<details><summary><b>2. Set Your Data</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `name` | Learner |
+| `city` | Chennai |
+| `tasks_done` | 3 |
+
+</details>
+
+<details><summary><b>3. Build Greeting</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 8 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>4. Send to Yourself</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | you@example.com |
+| `subject` | My first n8n workflow 🎉 |
+| `emailType` | html |
+| `message` | `<p>{{ $json.greeting }}</p><p><small>Sent at {{ $json.generated_at }}</small></p>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Click each node and open the **OUTPUT** tab: Table, JSON and Schema views show the same data in different shapes.
 - [ ] Change `tasks_done` to 10 and run again.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Credentials not found on Gmail</b></summary>
 

@@ -12,7 +12,7 @@
 
 **Learn n8n automation by building real workflows: one new concept at a time, from your first node to multi-agent AI.**
 
-[🚀 Start](#-start-in-3-steps) · [🗺️ Learning path](#-the-learning-path) · [🖼️ Gallery](#-gallery) · [🏗️ Architecture](docs/architecture.md) · [🧪 Testing](docs/testing.md) · [🤝 Contribute](CONTRIBUTING.md)
+[🚀 Start](#-start-in-3-steps) · [🗺️ Learning path](#-the-learning-path) · [🖼️ Gallery](#-gallery) · [🏗️ Architecture](docs/architecture.md) · [🧯 Mistakes](docs/common-mistakes.md) · [🧪 Testing](docs/testing.md) · [🤝 Contribute](CONTRIBUTING.md)
 
 </div>
 
@@ -233,6 +233,8 @@ If you want *any* template for a niche app, the big collections are great. This 
 | 🚀 [Getting started](docs/getting-started.md) | Install, import, the 5 core ideas |
 | 🔑 [Credentials](docs/credentials.md) | Gemini, Google, Jira, SerpAPI, GitHub |
 | 🏗️ [Architecture](docs/architecture.md) | Platform, AI blocks, RAG, multi-agent, reliability, deployment |
+| 🧬 [Workflow anatomy](docs/workflow-anatomy.md) | Every property inside a workflow.json, plus an expressions cheat sheet |
+| 🧯 [Common mistakes](docs/common-mistakes.md) | 40+ mistakes with fixes, a debugging flowchart and a pre-flight checklist |
 | 🧪 [Testing](docs/testing.md) | Test in the editor, validate, check against real n8n |
 | 🧾 [Sample data](docs/sample-data.md) | Made-up inputs for every AI lesson |
 
@@ -243,7 +245,7 @@ If you want *any* template for a niche app, the big collections are great. This 
 workflows/Lxx-name/
   workflow.json   import into n8n
   canvas.svg      snapshot (generated)
-  README.md       problem · architecture · build steps · tests · troubleshooting
+  README.md       problem · architecture · placeholders · build steps · node reference · tests · troubleshooting
 docs/             guides
 assets/           images
 tools/            build.py · render.py · validate.py · check-nodes.js

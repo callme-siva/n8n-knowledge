@@ -56,6 +56,17 @@ CALLEE  Execute Workflow Trigger → Code (template) → Gmail → Set (return)
 | Google Sheets OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Read Team Sheet | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+| Call: Send Branded Email | `workflowId` | `REPLACE_WITH_L20a_WORKFLOW_ID` |
+
+Nodes that need a credential selected after import: **Google Sheets**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -66,12 +77,86 @@ CALLEE  Execute Workflow Trigger → Code (template) → Gmail → Set (return)
 3. Import **L20**. In *Call: Send Branded Email*, select L20a *From list* (or paste the ID).
 4. Run it.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Every Day 9 AM</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.triggerAtHour` | 9 |
+
+</details>
+
+<details><summary><b>2. Read Team Sheet</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Team |
+
+</details>
+
+<details><summary><b>3. Who Celebrates Today?</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 10 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>4. Call: Send Branded Email</b> · <code>Execute Workflow</code> v1.2</summary>
+
+> Calls another workflow (a sub-workflow) and waits for its result.
+
+| Property | Value |
+|---|---|
+| `workflowId` | REPLACE_WITH_L20a_WORKFLOW_ID |
+| `workflowInputs.mappingMode` | defineBelow |
+| `workflowInputs.to` | `{{ $json.to }}` |
+| `workflowInputs.title` | `{{ $json.title }}` |
+| `workflowInputs.body_html` | `{{ $json.body_html }}` |
+| `workflowInputs.cta_text` | `{{ $json.cta_text }}` |
+| `workflowInputs.cta_url` | `{{ $json.cta_url }}` |
+| `workflowInputs.schema.1.displayName` | to |
+| `workflowInputs.schema.1.type` | string |
+| `workflowInputs.schema.1.required` | off |
+| `workflowInputs.schema.1.display` | ✅ on |
+| `workflowInputs.schema.1.canBeUsedToMatch` | ✅ on |
+| `workflowInputs.schema.1.defaultMatch` | off |
+| `workflowInputs.schema.1.removed` | off |
+| `workflowInputs.schema.2.displayName` | title |
+| `workflowInputs.schema.2.type` | string |
+| `workflowInputs.schema.2.required` | off |
+| `workflowInputs.schema.2.display` | ✅ on |
+| `workflowInputs.schema.2.canBeUsedToMatch` | ✅ on |
+| `workflowInputs.schema.2.defaultMatch` | off |
+| `workflowInputs.schema.2.removed` | off |
+| `workflowInputs.schema.3.displayName` | body_html |
+| `workflowInputs.schema.3.type` | string |
+| `workflowInputs.schema.3.required` | off |
+| … | 18 more in workflow.json |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Look at the Execute Workflow output: it contains `sent: true` returned by the sub-workflow.
 - [ ] Change the header colour in L20a and run again. Every caller gets the new look.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Workflow does not exist</b></summary>
 

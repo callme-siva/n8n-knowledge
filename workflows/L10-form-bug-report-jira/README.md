@@ -54,6 +54,17 @@ Form → Code (map severity, build summary) → Jira create Bug → Gmail confir
 | Jira Software Cloud API token | [docs/credentials.md](../../docs/credentials.md) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Create Jira Bug | `project` | `REPLACE_PROJECT_ID` |
+| Create Jira Bug | `issueType` | `REPLACE_BUG_ISSUE_TYPE_ID` |
+
+Nodes that need a credential selected after import: **Gmail**, **Jira Software**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -65,11 +76,71 @@ Form → Code (map severity, build summary) → Jira create Bug → Gmail confir
 4. Add **Jira → Issue → Create**. Add labels `from-form`. (Priority needs your Jira priority IDs; add it under *Additional fields* once you know them.)
 5. Add Gmail using `{{ $json.key }}` from the Jira output.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Bug Report Form</b> · <code>n8n Form Trigger</code> v2.2</summary>
+
+> Hosts a web form; each submission starts one execution. Field labels become JSON keys.
+
+| Property | Value |
+|---|---|
+| `formTitle` | Report a problem |
+| `formDescription` | Found something broken? Tell us and we will track it. |
+| `formFields.values` | Your email *, What is broken? *, Steps to reproduce *, Severity *, Page / module |
+
+</details>
+
+<details><summary><b>2. Map Severity → Priority</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `mode` | runOnceForEachItem |
+| `jsCode` | (JavaScript, 5 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>3. Create Jira Bug</b> · <code>Jira Software</code> v1</summary>
+
+> Creates, searches or updates Jira issues.
+
+| Property | Value |
+|---|---|
+| `project` | REPLACE_PROJECT_ID |
+| `issueType` | REPLACE_BUG_ISSUE_TYPE_ID |
+| `summary` | `{{ $json.summary }}` |
+| `additionalFields.description` | `{{ $json.description }}` |
+| `additionalFields.labels` | from-form |
+
+</details>
+
+<details><summary><b>4. Confirm to Reporter</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('Map Severity → Priority').item.json['Your email'] }}` |
+| `subject` | `We logged your report: {{ $json.key }}` |
+| `emailType` | html |
+| `message` | `<p>Thanks! Your report is now ticket <b>{{ $json.key }}</b> with priority {{ $('Map Severity → Priority').item.json.priority }}.</p><p>We'll update you when it's fixed.</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Submit a Blocker bug. Check that the Jira issue exists and that the email shows the key.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>issuetype: Specify a valid issue type</b></summary>
 

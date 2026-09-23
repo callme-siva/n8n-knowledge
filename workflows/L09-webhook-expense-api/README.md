@@ -62,6 +62,16 @@ Webhook POST /expense → Code validate → IF valid
 |---|---|
 | Google Sheets OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Append to Expenses Sheet | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+
+Nodes that need a credential selected after import: **Google Sheets**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -74,6 +84,94 @@ Webhook POST /expense → Code validate → IF valid
 5. Add **IF** `valid is true`, then on the true branch Set (raw JSON) → Sheets append → **Respond to Webhook** (201).
 6. On the false branch, **Respond to Webhook** with 400.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. POST /expense</b> · <code>Webhook</code> v2</summary>
+
+> Gives the workflow its own URL. Any HTTP call to it starts an execution.
+
+| Property | Value |
+|---|---|
+| `httpMethod` | POST |
+| `path` | expense |
+| `responseMode` | responseNode |
+
+</details>
+
+<details><summary><b>2. Validate</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `mode` | runOnceForEachItem |
+| `jsCode` | (JavaScript, 8 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>3. Valid?</b> · <code>If</code> v2.2</summary>
+
+> Splits items into a **true** and a **false** branch.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $json.valid }} is true` |
+
+</details>
+
+<details><summary><b>4. Prepare Row</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `mode` | raw |
+| `jsonOutput` | `{{ JSON.stringify($json.row) }}` |
+
+</details>
+
+<details><summary><b>5. Append to Expenses Sheet</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | append |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Expenses |
+| `columns.mappingMode` | autoMapInputData |
+
+</details>
+
+<details><summary><b>6. 201 Created</b> · <code>Respond to Webhook</code> v1.1</summary>
+
+> Sends the HTTP response (status code and body) back to the webhook caller.
+
+| Property | Value |
+|---|---|
+| `respondWith` | json |
+| `responseBody` | `{{ { ok: true, saved: $('Validate').item.json.row } }}` |
+| `responseCode` | 201 |
+
+</details>
+
+<details><summary><b>7. 400 Bad Request</b> · <code>Respond to Webhook</code> v1.1</summary>
+
+> Sends the HTTP response (status code and body) back to the webhook caller.
+
+| Property | Value |
+|---|---|
+| `respondWith` | json |
+| `responseBody` | `{{ { ok: false, errors: $json.errors } }}` |
+| `responseCode` | 400 |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] `curl ... -d '{"amount":450,"category":"food"}'` should return 201.
@@ -81,6 +179,8 @@ Webhook POST /expense → Code validate → IF valid
 - [ ] iPhone: Shortcuts app → *Get contents of URL* → POST JSON. That gives you a one-tap expense logger.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Webhook node not correctly configured</b></summary>
 

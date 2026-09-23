@@ -55,6 +55,16 @@ Gmail Trigger (every 5 min, unread + PDF) → Code (1 item per PDF) → Drive up
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 | Google Drive OAuth2 (the same Google Cloud project works, see docs/credentials.md) | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Upload to Drive | `folderId` | `PASTE_YOUR_DRIVE_FOLDER_URL` |
+
+Nodes that need a credential selected after import: **Gmail**, **Gmail Trigger**, **Google Drive**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -67,12 +77,72 @@ Gmail Trigger (every 5 min, unread + PDF) → Code (1 item per PDF) → Drive up
 5. Add **Gmail → Mark as read** with `messageId` from the Code node.
 6. Activate it.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. New Email with Attachment</b> · <code>Gmail Trigger</code> v1.2</summary>
+
+> Polls Gmail on an interval and starts once per matching email.
+
+| Property | Value |
+|---|---|
+| `pollTimes.item.mode` | everyX |
+| `pollTimes.item.value` | 5 |
+| `pollTimes.item.unit` | minutes |
+| `simple` | off |
+| `filters.q` | has:attachment filename:pdf |
+| `filters.readStatus` | unread |
+| `downloadAttachments` | ✅ on |
+| `dataPropertyAttachmentsPrefixName` | attachment_ |
+
+</details>
+
+<details><summary><b>2. Split PDF Attachments</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 12 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>3. Upload to Drive</b> · <code>Google Drive</code> v3</summary>
+
+> Uploads, downloads or moves files in Drive.
+
+| Property | Value |
+|---|---|
+| `name` | `{{ $json.fileName }}` |
+| `driveId` | My Drive |
+| `folderId` | PASTE_YOUR_DRIVE_FOLDER_URL |
+| `⚙️ Retry on fail` | ✅ on |
+
+</details>
+
+<details><summary><b>4. Mark Email as Read</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `operation` | markAsRead |
+| `messageId` | `{{ $('Split PDF Attachments').item.json.messageId }}` |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Email yourself 2 PDFs and 1 image. Exactly 2 files should appear in Drive.
 - [ ] Check that the email is now read and that the next poll doesn't re-upload it.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Same file uploaded again and again</b></summary>
 

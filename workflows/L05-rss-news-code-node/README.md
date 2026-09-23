@@ -66,6 +66,16 @@ Schedule ─┬─ RSS Google News ─┐
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Email Digest | `sendTo` | `you@example.com` |
+
+Nodes that need a credential selected after import: **Gmail**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -78,12 +88,108 @@ Schedule ─┬─ RSS Google News ─┐
 5. Add an **IF** node: `count > 0`.
 6. Add Gmail on the true branch.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Every Morning 8 AM</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.triggerAtHour` | 8 |
+
+</details>
+
+<details><summary><b>2. Merge Feeds</b> · <code>Merge</code> v3</summary>
+
+> Waits for several inputs and combines them into one stream.
+
+| Property | Value |
+|---|---|
+| `numberInputs` | 3 |
+
+</details>
+
+<details><summary><b>3. Google News · AI</b> · <code>RSS Read</code> v1.1</summary>
+
+> Reads an RSS/Atom feed; outputs one item per article.
+
+| Property | Value |
+|---|---|
+| `url` | https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&cei… |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>4. TechCrunch · AI</b> · <code>RSS Read</code> v1.1</summary>
+
+> Reads an RSS/Atom feed; outputs one item per article.
+
+| Property | Value |
+|---|---|
+| `url` | https://techcrunch.com/category/artificial-intelligence/feed/ |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>5. The Verge · AI</b> · <code>RSS Read</code> v1.1</summary>
+
+> Reads an RSS/Atom feed; outputs one item per article.
+
+| Property | Value |
+|---|---|
+| `url` | https://www.theverge.com/rss/ai-artificial-intelligence/index.xml |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>6. Filter · Dedupe · Sort</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 13 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>7. Anything New?</b> · <code>If</code> v2.2</summary>
+
+> Splits items into a **true** and a **false** branch.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $json.count }} > 0` |
+
+</details>
+
+<details><summary><b>8. Email Digest</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | you@example.com |
+| `subject` | `Tech news · {{ $json.count }} stories · {{ $now.toFormat('dd LLL') }}` |
+| `emailType` | html |
+| `message` | `<h2>Last 24 hours in AI</h2>{{ $json.html }}` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Run it and open the Code node output. `listText` is prepared for the AI version in L11.
 - [ ] Replace one feed URL with a broken one. The workflow should still finish.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Merge waits forever or outputs nothing</b></summary>
 

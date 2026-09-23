@@ -67,6 +67,16 @@ Schedule → 3× RSS → Merge → Code (from L05) → LLM Chain ⇐ Gemini → 
 | Google Gemini (PaLM) API key | free at https://aistudio.google.com/app/apikey |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Email Briefing | `sendTo` | `you@example.com` |
+
+Nodes that need a credential selected after import: **Gmail**, **Google Gemini Chat Model**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -79,12 +89,121 @@ Schedule → 3× RSS → Merge → Code (from L05) → LLM Chain ⇐ Gemini → 
 5. Add a *System* message (Chat Messages → System) with the editor rules.
 6. Gmail body = `{{ $json.text }}`.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Every Morning 8 AM</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.triggerAtHour` | 8 |
+
+</details>
+
+<details><summary><b>2. Merge Feeds</b> · <code>Merge</code> v3</summary>
+
+> Waits for several inputs and combines them into one stream.
+
+| Property | Value |
+|---|---|
+| `numberInputs` | 3 |
+
+</details>
+
+<details><summary><b>3. Google News · AI</b> · <code>RSS Read</code> v1.1</summary>
+
+> Reads an RSS/Atom feed; outputs one item per article.
+
+| Property | Value |
+|---|---|
+| `url` | https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&cei… |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>4. TechCrunch · AI</b> · <code>RSS Read</code> v1.1</summary>
+
+> Reads an RSS/Atom feed; outputs one item per article.
+
+| Property | Value |
+|---|---|
+| `url` | https://techcrunch.com/category/artificial-intelligence/feed/ |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>5. The Verge · AI</b> · <code>RSS Read</code> v1.1</summary>
+
+> Reads an RSS/Atom feed; outputs one item per article.
+
+| Property | Value |
+|---|---|
+| `url` | https://www.theverge.com/rss/ai-artificial-intelligence/index.xml |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>6. Filter · Dedupe · Sort</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 13 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>7. Write Briefing</b> · <code>Basic LLM Chain</code> v1.5</summary>
+
+> Sends one prompt to a model and returns the answer. Simplest AI node.
+
+| Property | Value |
+|---|---|
+| `promptType` | define |
+| `text` | `Here are today's AI news headlines ({{ $json.count }} items):  {{ $json.listText }}` |
+| `messages.message` | You are a news editor writing for busy professionals in India. From the headlines, write: 1. **Top 5 stories**: one bullet each, max 2 sentences: what happened + why it matters. Include the link. 2. **One-line trend of the day.** Rules: merge duplicates, skip clickbait, never invent facts beyond the headline. Output clean HTML (&lt;h3&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;), no markdown. |
+
+</details>
+
+<details><summary><b>8. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
+
+> The language model plugged into a chain or agent.
+
+| Property | Value |
+|---|---|
+| `modelName` | models/gemini-2.5-flash |
+| `temperature` | 0.3 |
+
+</details>
+
+<details><summary><b>9. Email Briefing</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | you@example.com |
+| `subject` | `☕ AI briefing · {{ $now.toFormat('dd LLL yyyy') }}` |
+| `emailType` | html |
+| `message` | `{{ $json.text }}<hr><details><summary>All {{ $('Filter · Dedupe · Sort').item.json.count }} headlines</summary>{{ $('Filter · Dedupe · Sort').item.json.html }}</details>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Run it and compare the briefing to the raw headlines. Did the model invent anything?
 - [ ] Change the system prompt to *Explain like I'm a school student* and run it again.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>429 / quota exceeded</b></summary>
 

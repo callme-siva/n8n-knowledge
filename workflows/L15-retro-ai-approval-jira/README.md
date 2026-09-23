@@ -70,6 +70,18 @@ Form → LLM Chain ⇐ Gemini, ⇐ Schema → Code (HTML) → Gmail send-and-wai
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 | Jira Software Cloud API token | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Ask Scrum Master | `sendTo` | `you@example.com` |
+| Create Jira Task | `project` | `REPLACE_PROJECT_ID` |
+| Create Jira Task | `issueType` | `REPLACE_TASK_ISSUE_TYPE_ID` |
+
+Nodes that need a credential selected after import: **Gmail**, **Google Gemini Chat Model**, **Jira Software**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -82,12 +94,136 @@ Form → LLM Chain ⇐ Gemini, ⇐ Schema → Code (HTML) → Gmail send-and-wai
 5. **IF** `{{ $json.data.approved }}` is true.
 6. Code: turn `action_items` back into items, then **Jira → Create issue** for each one.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Retrospective Form</b> · <code>n8n Form Trigger</code> v2.2</summary>
+
+> Hosts a web form; each submission starts one execution. Field labels become JSON keys.
+
+| Property | Value |
+|---|---|
+| `formTitle` | Sprint Retrospective |
+| `formDescription` | Honest, blameless feedback. Takes 2 minutes. |
+| `formFields.values` | Sprint *, What went well?, What didn't go well?, Suggestions, Team morale * |
+
+</details>
+
+<details><summary><b>2. Analyze Retro</b> · <code>Basic LLM Chain</code> v1.5</summary>
+
+> Sends one prompt to a model and returns the answer. Simplest AI node.
+
+| Property | Value |
+|---|---|
+| `promptType` | define |
+| `hasOutputParser` | ✅ on |
+| `text` | `Sprint: {{ $json.Sprint }} Morale: {{ $json['Team morale'] }}  Went well: {{ $json['What went well?'] }}  Didn't go well: {{ $json["What didn't go well?"] }}  Suggestions: {{ $json.Suggestions }}` |
+| `messages.message` | You are an experienced agile coach. Summarise the feedback, rate sentiment, and propose at most 3 SMART action items (specific, owner role, measurable). Only include items the team can act on next sprint. |
+
+</details>
+
+<details><summary><b>3. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
+
+> The language model plugged into a chain or agent.
+
+| Property | Value |
+|---|---|
+| `modelName` | models/gemini-2.5-flash |
+| `temperature` | 0.2 |
+
+</details>
+
+<details><summary><b>4. Retro Schema</b> · <code>Structured Output Parser</code> v1.2</summary>
+
+> Forces the model's answer into JSON matching your schema.
+
+| Property | Value |
+|---|---|
+| `jsonSchemaExample` | (JSON schema, 12 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>5. Build Approval Message</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 4 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>6. Ask Scrum Master</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `operation` | sendAndWait |
+| `sendTo` | you@example.com |
+| `subject` | `Approve retro action items for {{ $json.sprint }}?` |
+| `message` | `{{ $json.html }}` |
+| `approvalOptions.approvalType` | double |
+| `limitWaitTime.limitType` | afterTimeInterval |
+| `limitWaitTime.resumeAmount` | 2 |
+| `limitWaitTime.resumeUnit` | days |
+
+</details>
+
+<details><summary><b>7. Approved?</b> · <code>If</code> v2.2</summary>
+
+> Splits items into a **true** and a **false** branch.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $json.data.approved }} is true` |
+
+</details>
+
+<details><summary><b>8. Restore Items</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 1 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>9. Create Jira Task</b> · <code>Jira Software</code> v1</summary>
+
+> Creates, searches or updates Jira issues.
+
+| Property | Value |
+|---|---|
+| `project` | REPLACE_PROJECT_ID |
+| `issueType` | REPLACE_TASK_ISSUE_TYPE_ID |
+| `summary` | `[Retro {{ $json.sprint }}] {{ $json.title }}` |
+| `additionalFields.description` | `{{ $json.description }}  Owner role: {{ $json.owner_role }} Priority suggested by AI: {…` |
+| `additionalFields.labels` | retro-action |
+
+</details>
+
+<details><summary><b>10. Declined — stop</b> · <code>No Operation</code> v1</summary>
+
+> Does nothing. Marks a branch that intentionally ends.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Submit a retro from [docs/sample-data.md](../../docs/sample-data.md#retro-feedback). You should get an approval email and see the execution *Waiting*.
 - [ ] Click **Approve**: 1–3 Jira tasks should appear. Try again and click **Decline**: no tasks.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Approval link opens an error page</b></summary>
 

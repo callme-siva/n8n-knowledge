@@ -155,11 +155,13 @@ def render_readme(r, data, diagram):
             L.append(f"| {name.strip()} | {rest.strip() or '[docs/credentials.md](../../docs/credentials.md)'} |")
     else:
         L.append("| Nothing | Runs with zero setup |")
-    L += ["", "## 🛠️ Build it step by step", "",
+    from reference import node_reference, placeholders
+    L += ["", placeholders(data), "## 🛠️ Build it step by step", "",
           "> [!TIP]", "> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.", ""]
     L += [f"{i}. {s}" for i, s in enumerate(r["steps"], 1)]
-    L += ["", "## ✅ Test it", "", *[f"- [ ] {t}" for t in r["test"]], "",
-          "## 🧯 Troubleshooting", ""]
+    L += ["", node_reference(data), "## ✅ Test it", "", *[f"- [ ] {t}" for t in r["test"]], "",
+          "## 🧯 Troubleshooting", "",
+          "Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).", ""]
     for a, b in r["errors"]:
         L += [f"<details><summary><b>{a.replace('`', '')}</b></summary>", "", b, "", "</details>", ""]
     L += ["## 🚀 Level up", "", *[f"- {x}" for x in r["extend"]], "", "---", "", "{{NAV}}"]

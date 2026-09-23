@@ -57,6 +57,17 @@ Schedule (Mon–Fri 9 AM) → Config → Jira search (JQL) → Code (table + per
 | Jira Software Cloud | email + API token from id.atlassian.com → Security → API tokens |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| ⚙️ Config | `email_to` | `you@example.com` |
+| ⚙️ Config | `jira_base_url` | `https://YOUR-SITE.atlassian.net` |
+
+Nodes that need a credential selected after import: **Gmail**, **Jira Software**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -69,12 +80,83 @@ Schedule (Mon–Fri 9 AM) → Config → Jira search (JQL) → Code (table + per
 5. Node Settings → **Always Output Data** on (so an empty result still continues).
 6. Code node builds the report, then Gmail.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Weekdays 9 AM</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.field` | cronExpression |
+| `rule.interval.expression` | 0 9 * * 1-5 |
+
+</details>
+
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `project_key` | SCRUM |
+| `stale_days` | 3 |
+| `email_to` | you@example.com |
+| `jira_base_url` | https://YOUR-SITE.atlassian.net |
+
+</details>
+
+<details><summary><b>3. Search Stale Stories</b> · <code>Jira Software</code> v1</summary>
+
+> Creates, searches or updates Jira issues.
+
+| Property | Value |
+|---|---|
+| `operation` | getAll |
+| `returnAll` | ✅ on |
+| `jql` | `project = {{ $json.project_key }} AND statusCategory = "In Progress" AND updated <= -{{…` |
+| `fields` | summary,status,assignee,updated,priority |
+| `⚙️ Always output data` | ✅ on |
+
+</details>
+
+<details><summary><b>4. Build Report</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 13 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>5. Email Scrum Master</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('⚙️ Config').item.json.email_to }}` |
+| `subject` | `{{ $json.subject }}` |
+| `emailType` | html |
+| `message` | `{{ $json.html }}` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Set `stale_days` to 0 so you see every in-progress story.
 - [ ] Use a project key that doesn't exist. You should get a clear Jira error.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>JQL: field 'statusCategory' does not exist</b></summary>
 

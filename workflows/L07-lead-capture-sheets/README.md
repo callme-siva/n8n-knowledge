@@ -54,6 +54,16 @@ Form → Set (clean) → Google Sheets append → Gmail welcome
 | Google Sheets OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Append to Leads Sheet | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+
+Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -66,12 +76,77 @@ Form → Set (clean) → Google Sheets append → Gmail welcome
 5. Add **Google Sheets → Append row**. Paste the sheet URL, pick the tab, *Map automatically*.
 6. Add Gmail to `{{ $('Clean Lead').item.json.email }}`.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Lead Form</b> · <code>n8n Form Trigger</code> v2.2</summary>
+
+> Hosts a web form; each submission starts one execution. Field labels become JSON keys.
+
+| Property | Value |
+|---|---|
+| `formTitle` | Book a free demo |
+| `formDescription` | Tell us a little about you. We reply within one business day. |
+| `formFields.values` | Name *, Email *, Company, Interested in *, Monthly budget (INR) |
+| `respondWithOptions.formSubmittedText` | Thanks! Check your inbox for a confirmation. |
+
+</details>
+
+<details><summary><b>2. Clean Lead</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `timestamp` | `{{ $now.toISO() }}` |
+| `name` | `{{ $json.Name.trim() }}` |
+| `email` | `{{ $json.Email.trim().toLowerCase() }}` |
+| `company` | `{{ $json.Company \|\| '-' }}` |
+| `interest` | `{{ $json['Interested in'] }}` |
+| `budget` | `{{ $json['Monthly budget (INR)'] \|\| 'not given' }}` |
+| `source` | web-form |
+
+</details>
+
+<details><summary><b>3. Append to Leads Sheet</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | append |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Leads |
+| `columns.mappingMode` | autoMapInputData |
+
+</details>
+
+<details><summary><b>4. Welcome Email</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('Clean Lead').item.json.email }}` |
+| `subject` | `Thanks {{ $('Clean Lead').item.json.name }} — your demo request` |
+| `emailType` | html |
+| `message` | `<p>Hi {{ $('Clean Lead').item.json.name }},</p><p>Thanks for your interest in <b>{{ $('Clean Lead').item.json.interest }}</b>. We'll reply within one business day with a few slots.</p><p>— Team</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Submit the form 3 times with different data. You should see 3 rows and 3 emails.
 - [ ] Activate it and share the **Production URL**.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Columns are empty in the sheet</b></summary>
 

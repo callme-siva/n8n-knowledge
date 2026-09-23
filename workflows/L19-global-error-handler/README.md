@@ -56,6 +56,17 @@ Error Trigger → Code (shape + hint) ─┬→ Gmail alert
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 | Google Sheets OAuth2 (tab `Errors` | time, workflow, workflow_id, node, message, hint, url, mode) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Email Alert | `sendTo` | `you@example.com` |
+| Log to Error Sheet | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+
+Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -66,12 +77,68 @@ Error Trigger → Code (shape + hint) ─┬→ Gmail alert
 3. Add Gmail and Sheets in parallel, each with *On Error → Continue*.
 4. Open **every** other workflow → *Settings* → **Error workflow** → choose this one.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. On Any Workflow Error</b> · <code>Error Trigger</code> v1</summary>
+
+> Starts when *another* workflow that points here as its error workflow fails.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+<details><summary><b>2. Shape Error</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `jsCode` | (JavaScript, 9 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>3. Email Alert</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | you@example.com |
+| `subject` | `🚨 n8n failure: {{ $json.workflow }} → {{ $json.node }}` |
+| `emailType` | html |
+| `message` | `<p><b>Workflow:</b> {{ $json.workflow }}<br><b>Node:</b> {{ $json.node }}<br><b>Time:</b> {{ $json.time }}</p><pre>{{ $json.message }}</pre><p>💡 {{ $json.hint }}</p><p><a href="{{ $json.url }}">Open execution</a></p>` |
+| `appendAttribution` | off |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+<details><summary><b>4. Log to Error Sheet</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | append |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Errors |
+| `columns.mappingMode` | autoMapInputData |
+| `⚙️ On error` | Continue (regular output) |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Activate **L04** with `base = XYZ` (or disconnect a credential) and let it run. The alert should arrive within seconds.
 - [ ] Note: error workflows fire for **production** executions, not manual test runs.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>No alert when testing manually</b></summary>
 

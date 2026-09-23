@@ -63,6 +63,12 @@ Chat → AI Agent ⇐ Gemini, ⇐ Memory, ⇐ Calculator, ⇐ Wikipedia, ⇐ get
 |---|---|
 | Google Gemini API key (all tools used here are free and keyless) | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+No placeholder values. It runs as-is once the credentials are connected.
+
+Nodes that need a credential selected after import: **Google Gemini Chat Model**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -75,6 +81,104 @@ Chat → AI Agent ⇐ Gemini, ⇐ Memory, ⇐ Calculator, ⇐ Wikipedia, ⇐ get
 5. Attach a second HTTP tool, `get_exchange_rate`, with a `{base}` placeholder.
 6. Write a system prompt that tells the agent *when* to use tools.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Chat</b> · <code>Chat Trigger</code> v1.1</summary>
+
+> Opens a chat window; each message starts an execution with `chatInput` and a `sessionId`.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+<details><summary><b>2. Assistant Agent</b> · <code>AI Agent</code> v2.2</summary>
+
+> An LLM that can call tools, use memory and loop until it has an answer.
+
+| Property | Value |
+|---|---|
+| `systemMessage` | `You are a helpful personal assistant for a user in India. Today is {{ $now.toFormat('cccc, dd LLL yyyy') }}. Use tools for any fact that can change (weather, exchange rates) and the calculator for ANY arithmetic. For weather you need latitude/longitude — use your own knowledge of city coordinates. Be concise.` |
+| `maxIterations` | 8 |
+
+</details>
+
+<details><summary><b>3. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
+
+> The language model plugged into a chain or agent.
+
+| Property | Value |
+|---|---|
+| `modelName` | models/gemini-2.5-flash |
+| `temperature` | 0.2 |
+
+</details>
+
+<details><summary><b>4. Memory</b> · <code>Simple Memory</code> v1.3</summary>
+
+> Remembers the last N chat messages per session.
+
+| Property | Value |
+|---|---|
+| `contextWindowLength` | 10 |
+
+</details>
+
+<details><summary><b>5. Calculator</b> · <code>Calculator Tool</code> v1</summary>
+
+> Lets an agent do exact arithmetic.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+<details><summary><b>6. Wikipedia</b> · <code>Wikipedia Tool</code> v1</summary>
+
+> Lets an agent look things up on Wikipedia.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+<details><summary><b>7. get_weather</b> · <code>HTTP Request Tool</code> v1.1</summary>
+
+> Lets an agent call an API. `{placeholders}` in the URL are filled in by the model.
+
+| Property | Value |
+|---|---|
+| `toolDescription` | Get current weather and 3-day forecast for a location. Needs latitude and longitude. |
+| `url` | https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperatu… |
+| `placeholderDefinitions.1.name` | lat |
+| `placeholderDefinitions.1.description` | latitude in decimal degrees |
+| `placeholderDefinitions.1.type` | number |
+| `placeholderDefinitions.2.name` | lon |
+| `placeholderDefinitions.2.description` | longitude in decimal degrees |
+| `placeholderDefinitions.2.type` | number |
+| `optimizeResponse` | ✅ on |
+
+</details>
+
+<details><summary><b>8. get_exchange_rate</b> · <code>HTTP Request Tool</code> v1.1</summary>
+
+> Lets an agent call an API. `{placeholders}` in the URL are filled in by the model.
+
+| Property | Value |
+|---|---|
+| `toolDescription` | Get latest exchange rates for a base currency code like USD, EUR, INR. |
+| `url` | https://open.er-api.com/v6/latest/{base} |
+| `placeholderDefinitions.name` | base |
+| `placeholderDefinitions.description` | 3-letter ISO currency code |
+| `placeholderDefinitions.type` | string |
+| `optimizeResponse` | ✅ on |
+| `dataField` | rates |
+| `fieldsToInclude` | all |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] "What's 17.5% of 84,999?" should use Calculator.
@@ -83,6 +187,8 @@ Chat → AI Agent ⇐ Gemini, ⇐ Memory, ⇐ Calculator, ⇐ Wikipedia, ⇐ get
 - [ ] Follow-up: "and in USD?" tests memory and the currency tool.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>The agent answers from memory and skips tools</b></summary>
 

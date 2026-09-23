@@ -55,6 +55,16 @@ Schedule (7 AM) → ⚙️ Config → HTTP GET open-meteo.com → Gmail
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| ⚙️ Config | `email_to` | `you@example.com` |
+
+Nodes that need a credential selected after import: **Gmail**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -67,12 +77,80 @@ Schedule (7 AM) → ⚙️ Config → HTTP GET open-meteo.com → Gmail
 5. Add **Gmail**. Build the HTML body by dragging fields from the INPUT panel.
 6. Run it once manually, then **Activate** it.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Every Morning 7 AM</b> · <code>Schedule Trigger</code> v1.2</summary>
+
+> Starts the workflow on a timer or cron expression. Only fires when the workflow is **active**.
+
+| Property | Value |
+|---|---|
+| `rule.interval.triggerAtHour` | 7 |
+
+</details>
+
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `city` | Chennai |
+| `latitude` | 13.0827 |
+| `longitude` | 80.2707 |
+| `timezone` | Asia/Kolkata |
+| `email_to` | you@example.com |
+
+</details>
+
+<details><summary><b>3. Fetch Weather</b> · <code>HTTP Request</code> v4.2</summary>
+
+> Calls any REST API. Use it whenever there's no dedicated node.
+
+| Property | Value |
+|---|---|
+| `url` | https://api.open-meteo.com/v1/forecast |
+| `sendQuery` | ✅ on |
+| `queryParameters.latitude` | `{{ $json.latitude }}` |
+| `queryParameters.longitude` | `{{ $json.longitude }}` |
+| `queryParameters.current` | temperature_2m,relative_humidity_2m,wind_speed_10m |
+| `queryParameters.daily` | temperature_2m_max,temperature_2m_min,precipitation_probability_max |
+| `queryParameters.timezone` | `{{ $json.timezone }}` |
+| `queryParameters.forecast_days` | 1 |
+| `timeout` | 15000 |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 5000 |
+
+</details>
+
+<details><summary><b>4. Email Summary</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('⚙️ Config').item.json.email_to }}` |
+| `subject` | `{{ $('⚙️ Config').item.json.city }} weather — {{ $now.toFormat('dd LLL yyyy') }}` |
+| `emailType` | html |
+| `message` | `<h2>{{ $('⚙️ Config').item.json.city }} today</h2><ul><li>Now: {{ $json.current.temperature_2m }}°C, humidity {{ $json.current.relative_humidity_2m }}%, wind {{ $json.current.wind_speed_10m }} km/h</li><li>High / Low: {{ $json.daily.temperature_2m_max[0] }}°C / {{ $json.daily.temperature_2m_min[0] }}°C</li><li>Chance of rain: {{ $json.daily.precipitation_probability_max[0] }}% {{ $json.daily.precipitation_probability_max[0] > 50 ? '☔ carry an umbrella' : '' }}</li></ul>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Click *Execute workflow*. A schedule workflow can always be run manually for testing.
 - [ ] Check **Executions** (left sidebar) the next morning to see the automatic run.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Workflow never runs automatically</b></summary>
 

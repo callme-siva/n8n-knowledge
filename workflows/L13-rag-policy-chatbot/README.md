@@ -68,6 +68,12 @@ PART B  Chat Trigger → AI Agent ⇐ Gemini, ⇐ Memory, ⇐ Tool: Vector Store
 |---|---|
 | Google Gemini API key (used for chat and embeddings) | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+No placeholder values. It runs as-is once the credentials are connected.
+
+Nodes that need a credential selected after import: **Gemini Embeddings**, **Google Gemini Chat Model**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -81,6 +87,130 @@ PART B  Chat Trigger → AI Agent ⇐ Gemini, ⇐ Memory, ⇐ Tool: Vector Store
 6. Write the strict system prompt (see workflow.json).
 7. Click **Open chat** and ask a question.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Upload Policy PDFs</b> · <code>n8n Form Trigger</code> v2.2</summary>
+
+> Hosts a web form; each submission starts one execution. Field labels become JSON keys.
+
+| Property | Value |
+|---|---|
+| `formTitle` | Upload policy documents |
+| `formDescription` | PDFs only. They will be indexed for the chatbot. |
+| `formFields.values` | Documents * |
+
+</details>
+
+<details><summary><b>2. Store in Vector DB</b> · <code>In-Memory Vector Store</code> v1.1</summary>
+
+> Stores embeddings (insert mode) or searches them (retrieve mode).
+
+| Property | Value |
+|---|---|
+| `mode` | insert |
+| `memoryKey` | hr_policies |
+
+</details>
+
+<details><summary><b>3. Gemini Embeddings (insert)</b> · <code>Gemini Embeddings</code> v1</summary>
+
+> Turns text into vectors for semantic search.
+
+| Property | Value |
+|---|---|
+| `modelName` | models/gemini-embedding-001 |
+
+</details>
+
+<details><summary><b>4. PDF Loader</b> · <code>Default Data Loader</code> v1</summary>
+
+> Loads binary or JSON data as documents for a vector store.
+
+| Property | Value |
+|---|---|
+| `dataType` | binary |
+
+</details>
+
+<details><summary><b>5. Chunker</b> · <code>Recursive Text Splitter</code> v1</summary>
+
+> Cuts documents into overlapping chunks.
+
+| Property | Value |
+|---|---|
+| `chunkSize` | 1000 |
+| `chunkOverlap` | 150 |
+
+</details>
+
+<details><summary><b>6. Chat with Employees</b> · <code>Chat Trigger</code> v1.1</summary>
+
+> Opens a chat window; each message starts an execution with `chatInput` and a `sessionId`.
+
+*No settings. This node works with its defaults.*
+
+</details>
+
+<details><summary><b>7. Policy Assistant</b> · <code>AI Agent</code> v2.2</summary>
+
+> An LLM that can call tools, use memory and loop until it has an answer.
+
+| Property | Value |
+|---|---|
+| `systemMessage` | You are the HR policy assistant. ALWAYS search the policy_documents tool before answering. Answer only from what the tool returns; quote the policy name. If the documents don't cover it, say "I couldn't find that in our policies — please contact HR" — never guess. Keep answers under 120 words. |
+
+</details>
+
+<details><summary><b>8. Gemini Chat</b> · <code>Google Gemini Chat Model</code> v1</summary>
+
+> The language model plugged into a chain or agent.
+
+| Property | Value |
+|---|---|
+| `modelName` | models/gemini-2.5-flash |
+| `temperature` | 0.1 |
+
+</details>
+
+<details><summary><b>9. Chat Memory</b> · <code>Simple Memory</code> v1.3</summary>
+
+> Remembers the last N chat messages per session.
+
+| Property | Value |
+|---|---|
+| `contextWindowLength` | 8 |
+
+</details>
+
+<details><summary><b>10. policy_documents</b> · <code>In-Memory Vector Store</code> v1.1</summary>
+
+> Stores embeddings (insert mode) or searches them (retrieve mode).
+
+| Property | Value |
+|---|---|
+| `mode` | retrieve-as-tool |
+| `toolName` | policy_documents |
+| `toolDescription` | Search the company HR policy documents (leave, WFH, travel, reimbursement, code of conduct). |
+| `memoryKey` | hr_policies |
+| `topK` | 4 |
+
+</details>
+
+<details><summary><b>11. Gemini Embeddings (search)</b> · <code>Gemini Embeddings</code> v1</summary>
+
+> Turns text into vectors for semantic search.
+
+| Property | Value |
+|---|---|
+| `modelName` | models/gemini-embedding-001 |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Use the sample policy in [docs/sample-data.md](../../docs/sample-data.md#hr-policy) (save it as a PDF).
@@ -88,6 +218,8 @@ PART B  Chat Trigger → AI Agent ⇐ Gemini, ⇐ Memory, ⇐ Tool: Vector Store
 - [ ] Open the agent's execution log to see which chunks were retrieved.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>The agent answers without searching</b></summary>
 

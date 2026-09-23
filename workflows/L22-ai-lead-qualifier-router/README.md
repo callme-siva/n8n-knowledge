@@ -71,6 +71,19 @@ Form → LLM Chain ⇐ Gemini, ⇐ Schema → Set CRM row → Sheets → Switch
 | Google Sheets OAuth2 (tab `Leads` | time, name, email, company, score, tier, reason, use_case, reply) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| Save to CRM Sheet | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+| 🔥 Alert Sales Now | `sendTo` | `you@example.com` |
+| Personal Reply (Hot/Warm) | `message` | `<p>{{ $('Build CRM Row').item.json.reply }}</p><p>Pick a slot: https://cal.com/your-lin…` |
+| Nurture Email (Cold) | `message` | `<p>Thanks for your interest! Here are 3 free guides to get started with automation: htt…` |
+
+Nodes that need a credential selected after import: **Gmail**, **Google Gemini Chat Model**, **Google Sheets**.
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -80,11 +93,156 @@ Form → LLM Chain ⇐ Gemini, ⇐ Schema → Set CRM row → Sheets → Switch
 2. If you get stuck, import `workflow.json` and compare node by node.
 3. Set the workflow's *Error workflow* to L19.
 
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Enquiry Form</b> · <code>n8n Form Trigger</code> v2.2</summary>
+
+> Hosts a web form; each submission starts one execution. Field labels become JSON keys.
+
+| Property | Value |
+|---|---|
+| `formTitle` | Talk to us |
+| `formDescription` | Tell us what you want to automate. |
+| `formFields.values` | Name *, Work email *, Company *, Team size *, What do you want to automate? *, When do … |
+
+</details>
+
+<details><summary><b>2. Qualify Lead</b> · <code>Basic LLM Chain</code> v1.5</summary>
+
+> Sends one prompt to a model and returns the answer. Simplest AI node.
+
+| Property | Value |
+|---|---|
+| `promptType` | define |
+| `hasOutputParser` | ✅ on |
+| `text` | `Name: {{ $json.Name }} Email: {{ $json['Work email'] }} Company: {{ $json.Company }} Team size: {{ $json['Team size'] }} Timeline: {{ $json['When do you want to start?'] }} Need: {{ $json['What do you want to automate?'] }}` |
+| `messages.message` | You are a B2B sales development rep for an automation consultancy. Score the lead 0-100 using BANT (Budget signals, Authority, Need clarity, Timeline). Personal email domains (gmail, yahoo) lower authority. tier = hot (&gt;=70), warm (40-69), cold (&lt;40). Be strict and explain briefly. |
+
+</details>
+
+<details><summary><b>3. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
+
+> The language model plugged into a chain or agent.
+
+| Property | Value |
+|---|---|
+| `modelName` | models/gemini-2.5-flash |
+| `temperature` | 0 |
+
+</details>
+
+<details><summary><b>4. Lead Schema</b> · <code>Structured Output Parser</code> v1.2</summary>
+
+> Forces the model's answer into JSON matching your schema.
+
+| Property | Value |
+|---|---|
+| `jsonSchemaExample` | (JSON schema, 7 lines. See workflow.json) |
+
+</details>
+
+<details><summary><b>5. Build CRM Row</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `time` | `{{ $now.toISO() }}` |
+| `name` | `{{ $('Enquiry Form').item.json.Name }}` |
+| `email` | `{{ $('Enquiry Form').item.json['Work email'] }}` |
+| `company` | `{{ $('Enquiry Form').item.json.Company }}` |
+| `score` | `{{ $json.output.score }}` |
+| `tier` | `{{ $json.output.tier }}` |
+| `reason` | `{{ $json.output.reason }}` |
+| `use_case` | `{{ $json.output.use_case }}` |
+| `reply` | `{{ $json.output.suggested_reply }}` |
+
+</details>
+
+<details><summary><b>6. Save to CRM Sheet</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | append |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Leads |
+| `columns.mappingMode` | autoMapInputData |
+
+</details>
+
+<details><summary><b>7. Route by Tier</b> · <code>Switch</code> v3.2</summary>
+
+> Routes items to one of many named outputs.
+
+| Property | Value |
+|---|---|
+| `rule 1.condition` | `{{ $('Build CRM Row').item.json.tier }} = hot` |
+| `rule 1.renameOutput` | ✅ on |
+| `rule 1.outputKey` | Hot |
+| `rule 2.condition` | `{{ $('Build CRM Row').item.json.tier }} = warm` |
+| `rule 2.renameOutput` | ✅ on |
+| `rule 2.outputKey` | Warm |
+| `fallbackOutput` | extra |
+| `renameFallbackOutput` | Cold |
+
+</details>
+
+<details><summary><b>8. 🔥 Alert Sales Now</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | you@example.com |
+| `subject` | `🔥 HOT lead ({{ $('Build CRM Row').item.json.score }}): {{ $('Build CRM Row').item.json.company }}` |
+| `emailType` | html |
+| `message` | `<p><b>{{ $('Build CRM Row').item.json.name }}</b> · {{ $('Build CRM Row').item.json.email }}</p><p>{{ $('Build CRM Row').item.json.reason }}</p><p>Call within 1 hour.</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+<details><summary><b>9. Personal Reply (Hot/Warm)</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('Build CRM Row').item.json.email }}` |
+| `subject` | `Re: automating {{ $('Build CRM Row').item.json.use_case }}` |
+| `emailType` | html |
+| `message` | `<p>{{ $('Build CRM Row').item.json.reply }}</p><p>Pick a slot: https://cal.com/your-link</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+<details><summary><b>10. Nurture Email (Cold)</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('Build CRM Row').item.json.email }}` |
+| `subject` | `Thanks for reaching out, {{ $('Build CRM Row').item.json.name }}` |
+| `emailType` | html |
+| `message` | `<p>Thanks for your interest! Here are 3 free guides to get started with automation: https://github.com/YOUR_USER/n8n-knowledge</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
 ## ✅ Test it
 
 - [ ] Submit the 3 sample leads in [docs/sample-data.md](../../docs/sample-data.md#sales-leads): one each should come out hot, warm and cold.
 
 ## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
 
 <details><summary><b>Every lead is 'warm'</b></summary>
 
