@@ -1,0 +1,245 @@
+{
+  "name": "L07 · Lead capture form → Google Sheets + welcome email",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📋 L07 · Forms + Sheets (Sales)\nOpen the **Form URL** from the trigger (Test URL while building, Production URL when active).\nCreate a Sheet with headers:\n`timestamp | name | email | company | interest | budget | source`",
+        "width": 460,
+        "height": 220,
+        "color": 5
+      },
+      "id": "ea279b1e-b629-535e-9db2-79206eb6fa90",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Book a free demo",
+        "formDescription": "Tell us a little about you. We reply within one business day.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company"
+            },
+            {
+              "fieldLabel": "Interested in",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Automation consulting"
+                  },
+                  {
+                    "option": "n8n training"
+                  },
+                  {
+                    "option": "AI agents"
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Monthly budget (INR)",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "< 25k"
+                  },
+                  {
+                    "option": "25k – 1L"
+                  },
+                  {
+                    "option": "> 1L"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Thanks! Check your inbox for a confirmation."
+            }
+          }
+        }
+      },
+      "id": "059c0723-9a4d-5ed8-a58f-12a05bdc0be5",
+      "name": "Lead Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "name",
+              "value": "={{ $json.Name.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "email",
+              "value": "={{ $json.Email.trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "company",
+              "value": "={{ $json.Company || '-' }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "interest",
+              "value": "={{ $json['Interested in'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "budget",
+              "value": "={{ $json['Monthly budget (INR)'] || 'not given' }}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "source",
+              "value": "web-form",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "adda0499-d682-553d-9a4f-e91e911bda75",
+      "name": "Clean Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "62c82b7d-b62a-53f6-bfd8-9c7d4a20def3",
+      "name": "Append to Leads Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Clean Lead').item.json.email }}",
+        "subject": "=Thanks {{ $('Clean Lead').item.json.name }} — your demo request",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $('Clean Lead').item.json.name }},</p><p>Thanks for your interest in <b>{{ $('Clean Lead').item.json.interest }}</b>. We'll reply within one business day with a few slots.</p><p>— Team</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "7df86010-f60b-58fc-bcbf-84ab27e67029",
+      "name": "Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Lead Form": {
+      "main": [
+        [
+          {
+            "node": "Clean Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Lead": {
+      "main": [
+        [
+          {
+            "node": "Append to Leads Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Leads Sheet": {
+      "main": [
+        [
+          {
+            "node": "Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

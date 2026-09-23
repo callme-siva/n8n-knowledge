@@ -1,0 +1,179 @@
+{
+  "name": "L10 · Bug report form → Jira issue + reporter confirmation",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🐞 L10 · Form → Jira\nNon-technical users report bugs on a friendly form; n8n creates a proper Jira Bug with priority mapped from severity, then emails the reporter the ticket link.\nSet project and issue type IDs in *Create Jira Bug*.",
+        "width": 480,
+        "height": 240,
+        "color": 5
+      },
+      "id": "67f8e55d-b29b-53c8-95ef-3bdaa4cf7af5",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Report a problem",
+        "formDescription": "Found something broken? Tell us and we will track it.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "What is broken?",
+              "requiredField": true,
+              "placeholder": "Login button does nothing"
+            },
+            {
+              "fieldLabel": "Steps to reproduce",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Severity",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Blocker — cannot work"
+                  },
+                  {
+                    "option": "Major — workaround exists"
+                  },
+                  {
+                    "option": "Minor — cosmetic"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Page / module"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bd20776b-edc6-5d8a-a366-2e1abfd70e94",
+      "name": "Bug Report Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const sev = $json['Severity'] || '';\nconst priority = sev.startsWith('Blocker') ? 'Highest' : sev.startsWith('Major') ? 'High' : 'Low';\nreturn { json: { ...$json, priority,\n  summary: `[${$json['Page / module'] || 'General'}] ${$json['What is broken?']}`.slice(0, 250),\n  description: `*Reported by:* ${$json['Your email']}\\n*Severity:* ${sev}\\n\\n*Steps to reproduce:*\\n${$json['Steps to reproduce']}\\n\\n_Created automatically by n8n_` } };"
+      },
+      "id": "29e8ed96-ab4b-5331-acca-445e0ecac5f2",
+      "name": "Map Severity → Priority",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_PROJECT_ID"
+        },
+        "issueType": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_BUG_ISSUE_TYPE_ID"
+        },
+        "summary": "={{ $json.summary }}",
+        "additionalFields": {
+          "description": "={{ $json.description }}",
+          "labels": [
+            "from-form"
+          ]
+        }
+      },
+      "id": "adab0155-3cdd-52d7-8c0a-98fea2cdf789",
+      "name": "Create Jira Bug",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Map Severity → Priority').item.json['Your email'] }}",
+        "subject": "=We logged your report: {{ $json.key }}",
+        "emailType": "html",
+        "message": "=<p>Thanks! Your report is now ticket <b>{{ $json.key }}</b> with priority {{ $('Map Severity → Priority').item.json.priority }}.</p><p>We'll update you when it's fixed.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "803de593-d741-5633-8d2c-49ddea271de0",
+      "name": "Confirm to Reporter",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Bug Report Form": {
+      "main": [
+        [
+          {
+            "node": "Map Severity → Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Severity → Priority": {
+      "main": [
+        [
+          {
+            "node": "Create Jira Bug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Jira Bug": {
+      "main": [
+        [
+          {
+            "node": "Confirm to Reporter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

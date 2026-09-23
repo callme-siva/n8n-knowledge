@@ -1,0 +1,364 @@
+{
+  "name": "L15 · Retrospective → AI action items → human approval → Jira",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ✋ L15 · Human-in-the-loop\nAI drafts the action items, but **a human approves** before anything is created in Jira.\nGmail *Send and Wait for Response* pauses the execution until the Scrum Master clicks Approve / Decline.",
+        "width": 500,
+        "height": 240,
+        "color": 5
+      },
+      "id": "12521da4-2456-50eb-8fad-824b28164ced",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Sprint Retrospective",
+        "formDescription": "Honest, blameless feedback. Takes 2 minutes.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Sprint",
+              "requiredField": true,
+              "placeholder": "Sprint 24"
+            },
+            {
+              "fieldLabel": "What went well?",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "What didn't go well?",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Suggestions",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Team morale",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1 - Very low"
+                  },
+                  {
+                    "option": "2 - Low"
+                  },
+                  {
+                    "option": "3 - Neutral"
+                  },
+                  {
+                    "option": "4 - Good"
+                  },
+                  {
+                    "option": "5 - Excellent"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b1ce449-69f6-5158-827b-66e4bdb90dc1",
+      "name": "Retrospective Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "hasOutputParser": true,
+        "text": "=Sprint: {{ $json.Sprint }}\nMorale: {{ $json['Team morale'] }}\n\nWent well:\n{{ $json['What went well?'] }}\n\nDidn't go well:\n{{ $json[\"What didn't go well?\"] }}\n\nSuggestions:\n{{ $json.Suggestions }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an experienced agile coach. Summarise the feedback, rate sentiment, and propose at most 3 SMART action items (specific, owner role, measurable). Only include items the team can act on next sprint."
+            }
+          ]
+        }
+      },
+      "id": "be33a0e5-27bd-509e-b39f-e89c08dc8dbb",
+      "name": "Analyze Retro",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "9b4e6e98-3528-5d9c-9b36-fdb9bac1adf3",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        180,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"sentiment\": \"mixed\",\n  \"summary\": \"Delivery was good but too many unplanned requests.\",\n  \"action_items\": [\n    {\n      \"title\": \"Limit mid-sprint scope changes\",\n      \"description\": \"PO to route new requests to the backlog; SM tracks count.\",\n      \"priority\": \"High\",\n      \"owner_role\": \"Product Owner\"\n    }\n  ]\n}"
+      },
+      "id": "a50e530a-4b2f-5cc9-aac9-2f169ad638f6",
+      "name": "Retro Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        340,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const o = $input.first().json.output;\nconst li = (o.action_items || []).map((a, i) => `<li><b>${i + 1}. ${a.title}</b> (${a.priority}, ${a.owner_role})<br>${a.description}</li>`).join('');\nreturn [{ json: { ...o, sprint: $('Retrospective Form').first().json.Sprint,\n  html: `<p><b>Sentiment:</b> ${o.sentiment}</p><p>${o.summary}</p><p>Proposed Jira tasks:</p><ol>${li}</ol><p>Approve to create them in Jira.</p>` } }];"
+      },
+      "id": "682d81e9-6185-5b47-8b5f-2236b5329d2b",
+      "name": "Build Approval Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "you@example.com",
+        "subject": "=Approve retro action items for {{ $json.sprint }}?",
+        "message": "={{ $json.html }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 2,
+              "resumeUnit": "days"
+            }
+          }
+        }
+      },
+      "id": "e2e3e717-f89c-5f3e-ae81-997ad02dcf6b",
+      "name": "Ask Scrum Master",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.data.approved }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7982df6f-7805-5355-be2c-b843c77d32de",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1000,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Build Approval Message').first().json.action_items.map(a => ({ json: { ...a, sprint: $('Build Approval Message').first().json.sprint } }));"
+      },
+      "id": "549b4e74-c356-5517-a781-39f47dda0aaf",
+      "name": "Restore Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_PROJECT_ID"
+        },
+        "issueType": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_TASK_ISSUE_TYPE_ID"
+        },
+        "summary": "=[Retro {{ $json.sprint }}] {{ $json.title }}",
+        "additionalFields": {
+          "description": "={{ $json.description }}\n\nOwner role: {{ $json.owner_role }}\nPriority suggested by AI: {{ $json.priority }}\n\nApproved by Scrum Master via n8n.",
+          "labels": [
+            "retro-action"
+          ]
+        }
+      },
+      "id": "90287326-369e-56f8-a53d-f51ae61bd6e0",
+      "name": "Create Jira Task",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -100
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "9674992b-f371-5602-bf3f-07e86bcaeb17",
+      "name": "Declined — stop",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        120
+      ]
+    }
+  ],
+  "connections": {
+    "Retrospective Form": {
+      "main": [
+        [
+          {
+            "node": "Analyze Retro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Retro": {
+      "main": [
+        [
+          {
+            "node": "Build Approval Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Approval Message": {
+      "main": [
+        [
+          {
+            "node": "Ask Scrum Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Scrum Master": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Restore Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Declined — stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Items": {
+      "main": [
+        [
+          {
+            "node": "Create Jira Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyze Retro",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retro Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Analyze Retro",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

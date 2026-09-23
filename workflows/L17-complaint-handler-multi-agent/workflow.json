@@ -1,0 +1,585 @@
+{
+  "name": "L17 · Customer complaint handler (5 agents + auto-fixing parsers)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Customer Complaint",
+        "formDescription": "Tell us what went wrong and we will get back to you.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your email",
+              "fieldType": "email",
+              "fieldName": "customer_email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Order ID (if known)",
+              "fieldName": "order_id"
+            },
+            {
+              "fieldLabel": "Describe your complaint",
+              "fieldType": "textarea",
+              "fieldName": "complaint",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "path": "customer-complaint"
+        }
+      },
+      "id": "8dc6fad7-f474-45b1-bc29-0916350ba397",
+      "name": "Complaint Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Complaint from {{ $json.customer_email }} (order id: {{ $json.order_id }}):\n\n{{ $json.complaint }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a complaint intake analyst. Read the customer complaint and extract a structured understanding of it: category (e.g. shipping, billing, product-quality, service, other), urgency (low/medium/high), sentiment, product, order_id, customer_email, and a one-sentence summary. If a value is unknown, use an empty string."
+        }
+      },
+      "id": "082bbccc-a8d3-4226-b3f1-37dc05193b82",
+      "name": "Understand Complaint",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        256,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "22ea647f-f783-4909-a7d5-fda399cd36c3",
+      "name": "Understand Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\"category\":\"shipping\",\"urgency\":\"high\",\"sentiment\":\"negative\",\"product\":\"Wireless Headphones\",\"order_id\":\"ORD-1234\",\"customer_email\":\"customer@example.com\",\"summary\":\"Order arrived damaged and late.\"}",
+        "autoFix": true
+      },
+      "id": "754aaf72-a6cc-4132-baca-728e66251f03",
+      "name": "Understanding Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "44df6ed2-a06a-4f02-a8cf-d1cb1ce78b63",
+      "name": "Understanding Fix Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        448,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Structured complaint understanding:\n{{ JSON.stringify($json.output) }}\n\nOriginal complaint text:\n{{ $(\"Complaint Form\").item.json.complaint }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a support investigator. Based on the complaint understanding and available information, organize what is known about the customer and their order, list the information that is missing and would be needed to resolve the case, and suggest the specific lookups (e.g. CRM/order-management queries) that should be performed. Do not invent facts you were not given. For known_facts, missing_info, and recommended_lookups, return each as a single string with items separated by semicolons."
+        }
+      },
+      "id": "0a5f3845-1d91-4af8-9bd6-d3bf3de69093",
+      "name": "Investigate Customer/Order",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        752,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "eb046cd3-87f9-43a0-8c9a-cd6e50d6ff6e",
+      "name": "Investigate Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        736,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"known_facts\":{\"type\":\"string\"},\"missing_info\":{\"type\":\"string\"},\"recommended_lookups\":{\"type\":\"string\"},\"confidence\":{\"type\":\"string\"}},\"required\":[\"known_facts\",\"missing_info\",\"recommended_lookups\",\"confidence\"]}",
+        "autoFix": true
+      },
+      "id": "9870fffa-75f5-46c0-a3c3-daf54c4c27c5",
+      "name": "Investigation Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "e708e204-7bed-46ff-9c39-0481a3a94494",
+      "name": "Investigation Fix Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        944,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Complaint understanding:\n{{ JSON.stringify($(\"Understand Complaint\").item.json.output) }}\n\nInvestigation findings:\n{{ JSON.stringify($json.output) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a resolution strategist. Given the complaint and investigation, choose the most appropriate resolution workflow (e.g. refund-or-replacement, reship, billing-adjustment, technical-support, goodwill-gesture, information-request) and lay out the concrete steps to resolve it, with any relevant policy notes. Return steps as a single string with each step separated by semicolons."
+        }
+      },
+      "id": "c5bb52c7-cd0c-4c63-b945-e7027a3eeae0",
+      "name": "Determine Resolution",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1248,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "1eaa08a2-4964-4098-89e9-00ecfd5d4e5a",
+      "name": "Resolution Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"resolution_workflow\":{\"type\":\"string\"},\"steps\":{\"type\":\"string\"},\"policy_notes\":{\"type\":\"string\"}},\"required\":[\"resolution_workflow\",\"steps\",\"policy_notes\"]}",
+        "autoFix": true
+      },
+      "id": "d07530cc-c732-4052-a614-46d634fe5450",
+      "name": "Resolution Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "3e733a15-d338-4ef1-ae17-8c8d33e76aef",
+      "name": "Resolution Fix Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Complaint understanding:\n{{ JSON.stringify($(\"Understand Complaint\").item.json.output) }}\n\nResolution plan:\n{{ JSON.stringify($json.output) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an escalation reviewer. Decide whether this complaint requires human escalation. Consider urgency, sentiment, legal/safety risk, repeat issues, and high monetary value. Return escalate (boolean), priority (low/medium/high), a short reason, and route_to (which team, or empty if no escalation)."
+        }
+      },
+      "id": "51137d00-b9e7-4aed-8a2c-eb786a3c53de",
+      "name": "Check Escalation",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1744,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "3d17817d-ac87-44c9-af87-680bd63a4dec",
+      "name": "Escalation Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\"escalate\":true,\"priority\":\"high\",\"reason\":\"High-value order with damaged product and negative sentiment.\",\"route_to\":\"senior-support\"}",
+        "autoFix": true
+      },
+      "id": "66ca6707-11b5-43b7-ac08-0044a0baf17e",
+      "name": "Escalation Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1856,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "c4cc13c9-22c6-4a11-bb0e-4ade98207530",
+      "name": "Escalation Fix Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a customer response email.\n\nComplaint understanding:\n{{ JSON.stringify($(\"Understand Complaint\").item.json.output) }}\n\nResolution plan:\n{{ JSON.stringify($(\"Determine Resolution\").item.json.output) }}\n\nEscalation decision:\n{{ JSON.stringify($json.output) }}",
+        "options": {
+          "systemMessage": "You are a customer support writer. Draft a warm, professional, empathetic email reply to the customer that acknowledges their complaint, explains the resolution being taken, and sets clear expectations for next steps. If the case was escalated, reassure them a specialist is handling it. Return only the email body text."
+        }
+      },
+      "id": "c13345cb-f6c0-4a0a-b69a-6e78cec96c4e",
+      "name": "Draft Response",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2208,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "9dd230fe-fcc0-4263-b2d6-e03e280b9bf1",
+      "name": "Draft Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $(\"Complaint Form\").item.json.customer_email }}",
+        "subject": "=Re: your complaint{{ $(\"Complaint Form\").item.json.order_id ? \" (Order \" + $(\"Complaint Form\").item.json.order_id + \")\" : \"\" }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "3123ca58-ce37-42db-87a2-e712547620f6",
+      "name": "Send Response Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2560,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🎧 L17 · Production-style AI pipeline\nUnderstand → Investigate → Resolve → Escalate? → Draft reply.\nEvery agent returns **validated JSON**; each parser has its own *fix model* that repairs bad JSON automatically.\n⚠️ Add a human approval (L15) before auto-sending in real life.",
+        "width": 520,
+        "height": 300,
+        "color": 5
+      },
+      "id": "1b069e53-690f-5fb6-a9e4-e720dcca2090",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -380
+      ]
+    }
+  ],
+  "connections": {
+    "Complaint Form": {
+      "main": [
+        [
+          {
+            "node": "Understand Complaint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Understand Complaint": {
+      "main": [
+        [
+          {
+            "node": "Investigate Customer/Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Understand Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Understand Complaint",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Understanding Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Understand Complaint",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Understanding Fix Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Understanding Schema",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Investigate Customer/Order": {
+      "main": [
+        [
+          {
+            "node": "Determine Resolution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Investigate Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Investigate Customer/Order",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Investigation Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Investigate Customer/Order",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Investigation Fix Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Investigation Schema",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Resolution": {
+      "main": [
+        [
+          {
+            "node": "Check Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolution Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Determine Resolution",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolution Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Determine Resolution",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolution Fix Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resolution Schema",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Escalation": {
+      "main": [
+        [
+          {
+            "node": "Draft Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Check Escalation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Check Escalation",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Fix Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Escalation Schema",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Response": {
+      "main": [
+        [
+          {
+            "node": "Send Response Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Draft Response",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

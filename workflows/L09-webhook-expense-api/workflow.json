@@ -1,0 +1,233 @@
+{
+  "name": "L09 · Expense logger API (Webhook + validation + response)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔌 L09 · Build your own API\nPOST JSON to the webhook URL:\n```\ncurl -X POST <url> -H 'Content-Type: application/json' \\\n -d '{\"amount\":450,\"category\":\"food\",\"note\":\"team lunch\"}'\n```\nInvalid input → HTTP 400 with a reason.",
+        "width": 480,
+        "height": 260,
+        "color": 5
+      },
+      "id": "40eee5a9-8689-5cbf-a667-649e264d40a0",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "expense",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "9711ca91-1651-5a53-8a72-7c43af3a4487",
+      "name": "POST /expense",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const b = $json.body || {};\nconst allowed = ['food', 'travel', 'office', 'software', 'other'];\nconst errors = [];\nconst amount = Number(b.amount);\nif (!Number.isFinite(amount) || amount <= 0) errors.push('amount must be a positive number');\nif (!allowed.includes(String(b.category || '').toLowerCase())) errors.push(`category must be one of ${allowed.join(', ')}`);\nreturn { json: { valid: errors.length === 0, errors,\n  row: { date: b.date || new Date().toISOString().slice(0, 10), amount, category: String(b.category || '').toLowerCase(), note: b.note || '', submitted_by: b.user || 'api' } } };"
+      },
+      "id": "32c58371-a6e6-5b5f-9fa7-1ed649eef19d",
+      "name": "Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "64003594-a569-59fc-ba1b-84e46ad19a69",
+      "name": "Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.stringify($json.row) }}",
+        "options": {}
+      },
+      "id": "6f5e2988-47f1-5a04-b00b-a61f9d86e339",
+      "name": "Prepare Row",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Expenses"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "5dec64e4-61f4-578c-94f3-253fadc15802",
+      "name": "Append to Expenses Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, saved: $('Validate').item.json.row } }}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "id": "9282268d-8c07-5969-a08a-82596c8014af",
+      "name": "201 Created",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: false, errors: $json.errors } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "53094ed9-e15f-562a-8ff3-28774006fbdb",
+      "name": "400 Bad Request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        120
+      ]
+    }
+  ],
+  "connections": {
+    "POST /expense": {
+      "main": [
+        [
+          {
+            "node": "Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate": {
+      "main": [
+        [
+          {
+            "node": "Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "400 Bad Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Row": {
+      "main": [
+        [
+          {
+            "node": "Append to Expenses Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Expenses Sheet": {
+      "main": [
+        [
+          {
+            "node": "201 Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

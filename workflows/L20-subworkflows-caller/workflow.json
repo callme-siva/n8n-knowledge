@@ -1,0 +1,198 @@
+{
+  "name": "L20 · Sub-workflows — weekly birthday & anniversary wishes",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧱 L20 · Build once, reuse everywhere\nThis caller reads a team sheet, finds today's birthdays / work anniversaries and calls **L20a** once per person.\nSet the sub-workflow in *Call: Send Branded Email* (From list → L20a).",
+        "width": 480,
+        "height": 240,
+        "color": 6
+      },
+      "id": "b66fc4c3-538f-5871-a232-2a66a848d4d4",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "49e0b741-6179-512b-ba15-97de976e16ff",
+      "name": "Every Day 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Team"
+        },
+        "options": {}
+      },
+      "id": "d0810fd7-a37e-55ca-8d57-aab1e3c0bb56",
+      "name": "Read Team Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sheet columns: name | email | birthday (YYYY-MM-DD) | joined (YYYY-MM-DD)\nconst today = new Date(); const md = d => d && d.slice(5, 10);\nconst tmd = today.toISOString().slice(5, 10);\nconst out = [];\nfor (const { json: p } of $input.all()) {\n  if (md(p.birthday) === tmd) out.push({ json: { to: p.email, title: `Happy birthday, ${p.name}! 🎂`, body_html: `<p>Wishing you a fantastic year ahead, ${p.name}. Cake is on the team today!</p>`, cta_text: '', cta_url: '' } });\n  if (md(p.joined) === tmd) { const yrs = today.getFullYear() - Number(p.joined.slice(0, 4));\n    if (yrs > 0) out.push({ json: { to: p.email, title: `Happy ${yrs}-year work anniversary, ${p.name}! 🎉`, body_html: `<p>Thank you for ${yrs} great year${yrs > 1 ? 's' : ''} with us.</p>`, cta_text: '', cta_url: '' } }); }\n}\nreturn out;"
+      },
+      "id": "fcf0fd39-a4bd-54c5-8bd2-bcfb1c25cb4e",
+      "name": "Who Celebrates Today?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_L20a_WORKFLOW_ID"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "to": "={{ $json.to }}",
+            "title": "={{ $json.title }}",
+            "body_html": "={{ $json.body_html }}",
+            "cta_text": "={{ $json.cta_text }}",
+            "cta_url": "={{ $json.cta_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "to",
+              "displayName": "to",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "body_html",
+              "displayName": "body_html",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "cta_text",
+              "displayName": "cta_text",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            },
+            {
+              "id": "cta_url",
+              "displayName": "cta_url",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "74e22cad-5694-5d2c-9287-b9713c4c0ce1",
+      "name": "Call: Send Branded Email",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every Day 9 AM": {
+      "main": [
+        [
+          {
+            "node": "Read Team Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Team Sheet": {
+      "main": [
+        [
+          {
+            "node": "Who Celebrates Today?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Who Celebrates Today?": {
+      "main": [
+        [
+          {
+            "node": "Call: Send Branded Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

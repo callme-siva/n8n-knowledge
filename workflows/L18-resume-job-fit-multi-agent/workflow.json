@@ -1,0 +1,345 @@
+{
+  "name": "L18 · Resume ↔ job fit analyser (4 specialist agents)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Resume & Job Fit Analysis",
+        "formDescription": "Upload your resume and paste one or more job descriptions to receive a personalized analysis by email.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Candidate Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Job Descriptions",
+              "fieldType": "textarea",
+              "placeholder": "Paste one or more job descriptions here",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "afe32c00-07eb-4354-9c93-a24dadc64c10",
+      "name": "Candidate Submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Resume",
+        "options": {
+          "joinPages": true
+        }
+      },
+      "id": "d7ec0e36-5878-45ae-87be-27a80375303c",
+      "name": "Extract Resume Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following resume. Summarize the candidate's key skills, experience, notable achievements, strengths, and any gaps or weaknesses.\n\nRESUME:\n{{ $json.text }}",
+        "options": {
+          "systemMessage": "You are an expert technical recruiter and resume reviewer. Produce a clear, well-structured analysis using short headings and bullet points."
+        }
+      },
+      "id": "8979346d-e679-4e67-b6ec-8ba780a2a9cb",
+      "name": "Resume Analyst",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "e8b20197-f2af-4a69-bc0b-f3b1a4a857a3",
+      "name": "Model - Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Compare the candidate's resume against the job description(s). For each role, give a fit score out of 100, list matched requirements, missing/weak requirements, and an overall recommendation.\n\nRESUME:\n{{ $node[\"Extract Resume Text\"].json.text }}\n\nJOB DESCRIPTION(S):\n{{ $node[\"Candidate Submission\"].json[\"Job Descriptions\"] }}",
+        "options": {
+          "systemMessage": "You are an expert hiring manager. Assess how well the candidate matches each job's requirements. Use clear headings per role and bullet points."
+        }
+      },
+      "id": "0fea2934-57cc-4a0d-b285-fb841d045598",
+      "name": "Job Fit Analyst",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        800,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "dd28bd60-cef7-48e9-a0f0-8a5ebff2b372",
+      "name": "Model - Matcher",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        880,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Based on the resume and the job description(s), prepare a tailored set of interview questions: technical, behavioral, and role-specific. Group them by category and note what a strong answer should cover.\n\nRESUME:\n{{ $node[\"Extract Resume Text\"].json.text }}\n\nJOB DESCRIPTION(S):\n{{ $node[\"Candidate Submission\"].json[\"Job Descriptions\"] }}",
+        "options": {
+          "systemMessage": "You are an experienced interviewer. Produce practical, tailored interview questions grouped by category."
+        }
+      },
+      "id": "3aa19bc8-f102-448f-9bb5-b4133b3441d5",
+      "name": "Interview Question Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1152,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "a19107be-0b6c-43e2-a08f-2720d3e59ec6",
+      "name": "Model - Interview",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a personalized learning plan to close the gaps between the candidate's resume and the job description(s). Include prioritized skills to learn, recommended resource types, and a suggested weekly timeline.\n\nRESUME:\n{{ $node[\"Extract Resume Text\"].json.text }}\n\nJOB DESCRIPTION(S):\n{{ $node[\"Candidate Submission\"].json[\"Job Descriptions\"] }}",
+        "options": {
+          "systemMessage": "You are a career coach. Build an actionable, prioritized learning plan with a realistic timeline."
+        }
+      },
+      "id": "28900fdb-a7d3-4ad5-894e-431d86096e91",
+      "name": "Learning Plan Builder",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1504,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "eb5a95b4-f3be-4ad3-97e1-49ff8a7bf005",
+      "name": "Model - Learning",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Candidate Submission\"].json.Email }}",
+        "subject": "=Your Resume & Job Fit Analysis, {{ $node[\"Candidate Submission\"].json[\"Candidate Name\"] }}",
+        "message": "=<h2>Hi {{ $node[\"Candidate Submission\"].json[\"Candidate Name\"] }},</h2><p>Here is your personalized resume and job fit analysis.</p><h3>1. Resume Analysis</h3><div style=\"white-space:pre-wrap\">{{ $node[\"Resume Analyst\"].json.output }}</div><h3>2. Job Fit &amp; Comparison</h3><div style=\"white-space:pre-wrap\">{{ $node[\"Job Fit Analyst\"].json.output }}</div><h3>3. Interview Questions</h3><div style=\"white-space:pre-wrap\">{{ $node[\"Interview Question Generator\"].json.output }}</div><h3>4. Personalized Learning Plan</h3><div style=\"white-space:pre-wrap\">{{ $node[\"Learning Plan Builder\"].json.output }}</div><p>Best of luck!</p>",
+        "options": {}
+      },
+      "id": "7d69fb60-a6b3-48d1-88f6-5824d5888802",
+      "name": "Send Analysis Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1856,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📄 L18 · Document AI + specialists\nUpload a PDF resume + paste a job description → Analyst, Fit Scorer, Interview Coach and Learning-Plan agents → one email report.",
+        "width": 520,
+        "height": 300,
+        "color": 5
+      },
+      "id": "7324dcc1-f17c-512a-8ef0-7d24f539192c",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -380
+      ]
+    }
+  ],
+  "connections": {
+    "Candidate Submission": {
+      "main": [
+        [
+          {
+            "node": "Extract Resume Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Resume Text": {
+      "main": [
+        [
+          {
+            "node": "Resume Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Analyst": {
+      "main": [
+        [
+          {
+            "node": "Job Fit Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model - Analyzer": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resume Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Fit Analyst": {
+      "main": [
+        [
+          {
+            "node": "Interview Question Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model - Matcher": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Job Fit Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interview Question Generator": {
+      "main": [
+        [
+          {
+            "node": "Learning Plan Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model - Interview": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Interview Question Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Learning Plan Builder": {
+      "main": [
+        [
+          {
+            "node": "Send Analysis Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model - Learning": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Learning Plan Builder",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

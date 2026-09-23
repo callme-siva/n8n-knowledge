@@ -1,0 +1,390 @@
+{
+  "name": "L04 · Currency rate alert (IF + Switch)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔀 L04 · Branching\n**IF** = two roads (true/false).\n**Switch** = many roads.\nUSD→INR is checked every hour; you get an email only when something interesting happens.",
+        "width": 420,
+        "height": 220,
+        "color": 5
+      },
+      "id": "81fca5de-1262-588f-ac98-555d569b1cd2",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "8947bdc5-4e85-5726-9428-003dc83211a4",
+      "name": "Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "base",
+              "value": "USD",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "target",
+              "value": "INR",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "high",
+              "value": 88.5,
+              "type": "number"
+            },
+            {
+              "id": "a3",
+              "name": "low",
+              "value": 83.0,
+              "type": "number"
+            },
+            {
+              "id": "a4",
+              "name": "email_to",
+              "value": "you@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1d7024e0-72d7-5133-b220-3c9ad92cac3e",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://open.er-api.com/v6/latest/{{ $json.base }}",
+        "options": {}
+      },
+      "id": "82d916b8-f914-5629-9981-91e151cb6a70",
+      "name": "Get Exchange Rate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.result }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "success"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "81857b00-b546-5f3a-be34-c4ab08cf391e",
+      "name": "API OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "rate",
+              "value": "={{ $json.rates[$('⚙️ Config').item.json.target] }}",
+              "type": "number"
+            },
+            {
+              "id": "a1",
+              "name": "updated",
+              "value": "={{ $json.time_last_update_utc }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cbe1b3ec-6b12-5f15-ab3c-8f8ec6077ea4",
+      "name": "Extract Rate",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.rate }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    },
+                    "rightValue": "={{ $('⚙️ Config').item.json.high }}"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "High"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.rate }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    },
+                    "rightValue": "={{ $('⚙️ Config').item.json.low }}"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Low"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Normal"
+        }
+      },
+      "id": "4c1cae13-7453-5941-ae32-78d69b9e2b43",
+      "name": "Which Zone?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1100,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('⚙️ Config').item.json.email_to }}",
+        "subject": "=📈 {{ $('⚙️ Config').item.json.base }}→{{ $('⚙️ Config').item.json.target }} is HIGH: {{ $json.rate }}",
+        "emailType": "html",
+        "message": "=<p>Rate is <b>{{ $json.rate }}</b>, above your threshold. Good time to send money home.</p><p>Updated: {{ $json.updated }}</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "5c47c9f8-011a-5c09-9aa7-536185c42a51",
+      "name": "Alert: Rate High",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1340,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('⚙️ Config').item.json.email_to }}",
+        "subject": "=📉 {{ $('⚙️ Config').item.json.base }}→{{ $('⚙️ Config').item.json.target }} is LOW: {{ $json.rate }}",
+        "emailType": "html",
+        "message": "=<p>Rate is <b>{{ $json.rate }}</b>, below your threshold. Good time to buy USD.</p><p>Updated: {{ $json.updated }}</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "2b37d7e1-74c3-5ba0-9e1b-aa0b74189478",
+      "name": "Alert: Rate Low",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1340,
+        -80
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3f6bd634-166d-5a17-9dba-9b6df5f073f5",
+      "name": "Normal — do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Exchange-rate API returned: {{ $json['error-type'] || 'unknown error' }}"
+      },
+      "id": "248c34bd-58f4-5a42-8c23-e7ab35383be8",
+      "name": "API Failed — log it",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        880,
+        120
+      ]
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Get Exchange Rate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Exchange Rate": {
+      "main": [
+        [
+          {
+            "node": "API OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API OK?": {
+      "main": [
+        [
+          {
+            "node": "Extract Rate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API Failed — log it",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Rate": {
+      "main": [
+        [
+          {
+            "node": "Which Zone?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Which Zone?": {
+      "main": [
+        [
+          {
+            "node": "Alert: Rate High",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert: Rate Low",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Normal — do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

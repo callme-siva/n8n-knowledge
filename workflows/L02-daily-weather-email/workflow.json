@@ -1,0 +1,195 @@
+{
+  "name": "L02 · Daily weather email (Schedule + free API)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ⏰ L02 · Scheduled workflows\nEdit **⚙️ Config** first (city, lat/lon, email).\nThen **Activate** the workflow (toggle top right) — schedules only fire when active.\n\nOpen-Meteo is free, no API key.",
+        "width": 420,
+        "height": 240,
+        "color": 5
+      },
+      "id": "06b023f0-5ab1-5635-bcf9-62ba195c4ae5",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -280
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "98c1654e-6810-57dd-b31e-56bd8989ca29",
+      "name": "Every Morning 7 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "city",
+              "value": "Chennai",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "latitude",
+              "value": 13.0827,
+              "type": "number"
+            },
+            {
+              "id": "a2",
+              "name": "longitude",
+              "value": 80.2707,
+              "type": "number"
+            },
+            {
+              "id": "a3",
+              "name": "timezone",
+              "value": "Asia/Kolkata",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "email_to",
+              "value": "you@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b57f00dc-c738-5cc5-925f-294d3e0f5349",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "={{ $json.latitude }}"
+            },
+            {
+              "name": "longitude",
+              "value": "={{ $json.longitude }}"
+            },
+            {
+              "name": "current",
+              "value": "temperature_2m,relative_humidity_2m,wind_speed_10m"
+            },
+            {
+              "name": "daily",
+              "value": "temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+            },
+            {
+              "name": "timezone",
+              "value": "={{ $json.timezone }}"
+            },
+            {
+              "name": "forecast_days",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "76be74b0-1fd5-57cf-a6b8-173626b4f90a",
+      "name": "Fetch Weather",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('⚙️ Config').item.json.email_to }}",
+        "subject": "={{ $('⚙️ Config').item.json.city }} weather — {{ $now.toFormat('dd LLL yyyy') }}",
+        "emailType": "html",
+        "message": "=<h2>{{ $('⚙️ Config').item.json.city }} today</h2><ul><li>Now: {{ $json.current.temperature_2m }}°C, humidity {{ $json.current.relative_humidity_2m }}%, wind {{ $json.current.wind_speed_10m }} km/h</li><li>High / Low: {{ $json.daily.temperature_2m_max[0] }}°C / {{ $json.daily.temperature_2m_min[0] }}°C</li><li>Chance of rain: {{ $json.daily.precipitation_probability_max[0] }}% {{ $json.daily.precipitation_probability_max[0] > 50 ? '☔ carry an umbrella' : '' }}</li></ul>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "26852b41-a039-5d34-b77b-bf99cb0c5a0d",
+      "name": "Email Summary",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every Morning 7 AM": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch Weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Weather": {
+      "main": [
+        [
+          {
+            "node": "Email Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

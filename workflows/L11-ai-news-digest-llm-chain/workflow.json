@@ -1,0 +1,273 @@
+{
+  "name": "L11 · AI news briefing (Basic LLM Chain + Gemini)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🤖 L11 · Your first LLM call\nSame pipeline as L05, but **Gemini** turns 25 headlines into a 5-bullet executive briefing.\nFree Gemini key: aistudio.google.com → Get API key.",
+        "width": 460,
+        "height": 220,
+        "color": 5
+      },
+      "id": "b482cc04-1b91-5e64-bafd-fdc8dcc16f0d",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "70f86f30-797e-556c-b5e6-d04a21a00505",
+      "name": "Every Morning 8 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "ddafe62b-6ae7-5c23-8361-d8be7feff115",
+      "name": "Merge Feeds",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&ceid=IN:en",
+        "options": {}
+      },
+      "id": "cbc11190-b5f9-5d22-976a-477a9b8f67f5",
+      "name": "Google News · AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        -160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+        "options": {}
+      },
+      "id": "33f52f27-f1e1-504e-844b-e04c546a4c2c",
+      "name": "TechCrunch · AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+        "options": {}
+      },
+      "id": "5314c2ab-38b4-5aab-ba0f-159475d01871",
+      "name": "The Verge · AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cutoff = Date.now() - 24 * 3600 * 1000;\nconst seen = new Set();\nconst norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').slice(0, 60);\nconst articles = $input.all().map(i => i.json)\n  .filter(a => a.title && a.link)\n  .map(a => ({ title: a.title.trim(), link: a.link, source: a.creator || (a.link.match(/https?:\\/\\/(?:www\\.)?([^/]+)/) || [])[1] || 'unknown', ts: Date.parse(a.isoDate || a.pubDate || '') || 0 }))\n  .filter(a => a.ts >= cutoff)\n  .filter(a => { const k = norm(a.title); if (seen.has(k)) return false; seen.add(k); return true; })\n  .sort((a, b) => b.ts - a.ts)\n  .slice(0, 25);\nconst li = articles.map(a => `<li><a href=\"${a.link}\">${a.title}</a> <small>(${a.source})</small></li>`).join('');\nconst listText = articles.map((a, i) => `${i + 1}. ${a.title} — ${a.link}`).join('\\n');\nreturn [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];"
+      },
+      "id": "19a24130-440f-5867-b40c-eceb318b60df",
+      "name": "Filter · Dedupe · Sort",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here are today's AI news headlines ({{ $json.count }} items):\n\n{{ $json.listText }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a news editor writing for busy professionals in India. From the headlines, write:\n1. **Top 5 stories**: one bullet each, max 2 sentences: what happened + why it matters. Include the link.\n2. **One-line trend of the day.**\nRules: merge duplicates, skip clickbait, never invent facts beyond the headline. Output clean HTML (<h3>, <ul>, <li>, <a>), no markdown."
+            }
+          ]
+        }
+      },
+      "id": "bcfb3a58-31d5-5e46-9562-e86f444f3731",
+      "name": "Write Briefing",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        920,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "5237d63a-00be-5219-a5c5-2366cd16f9f4",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        920,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=☕ AI briefing · {{ $now.toFormat('dd LLL yyyy') }}",
+        "emailType": "html",
+        "message": "={{ $json.text }}<hr><details><summary>All {{ $('Filter · Dedupe · Sort').item.json.count }} headlines</summary>{{ $('Filter · Dedupe · Sort').item.json.html }}</details>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "3fe2bcfe-baf2-5390-80f2-b130cf7fba1f",
+      "name": "Email Briefing",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1160,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every Morning 8 AM": {
+      "main": [
+        [
+          {
+            "node": "Google News · AI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TechCrunch · AI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "The Verge · AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google News · AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TechCrunch · AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "The Verge · AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Feeds": {
+      "main": [
+        [
+          {
+            "node": "Filter · Dedupe · Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter · Dedupe · Sort": {
+      "main": [
+        [
+          {
+            "node": "Write Briefing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Briefing": {
+      "main": [
+        [
+          {
+            "node": "Email Briefing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write Briefing",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

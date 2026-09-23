@@ -1,0 +1,484 @@
+{
+  "name": "L22 · AI lead qualifier & router (Sales capstone)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🏁 L22 · Capstone: everything together\nForm → Gemini scores the lead (BANT) with **structured output** → **Switch** routes Hot / Warm / Cold → CRM sheet, instant sales alert, tailored reply.\nErrors → L19. Emails → could call L20a.",
+        "width": 500,
+        "height": 240,
+        "color": 4
+      },
+      "id": "338c5497-1ca8-5e2e-8f33-0462a7934104",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -440
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Talk to us",
+        "formDescription": "Tell us what you want to automate.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Work email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Team size",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1-10"
+                  },
+                  {
+                    "option": "11-50"
+                  },
+                  {
+                    "option": "51-200"
+                  },
+                  {
+                    "option": "200+"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "What do you want to automate?",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "When do you want to start?",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "This month"
+                  },
+                  {
+                    "option": "This quarter"
+                  },
+                  {
+                    "option": "Just exploring"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b6e73d18-0cf8-5776-83e7-0a09412de869",
+      "name": "Enquiry Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "hasOutputParser": true,
+        "text": "=Name: {{ $json.Name }}\nEmail: {{ $json['Work email'] }}\nCompany: {{ $json.Company }}\nTeam size: {{ $json['Team size'] }}\nTimeline: {{ $json['When do you want to start?'] }}\nNeed: {{ $json['What do you want to automate?'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a B2B sales development rep for an automation consultancy. Score the lead 0-100 using BANT (Budget signals, Authority, Need clarity, Timeline). Personal email domains (gmail, yahoo) lower authority. tier = hot (>=70), warm (40-69), cold (<40). Be strict and explain briefly."
+            }
+          ]
+        }
+      },
+      "id": "f6a693a0-3bf6-5193-a25b-29388eb518e8",
+      "name": "Qualify Lead",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "42e8c23e-bb5b-56ad-9b4c-e84fb37a6a96",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        180,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"score\": 78,\n  \"tier\": \"hot\",\n  \"reason\": \"Clear need, 51-200 team, starting this month.\",\n  \"use_case\": \"Invoice processing\",\n  \"suggested_reply\": \"Hi Asha, thanks \\u2014 invoice automation is a sweet spot for us...\"\n}"
+      },
+      "id": "7dd76e69-b429-5029-a625-22e2083ebf4e",
+      "name": "Lead Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        340,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "time",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "name",
+              "value": "={{ $('Enquiry Form').item.json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "email",
+              "value": "={{ $('Enquiry Form').item.json['Work email'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "company",
+              "value": "={{ $('Enquiry Form').item.json.Company }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "score",
+              "value": "={{ $json.output.score }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "tier",
+              "value": "={{ $json.output.tier }}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "reason",
+              "value": "={{ $json.output.reason }}",
+              "type": "string"
+            },
+            {
+              "id": "a7",
+              "name": "use_case",
+              "value": "={{ $json.output.use_case }}",
+              "type": "string"
+            },
+            {
+              "id": "a8",
+              "name": "reply",
+              "value": "={{ $json.output.suggested_reply }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4256cd8e-f4f4-583c-b77f-b78017e7b279",
+      "name": "Build CRM Row",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "5ff48799-32c9-5193-b56c-85525803a128",
+      "name": "Save to CRM Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $('Build CRM Row').item.json.tier }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "hot"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $('Build CRM Row').item.json.tier }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "warm"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Cold"
+        }
+      },
+      "id": "dc02a769-f6f4-5b89-a02b-60f037d49c7d",
+      "name": "Route by Tier",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        920,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=🔥 HOT lead ({{ $('Build CRM Row').item.json.score }}): {{ $('Build CRM Row').item.json.company }}",
+        "emailType": "html",
+        "message": "=<p><b>{{ $('Build CRM Row').item.json.name }}</b> · {{ $('Build CRM Row').item.json.email }}</p><p>{{ $('Build CRM Row').item.json.reason }}</p><p>Call within 1 hour.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b9dc02d9-872a-5a6f-8acb-c6c3827b11aa",
+      "name": "🔥 Alert Sales Now",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1160,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Build CRM Row').item.json.email }}",
+        "subject": "=Re: automating {{ $('Build CRM Row').item.json.use_case }}",
+        "emailType": "html",
+        "message": "=<p>{{ $('Build CRM Row').item.json.reply }}</p><p>Pick a slot: https://cal.com/your-link</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a7741445-a302-5711-925d-b987bec153e7",
+      "name": "Personal Reply (Hot/Warm)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1400,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Build CRM Row').item.json.email }}",
+        "subject": "=Thanks for reaching out, {{ $('Build CRM Row').item.json.name }}",
+        "emailType": "html",
+        "message": "=<p>Thanks for your interest! Here are 3 free guides to get started with automation: https://github.com/YOUR_USER/n8n-knowledge</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "6b072c25-0cf6-5272-aaf5-e17abdd5535a",
+      "name": "Nurture Email (Cold)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1160,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "Enquiry Form": {
+      "main": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualify Lead": {
+      "main": [
+        [
+          {
+            "node": "Build CRM Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build CRM Row": {
+      "main": [
+        [
+          {
+            "node": "Save to CRM Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to CRM Sheet": {
+      "main": [
+        [
+          {
+            "node": "Route by Tier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Tier": {
+      "main": [
+        [
+          {
+            "node": "🔥 Alert Sales Now",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Personal Reply (Hot/Warm)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nurture Email (Cold)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔥 Alert Sales Now": {
+      "main": [
+        [
+          {
+            "node": "Personal Reply (Hot/Warm)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

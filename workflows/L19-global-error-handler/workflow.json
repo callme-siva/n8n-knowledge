@@ -1,0 +1,131 @@
+{
+  "name": "L19 · Global error handler (alerts for every failing workflow)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🚨 L19 · Never fail silently\n1. Save this workflow.\n2. In **every other workflow**: ⋯ → Settings → *Error workflow* → pick **L19**.\n3. Any failed production run now sends a formatted alert **and** logs it to a sheet.\n\nTest: run *L04* with base = XYZ.",
+        "width": 480,
+        "height": 260,
+        "color": 3
+      },
+      "id": "91fdca4b-5d71-5e2d-a793-04d7e2f749fd",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -400
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "34b7cd2e-ee20-5c9e-bb0b-3ca7950a80ab",
+      "name": "On Any Workflow Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e = $input.first().json;\nconst ex = e.execution || {}; const wf = e.workflow || {};\nconst msg = ex.error?.message || e.trigger?.error?.message || 'Unknown error';\nconst node = ex.lastNodeExecuted || 'trigger';\nconst hint = /401|403|credential|unauthori/i.test(msg) ? 'Check / reconnect the credential.'\n  : /429|rate|quota/i.test(msg) ? 'Rate limit — add Retry on Fail or slow the schedule.'\n  : /timeout|ETIMEDOUT|ECONNRESET/i.test(msg) ? 'Network/API timeout — enable retries.'\n  : 'Open the execution to debug.';\nreturn [{ json: { time: new Date().toISOString(), workflow: wf.name, workflow_id: wf.id, node, message: msg.slice(0, 500), hint, url: ex.url || '', mode: ex.mode || '' } }];"
+      },
+      "id": "ee16ed44-d15a-527b-a3e6-80867f5f1ff5",
+      "name": "Shape Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=🚨 n8n failure: {{ $json.workflow }} → {{ $json.node }}",
+        "emailType": "html",
+        "message": "=<p><b>Workflow:</b> {{ $json.workflow }}<br><b>Node:</b> {{ $json.node }}<br><b>Time:</b> {{ $json.time }}</p><pre>{{ $json.message }}</pre><p>💡 {{ $json.hint }}</p><p><a href=\"{{ $json.url }}\">Open execution</a></p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "fee3a9c4-925b-5ad2-8dc7-24882e51d1c0",
+      "name": "Email Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        -100
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Errors"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "ce780780-4d3d-5f79-a107-c790309f03f3",
+      "name": "Log to Error Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        100
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "On Any Workflow Error": {
+      "main": [
+        [
+          {
+            "node": "Shape Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Error": {
+      "main": [
+        [
+          {
+            "node": "Email Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Error Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

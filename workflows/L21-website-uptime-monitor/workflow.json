@@ -1,0 +1,244 @@
+{
+  "name": "L21 · Website & API uptime monitor (state + alerts on change)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📡 L21 · Ops monitoring\nEvery 5 min: check each URL, measure status + response time.\nAlerts only when a site **changes** state (UP→DOWN, DOWN→UP) — state kept with `$getWorkflowStaticData`.\n⚠️ Static data persists only for **active** (production) runs.",
+        "width": 500,
+        "height": 240,
+        "color": 3
+      },
+      "id": "dab98aa8-b24f-5707-b08c-85976573a40a",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "b6908422-9ed7-5ab9-80df-e0be9ae2cf5d",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { url: 'https://n8n.io', name: 'n8n website' },\n  { url: 'https://api.github.com', name: 'GitHub API' },\n  { url: 'https://httpstat.us/503', name: 'Demo: always down' },\n].map(s => ({ json: { ...s, started: Date.now() } }));"
+      },
+      "id": "0802f2be-a98f-52a4-9660-aea89a93f942",
+      "name": "Sites to Watch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "timeout": 10000,
+          "redirect": {
+            "redirect": {}
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "39e1cdc0-9b40-5b57-b9d6-32374cc66835",
+      "name": "Check Site",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const state = $getWorkflowStaticData('global');\nstate.sites = state.sites || {};\nconst sites = $('Sites to Watch').all();\nreturn $input.all().map((r, i) => {\n  const site = sites[i].json;\n  const code = r.json.statusCode || 0;\n  const ms = Date.now() - site.started;\n  const up = code >= 200 && code < 400;\n  const prev = state.sites[site.url]?.up;\n  const changed = prev !== undefined && prev !== up;\n  const since = changed || prev === undefined ? new Date().toISOString() : state.sites[site.url].since;\n  state.sites[site.url] = { up, since };\n  return { json: { time: new Date().toISOString(), name: site.name, url: site.url, status: up ? 'UP' : 'DOWN', code, ms, changed, since, error: r.json.error?.message || '' } };\n});"
+      },
+      "id": "a50cb6be-03f8-5a75-84ad-ce975b71db73",
+      "name": "Compare with Last State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Uptime"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "8291fb42-a47a-584f-ae08-ef16e10aa497",
+      "name": "Log Every Check",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        -120
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.changed }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6d52ca0f-59ff-5c2b-b8e5-309d762217d5",
+      "name": "State Changed?",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "={{ $json.status === 'DOWN' ? '🔴' : '🟢' }} {{ $json.name }} is {{ $json.status }}",
+        "emailType": "html",
+        "message": "=<p><b>{{ $json.name }}</b> ({{ $json.url }}) is now <b>{{ $json.status }}</b>.</p><p>HTTP {{ $json.code }} · {{ $json.ms }} ms · since {{ $json.since }}</p><p>{{ $json.error }}</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "898acc6c-2de6-5343-a592-a0f2b8181d39",
+      "name": "Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        80
+      ]
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Sites to Watch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sites to Watch": {
+      "main": [
+        [
+          {
+            "node": "Check Site",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Site": {
+      "main": [
+        [
+          {
+            "node": "Compare with Last State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare with Last State": {
+      "main": [
+        [
+          {
+            "node": "Log Every Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "State Changed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State Changed?": {
+      "main": [
+        [
+          {
+            "node": "Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

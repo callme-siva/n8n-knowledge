@@ -1,0 +1,398 @@
+{
+  "name": "L12 · Meeting transcript → RAID log (Structured Output)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Project Meeting Transcript — RAID Analysis",
+        "formDescription": "Paste a raw transcript from a project status, steering committee, sprint review, or governance call. The transcript will be analysed for Risks, Assumptions, Issues and Dependencies (RAID).",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Meeting Title",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Meeting Date",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Meeting Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Project Status Meeting"
+                  },
+                  {
+                    "option": "Steering Committee Meeting"
+                  },
+                  {
+                    "option": "Sprint Review"
+                  },
+                  {
+                    "option": "Project Governance Call"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Transcript",
+              "fieldType": "textarea",
+              "placeholder": "Paste the full meeting transcript here...",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2453393-bacc-4d3e-a481-eb2378b01fe0",
+      "name": "Submit Meeting Transcript",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyse the following project meeting transcript and identify every Risk, Assumption, Issue and Dependency (RAID).\n\nMeeting Title: {{ $json[\"Meeting Title\"] }}\nMeeting Type: {{ $json[\"Meeting Type\"] }}\nMeeting Date: {{ $json[\"Meeting Date\"] }}\n\nTranscript:\n{{ $json[\"Transcript\"] }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an experienced project-management analyst. Read the meeting transcript and extract a flat list of RAID items. For each item set \"category\" to exactly one of: \"Risk\", \"Assumption\", \"Issue\", \"Dependency\". Provide a concise \"description\", the responsible \"owner\" (use \"Unassigned\" if none is stated), the \"impact\", and a \"mitigation\" or next step (\"N/A\" if none). Only include items genuinely supported by the transcript. If a category has no items, simply omit them. Return the result using the required structured format."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "4839d073-dc55-4064-823c-8ca35256c172",
+      "name": "Extract RAID",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "5f2ec997-e260-4cf9-9c1f-6c250abca2e5",
+      "name": "RAID Analysis Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"items\": [\n    {\n      \"category\": \"Risk\",\n      \"description\": \"Third-party vendor may miss the integration deadline.\",\n      \"owner\": \"Jane Doe\",\n      \"impact\": \"Could delay go-live by two weeks.\",\n      \"mitigation\": \"Escalate to vendor account manager and prepare fallback.\"\n    },\n    {\n      \"category\": \"Dependency\",\n      \"description\": \"Release depends on the security team completing the pen test.\",\n      \"owner\": \"Security Team\",\n      \"impact\": \"Blocks production deployment until resolved.\",\n      \"mitigation\": \"Book pen-test slot for next sprint.\"\n    }\n  ]\n}"
+      },
+      "id": "82f3bf05-950e-478f-9a7a-fea669272c31",
+      "name": "RAID Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.items",
+        "options": {}
+      },
+      "id": "ad237cd5-a59d-4357-9075-646cebdb1f9a",
+      "name": "Split RAID Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        576,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "meeting_title",
+              "name": "meeting_title",
+              "type": "string",
+              "value": "={{ $(\"Submit Meeting Transcript\").item.json[\"Meeting Title\"] }}"
+            },
+            {
+              "id": "meeting_date",
+              "name": "meeting_date",
+              "type": "string",
+              "value": "={{ $(\"Submit Meeting Transcript\").item.json[\"Meeting Date\"] }}"
+            },
+            {
+              "id": "meeting_type",
+              "name": "meeting_type",
+              "type": "string",
+              "value": "={{ $(\"Submit Meeting Transcript\").item.json[\"Meeting Type\"] }}"
+            },
+            {
+              "id": "category",
+              "name": "category",
+              "type": "string",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "id": "description",
+              "name": "description",
+              "type": "string",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "id": "owner",
+              "name": "owner",
+              "type": "string",
+              "value": "={{ $json.owner }}"
+            },
+            {
+              "id": "impact",
+              "name": "impact",
+              "type": "string",
+              "value": "={{ $json.impact }}"
+            },
+            {
+              "id": "mitigation",
+              "name": "mitigation",
+              "type": "string",
+              "value": "={{ $json.mitigation }}"
+            },
+            {
+              "id": "logged_at",
+              "name": "logged_at",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f2555107-223c-4968-bea7-24808197ba09",
+      "name": "Build RAID Row",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        800,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "RAID"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": [
+            {
+              "id": "meeting_title",
+              "displayName": "meeting_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "meeting_date",
+              "displayName": "meeting_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "meeting_type",
+              "displayName": "meeting_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "owner",
+              "displayName": "owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "impact",
+              "displayName": "impact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "mitigation",
+              "displayName": "mitigation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "logged_at",
+              "displayName": "logged_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dac32314-2cc7-4684-96f5-6783134ff654",
+      "name": "Append RAID to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🧩 L12 · Structured output\nPaste a meeting transcript → Gemini returns **JSON that follows a schema** → one Sheet row per Risk / Assumption / Issue / Dependency.\n\nThis is the most useful AI pattern in business: *unstructured text → rows*.",
+        "width": 520,
+        "height": 300,
+        "color": 5
+      },
+      "id": "fe3e6a77-7138-5242-ad0e-d717de754105",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -380
+      ]
+    }
+  ],
+  "connections": {
+    "Submit Meeting Transcript": {
+      "main": [
+        [
+          {
+            "node": "Extract RAID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract RAID": {
+      "main": [
+        [
+          {
+            "node": "Split RAID Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAID Analysis Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract RAID",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAID Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Extract RAID",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split RAID Items": {
+      "main": [
+        [
+          {
+            "node": "Build RAID Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build RAID Row": {
+      "main": [
+        [
+          {
+            "node": "Append RAID to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

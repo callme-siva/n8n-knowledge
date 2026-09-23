@@ -1,0 +1,409 @@
+{
+  "name": "L16 · Sprint progress report (4 cooperating agents)",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "org",
+              "name": "org",
+              "type": "string",
+              "value": "https://github.com/YOUR_GITHUB_USER_OR_ORG"
+            },
+            {
+              "id": "projectNumber",
+              "name": "projectNumber",
+              "type": "string",
+              "value": "3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "37f8c55b-c256-4f78-bdf6-e78a23537d78",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Config').first().json;\nlet login = String(cfg.org || '').trim();\n// Accept a full URL, an @handle, or a bare login and reduce to the bare login\nlogin = login.replace(/^https?:\\/\\/github\\.com\\//i, '').replace(/^@/, '').split('/')[0].trim();\nconst number = parseInt(String(cfg.projectNumber || '').trim(), 10);\nconst query = 'query($login:String!,$number:Int!){ repositoryOwner(login:$login){ ... on ProjectV2Owner { projectV2(number:$number){ title items(first:100){ nodes{ content{ ... on Issue{title state} ... on PullRequest{title state} } fieldValues(first:20){ nodes{ ... on ProjectV2ItemFieldSingleSelectValue{name field{... on ProjectV2FieldCommon{name}}} ... on ProjectV2ItemFieldNumberValue{number field{... on ProjectV2FieldCommon{name}}} ... on ProjectV2ItemFieldIterationValue{title startDate duration field{... on ProjectV2FieldCommon{name}}} } } } } } } } }';\nreturn [{ json: { body: JSON.stringify({ query, variables: { login, number } }) } }];"
+      },
+      "id": "050ea3df-d63d-4b7f-aed7-1c98e5c6c202",
+      "name": "Build GraphQL Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.github.com/graphql",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "0590f26d-ec38-401d-bb28-32adcde53562",
+      "name": "Fetch GitHub Project",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const resp = $input.first().json;\nconst owner = resp && resp.data && (resp.data.repositoryOwner || resp.data.organization);\nconst project = (owner && owner.projectV2) || {};\nconst nodes = (project.items && project.items.nodes) || [];\nlet totalItems = 0, done = 0, inProgress = 0, todo = 0;\nlet totalPoints = 0, donePoints = 0, iterationTitle = '', iterationStart = '', iterationDuration = 0;\nfor (const it of nodes) {\n  totalItems++;\n  let status = '';\n  let points = 0;\n  const fvs = (it.fieldValues && it.fieldValues.nodes) || [];\n  for (const fv of fvs) {\n    const fname = fv && fv.field && fv.field.name ? String(fv.field.name).toLowerCase() : '';\n    if (fv && typeof fv.name === 'string' && fname === 'status') status = fv.name;\n    if (fv && typeof fv.number === 'number' && (fname.includes('point') || fname.includes('estimate') || fname.includes('size'))) points = fv.number;\n    if (fv && typeof fv.title === 'string' && fv.startDate) { iterationTitle = fv.title; iterationStart = fv.startDate; iterationDuration = fv.duration || 0; }\n  }\n  const s = status.toLowerCase();\n  totalPoints += points;\n  if (s.includes('done') || s.includes('closed')) { done++; donePoints += points; }\n  else if (s.includes('progress') || s.includes('review')) { inProgress++; }\n  else { todo++; }\n}\nconst remainingPoints = totalPoints - donePoints;\nconst pctComplete = totalPoints > 0 ? Math.round((donePoints / totalPoints) * 100) : (totalItems > 0 ? Math.round((done / totalItems) * 100) : 0);\nlet dayOfSprint = 0, sprintLength = iterationDuration;\nif (iterationStart) {\n  const start = new Date(iterationStart);\n  const now = new Date();\n  dayOfSprint = Math.max(0, Math.round((now - start) / 86400000));\n}\nconst timeElapsedPct = sprintLength > 0 ? Math.round((dayOfSprint / sprintLength) * 100) : 0;\nreturn [{ json: { projectTitle: project.title || '', iteration: iterationTitle, iterationStart, sprintLength, dayOfSprint, timeElapsedPct, totalItems, todo, inProgress, done, totalPoints, donePoints, remainingPoints, pctComplete, reportDate: $now.toFormat('yyyy-MM-dd') } }];"
+      },
+      "id": "3a07fe4e-d184-42de-a25a-8c282109f93f",
+      "name": "Compute Sprint Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this sprint's team capacity. Sprint metrics (JSON): {{ JSON.stringify($('Compute Sprint Metrics').item.json) }}",
+        "options": {
+          "systemMessage": "You are the Capacity Planning Agent in a team of three sprint analysts. Given sprint metrics (total story points, remaining points, day of sprint, time elapsed %, item counts), assess whether the committed scope fits the remaining team capacity. State if the team is over-committed, on-track, or under-committed, with a one-line rationale using the numbers. Keep it under 120 words. End with \"Capacity signal: GOOD | MODERATE | BAD\"."
+        }
+      },
+      "id": "92e00142-28a0-448b-bcc5-ad9c3e893b2a",
+      "name": "Capacity Planning Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        896,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "9071902c-f6bd-4f54-ba1e-af55d9dbe376",
+      "name": "Capacity Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        976,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Assess backlog health. Sprint metrics (JSON): {{ JSON.stringify($('Compute Sprint Metrics').item.json) }}. The Capacity Planning Agent reported: {{ $('Capacity Planning Agent').item.json.output }}",
+        "options": {
+          "systemMessage": "You are the Backlog Health Agent, working with a Capacity Planning Agent and a Burndown Agent. Evaluate backlog health from the metrics: ratio of Todo vs In Progress vs Done items, whether too much work is unstarted late in the sprint, and whether WIP looks unhealthy. Reference and build on the Capacity Agent's finding you were given. Keep it under 120 words. End with \"Backlog signal: GOOD | MODERATE | BAD\"."
+        }
+      },
+      "id": "5618863e-d4a1-43a4-8f23-bb70d7de9b8a",
+      "name": "Backlog Health Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1248,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "0fab8bbc-b59d-4a35-818f-ad317d6baf00",
+      "name": "Backlog Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Track the burndown. Sprint metrics (JSON): {{ JSON.stringify($('Compute Sprint Metrics').item.json) }}. Capacity Agent said: {{ $('Capacity Planning Agent').item.json.output }}. Backlog Agent said: {{ $('Backlog Health Agent').item.json.output }}",
+        "options": {
+          "systemMessage": "You are the Burndown Tracking Agent, the third analyst. Compare completion progress (donePoints / totalPoints, pctComplete) against time elapsed (timeElapsedPct, dayOfSprint / sprintLength). If completion trails time elapsed, the team is behind the ideal burndown; if ahead, they are ahead. Reference the Capacity and Backlog agents' findings you were given. Keep it under 120 words. End with \"Burndown signal: GOOD | MODERATE | BAD\"."
+        }
+      },
+      "id": "0519438d-bd27-4551-aae8-ba23f306f670",
+      "name": "Burndown Tracking Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "8e25ea0c-f6f6-4b1d-9bf4-b98c866a6bb1",
+      "name": "Burndown Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Produce the daily team progress report for {{ $('Compute Sprint Metrics').item.json.reportDate }}. Metrics (JSON): {{ JSON.stringify($('Compute Sprint Metrics').item.json) }}. Capacity Agent: {{ $('Capacity Planning Agent').item.json.output }}. Backlog Agent: {{ $('Backlog Health Agent').item.json.output }}. Burndown Agent: {{ $('Burndown Tracking Agent').item.json.output }}",
+        "options": {
+          "systemMessage": "You are the Coordinator. You receive findings from the Capacity Planning, Backlog Health, and Burndown Tracking agents plus the raw metrics. Reconcile the three signals into ONE overall verdict. Output a clean plain-text email report with exactly this structure:\nLine 1: \"Overall team progress: GOOD\" or \"MODERATE\" or \"BAD\" (worst-weighted: any BAD with another non-GOOD => BAD; mixed => MODERATE; all GOOD => GOOD).\nThen \"Snapshot:\" with 2-3 bullet metric lines (points done/total, % complete vs % time elapsed, item counts).\nThen \"Capacity:\", \"Backlog:\", \"Burndown:\" each with a one-line summary of that agent's finding.\nThen \"Recommended focus today:\" with 1-2 concrete actions. Be concise and factual."
+        }
+      },
+      "id": "5c2b89c5-b81b-4b47-bd00-d0c081d597f9",
+      "name": "Coordinator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1952,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "b133b8b6-6da4-4ce7-ab20-f3e19637beb6",
+      "name": "Coordinator Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2032,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=Daily Sprint Progress Report - {{ $('Compute Sprint Metrics').item.json.reportDate }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "id": "88fbdcc7-ba93-4ffb-9fd2-abc28bd179b1",
+      "name": "Email Daily Report",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2304,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "7a9b3da9-7e3c-496d-86f1-5ad8900bea78",
+      "name": "Weekdays 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 👥 L16 · Multi-agent pipeline\nGitHub Projects (GraphQL) → metrics → **Capacity → Backlog → Burndown → Coordinator** agents, each reading the previous agent's output.\nSet `org` and `projectNumber` in **Config**.",
+        "width": 520,
+        "height": 300,
+        "color": 5
+      },
+      "id": "4f8dbac7-4057-575d-be4e-bdef8d139b4f",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -380
+      ]
+    }
+  ],
+  "connections": {
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Build GraphQL Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build GraphQL Request": {
+      "main": [
+        [
+          {
+            "node": "Fetch GitHub Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch GitHub Project": {
+      "main": [
+        [
+          {
+            "node": "Compute Sprint Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Sprint Metrics": {
+      "main": [
+        [
+          {
+            "node": "Capacity Planning Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capacity Planning Agent": {
+      "main": [
+        [
+          {
+            "node": "Backlog Health Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capacity Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Capacity Planning Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backlog Health Agent": {
+      "main": [
+        [
+          {
+            "node": "Burndown Tracking Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backlog Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Backlog Health Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Burndown Tracking Agent": {
+      "main": [
+        [
+          {
+            "node": "Coordinator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Burndown Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Burndown Tracking Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coordinator Agent": {
+      "main": [
+        [
+          {
+            "node": "Email Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coordinator Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Coordinator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekdays 9 AM": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

@@ -1,0 +1,161 @@
+{
+  "name": "L20a · SUB — Send branded email (reusable)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ♻️ Sub-workflow (callee)\nInput: `to`, `title`, `body_html`, optional `cta_text` / `cta_url`.\nAny workflow can call this — change the branding **once**, every email updates.",
+        "width": 460,
+        "height": 220,
+        "color": 6
+      },
+      "id": "760f17d7-6c90-5d9b-a5c3-1c18ae1c2b63",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "to"
+            },
+            {
+              "name": "title"
+            },
+            {
+              "name": "body_html"
+            },
+            {
+              "name": "cta_text"
+            },
+            {
+              "name": "cta_url"
+            }
+          ]
+        }
+      },
+      "id": "07d95761-f64c-53a5-bc10-8eeb6f14bb48",
+      "name": "When Called by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const j = $json;\nconst cta = j.cta_url ? `<p style=\"margin:24px 0\"><a href=\"${j.cta_url}\" style=\"background:#EA4B71;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none\">${j.cta_text || 'Open'}</a></p>` : '';\nconst html = `<div style=\"font-family:Segoe UI,Arial;max-width:600px;margin:auto;border:1px solid #eee;border-radius:8px\">\n<div style=\"background:#1f2937;color:#fff;padding:16px 20px;font-size:18px\">${j.title}</div>\n<div style=\"padding:20px;color:#111\">${j.body_html}${cta}</div>\n<div style=\"padding:12px 20px;color:#888;font-size:12px;border-top:1px solid #eee\">Sent by n8n automation · reply to this email if something looks wrong</div></div>`;\nreturn { json: { ...j, html } };"
+      },
+      "id": "d271e493-dd30-5ada-9dc3-17499c81f841",
+      "name": "Wrap in Template",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.title }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "58f00d03-6602-52e3-b17e-27c320ab1a4b",
+      "name": "Send",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "sent",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "a1",
+              "name": "to",
+              "value": "={{ $('Wrap in Template').item.json.to }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "78459ec2-301c-50c6-9d66-8d7f59001977",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Called by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Wrap in Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wrap in Template": {
+      "main": [
+        [
+          {
+            "node": "Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

@@ -1,0 +1,144 @@
+{
+  "name": "L06 · Save Gmail PDF attachments to Google Drive",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📎 L06 · Gmail → Drive\nEvery 5 minutes: new unread mail with a PDF → upload to a Drive folder → **mark the email as read** so it is never processed twice.\n\nSet the Drive folder in *Upload to Drive*.",
+        "width": 440,
+        "height": 220,
+        "color": 5
+      },
+      "id": "9b8cd6e8-9c86-5477-9059-cc5c572353e1",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "has:attachment filename:pdf",
+          "readStatus": "unread"
+        },
+        "options": {
+          "downloadAttachments": true,
+          "dataPropertyAttachmentsPrefixName": "attachment_"
+        }
+      },
+      "id": "d47c658c-d4e3-5b0b-9d6d-9f7a4856bb86",
+      "name": "New Email with Attachment",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// One email can carry many files. Output one item per PDF.\nconst out = [];\nfor (const item of $input.all()) {\n  for (const [key, bin] of Object.entries(item.binary || {})) {\n    const name = bin.fileName || key;\n    if (bin.mimeType === 'application/pdf' || name.toLowerCase().endsWith('.pdf')) {\n      const date = new Date(item.json.date || Date.now()).toISOString().slice(0, 10);\n      out.push({ json: { fileName: `${date}_${name}`, from: item.json.from?.text || '', subject: item.json.subject || '', messageId: item.json.id }, binary: { data: bin } });\n    }\n  }\n}\nreturn out;"
+      },
+      "id": "6bdf6f50-1c68-50f4-b794-eee78712f821",
+      "name": "Split PDF Attachments",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_DRIVE_FOLDER_URL"
+        },
+        "options": {}
+      },
+      "id": "15b778c2-513e-585d-8acc-8e4f9921d89c",
+      "name": "Upload to Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        440,
+        0
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Split PDF Attachments').item.json.messageId }}"
+      },
+      "id": "277314ec-7464-56f6-b867-84c31ce50b15",
+      "name": "Mark Email as Read",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "New Email with Attachment": {
+      "main": [
+        [
+          {
+            "node": "Split PDF Attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split PDF Attachments": {
+      "main": [
+        [
+          {
+            "node": "Upload to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Drive": {
+      "main": [
+        [
+          {
+            "node": "Mark Email as Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

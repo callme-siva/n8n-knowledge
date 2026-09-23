@@ -1,0 +1,296 @@
+{
+  "name": "L13 · HR policy chatbot (RAG over your PDFs)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📚 L13 · RAG = Retrieval-Augmented Generation\n**Part A (top):** upload PDFs → split → embed → store.\n**Part B (bottom):** chat → agent searches the store → answers *with sources*.\n\nIn-memory store = perfect for learning; resets on restart. Production: swap for Supabase/Pinecone/Qdrant.",
+        "width": 520,
+        "height": 260,
+        "color": 5
+      },
+      "id": "93b8c4ea-42db-5447-a44a-c3fc19f214d5",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -520
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload policy documents",
+        "formDescription": "PDFs only. They will be indexed for the chatbot.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Documents",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "58145d37-3cd3-57f8-96be-1f616e3c8a28",
+      "name": "Upload Policy PDFs",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": "hr_policies"
+      },
+      "id": "988f312d-5d48-52e9-bc65-8544fdcc0afe",
+      "name": "Store in Vector DB",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "id": "0020baf9-8361-5261-a1e1-23492413e8b7",
+      "name": "Gemini Embeddings (insert)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "7bd8d298-d5b4-540d-bf71-81586c4d530c",
+      "name": "PDF Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        380,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "chunkSize": 1000,
+        "chunkOverlap": 150,
+        "options": {}
+      },
+      "id": "d5fdc936-dfc4-5bd4-9197-72e99ad68ebc",
+      "name": "Chunker",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        460,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c844196d-374d-5db8-af56-61bc3426017e",
+      "name": "Chat with Employees",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the HR policy assistant. ALWAYS search the policy_documents tool before answering. Answer only from what the tool returns; quote the policy name. If the documents don't cover it, say \"I couldn't find that in our policies — please contact HR\" — never guess. Keep answers under 120 words."
+        }
+      },
+      "id": "e02174d1-e0b3-5439-8f85-77b054891818",
+      "name": "Policy Assistant",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        260,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "1b1c5343-eba8-5391-9122-383721538c95",
+      "name": "Gemini Chat",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 8
+      },
+      "id": "34b7e649-14da-51f8-9a20-9cbd9be536bb",
+      "name": "Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        300,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "policy_documents",
+        "toolDescription": "Search the company HR policy documents (leave, WFH, travel, reimbursement, code of conduct).",
+        "memoryKey": "hr_policies",
+        "topK": 4
+      },
+      "id": "58197d38-bb22-5fa0-b753-cee7495e7fe0",
+      "name": "policy_documents",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "id": "90311c2e-5127-574d-8a34-b465173c777a",
+      "name": "Gemini Embeddings (search)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        460,
+        740
+      ]
+    }
+  ],
+  "connections": {
+    "Upload Policy PDFs": {
+      "main": [
+        [
+          {
+            "node": "Store in Vector DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Embeddings (insert)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Store in Vector DB",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Store in Vector DB",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunker": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "PDF Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat with Employees": {
+      "main": [
+        [
+          {
+            "node": "Policy Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Policy Assistant",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Policy Assistant",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "policy_documents": {
+      "ai_tool": [
+        [
+          {
+            "node": "Policy Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Embeddings (search)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "policy_documents",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

@@ -1,0 +1,204 @@
+{
+  "name": "L03 · Daily job search digest (HTTP API + Code)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🌐 L03 · Calling any REST API\nSerpAPI → Google Jobs.\nFree key: serpapi.com (100 searches/month).\nEdit the query in **⚙️ Config**.",
+        "width": 400,
+        "height": 200,
+        "color": 5
+      },
+      "id": "b8ef7963-95cd-55e3-8239-010d6b024faa",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "59f92872-09c1-5ba1-8c81-c9f2349ceb99",
+      "name": "Every Morning 8 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "query",
+              "value": "Scrum Master OR Agile Coach",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "location",
+              "value": "India",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "email_to",
+              "value": "you@example.com",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "max_jobs",
+              "value": 15,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8de29f87-b612-5e85-b406-1a61a30ab54f",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "serpApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_jobs"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.query }}"
+            },
+            {
+              "name": "location",
+              "value": "={{ $json.location }}"
+            },
+            {
+              "name": "chips",
+              "value": "date_posted:today"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "647bdd02-f844-5eef-8bcd-683dabe94838",
+      "name": "Search Google Jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('⚙️ Config').first().json;\nconst jobs = ($input.first().json.jobs_results || []).slice(0, cfg.max_jobs);\nconst today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });\nconst esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));\nconst rows = jobs.map(j => {\n  const link = j.apply_options?.[0]?.link || j.share_link || '#';\n  return `<tr><td><a href=\"${link}\">${esc(j.title)}</a></td><td>${esc(j.company_name)}</td><td>${esc(j.location)}</td><td>${esc(j.detected_extensions?.posted_at || '')}</td></tr>`;\n}).join('');\nconst html = jobs.length\n  ? `<h2>${jobs.length} new jobs · ${today}</h2><table border=\"1\" cellpadding=\"6\" style=\"border-collapse:collapse\"><tr><th>Role</th><th>Company</th><th>Location</th><th>Posted</th></tr>${rows}</table>`\n  : `<p>No new jobs today for <b>${esc(cfg.query)}</b>. Try widening the query.</p>`;\nreturn [{ json: { subject: `Job digest: ${jobs.length} × ${cfg.query} (${today})`, html, count: jobs.length } }];"
+      },
+      "id": "4ce14e7e-ca9c-5ea9-9b5f-b339c268b009",
+      "name": "Format Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('⚙️ Config').item.json.email_to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "e6b2fc83-12ee-52d9-bc05-98afebf64eef",
+      "name": "Send Digest",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every Morning 8 AM": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Search Google Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Google Jobs": {
+      "main": [
+        [
+          {
+            "node": "Format Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Email": {
+      "main": [
+        [
+          {
+            "node": "Send Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

@@ -1,0 +1,185 @@
+{
+  "name": "L08 · Daily stale Jira stories report",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧭 L08 · Jira for Scrum teams\nFinds In-Progress stories with no update for N days and emails the list.\nEdit the JQL in *Search Stale Stories* (project key!) and the days in **⚙️ Config**.",
+        "width": 440,
+        "height": 220,
+        "color": 5
+      },
+      "id": "164478f8-217f-54d6-a5e2-f0866539f726",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "090ffb6d-2581-5b89-8e54-98503559513f",
+      "name": "Weekdays 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "project_key",
+              "value": "SCRUM",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "stale_days",
+              "value": 3,
+              "type": "number"
+            },
+            {
+              "id": "a2",
+              "name": "email_to",
+              "value": "you@example.com",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "jira_base_url",
+              "value": "https://YOUR-SITE.atlassian.net",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fdbdfcc4-8221-569f-bbac-05031385b9ca",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "=project = {{ $json.project_key }} AND statusCategory = \"In Progress\" AND updated <= -{{ $json.stale_days }}d ORDER BY updated ASC",
+          "fields": "summary,status,assignee,updated,priority"
+        }
+      },
+      "id": "ca9c54a0-cc34-5d34-aed7-4b106531be2b",
+      "name": "Search Stale Stories",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('⚙️ Config').first().json;\nconst issues = $input.all().map(i => i.json).filter(j => j && j.key);\nconst days = d => Math.floor((Date.now() - Date.parse(d)) / 86400000);\nconst rows = issues.map(i => {\n  const f = i.fields || {};\n  return { key: i.key, summary: f.summary, assignee: f.assignee?.displayName || 'Unassigned', status: f.status?.name, days: days(f.updated) };\n}).sort((a, b) => b.days - a.days);\nconst tr = rows.map(r => `<tr><td><a href=\"${cfg.jira_base_url}/browse/${r.key}\">${r.key}</a></td><td>${r.summary}</td><td>${r.assignee}</td><td>${r.status}</td><td style=\"color:${r.days > 7 ? 'red' : 'inherit'}\">${r.days}</td></tr>`).join('');\nconst byPerson = rows.reduce((m, r) => (m[r.assignee] = (m[r.assignee] || 0) + 1, m), {});\nconst summary = Object.entries(byPerson).map(([p, n]) => `${p}: ${n}`).join(' · ');\nreturn [{ json: { count: rows.length,\n  subject: rows.length ? `⚠️ ${rows.length} stale stories in ${cfg.project_key}` : `✅ No stale stories in ${cfg.project_key}`,\n  html: rows.length ? `<p>${summary}</p><table border=1 cellpadding=6 style=\"border-collapse:collapse\"><tr><th>Key</th><th>Summary</th><th>Assignee</th><th>Status</th><th>Days idle</th></tr>${tr}</table>` : '<p>Everything moved in the last few days. 🎉</p>' } }];"
+      },
+      "id": "981d48d2-77cc-5c6a-a051-903745fa4b51",
+      "name": "Build Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('⚙️ Config').item.json.email_to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a9a1f071-429d-5a00-8127-d3d1048a4bb1",
+      "name": "Email Scrum Master",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Weekdays 9 AM": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Search Stale Stories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Stale Stories": {
+      "main": [
+        [
+          {
+            "node": "Build Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Report": {
+      "main": [
+        [
+          {
+            "node": "Email Scrum Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

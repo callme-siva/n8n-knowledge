@@ -1,0 +1,258 @@
+{
+  "name": "L05 · Tech news digest (RSS + Merge + Code)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧑‍💻 L05 · Code node superpowers\nThree RSS feeds → Merge → **one Code node** that:\n• keeps the last 24 h\n• removes duplicates\n• sorts newest first\n• builds HTML\n(No AI yet. L11 adds Gemini on top of this.)",
+        "width": 440,
+        "height": 260,
+        "color": 5
+      },
+      "id": "197a3416-2517-5a0f-8b62-223be093e579",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "ed26f28f-82f1-5fd8-a1b4-f240f0cab864",
+      "name": "Every Morning 8 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "700e7add-6097-563a-abd6-db57663aa1ce",
+      "name": "Merge Feeds",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&ceid=IN:en",
+        "options": {}
+      },
+      "id": "c4dfa553-bbc1-52e4-82f4-34fdf4a43c0b",
+      "name": "Google News · AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        -160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+        "options": {}
+      },
+      "id": "46f59188-9be3-5037-8c39-9e1442234113",
+      "name": "TechCrunch · AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+        "options": {}
+      },
+      "id": "dec4f58f-8d0a-5a1c-8806-01938ad90f25",
+      "name": "The Verge · AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cutoff = Date.now() - 24 * 3600 * 1000;\nconst seen = new Set();\nconst norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').slice(0, 60);\nconst articles = $input.all().map(i => i.json)\n  .filter(a => a.title && a.link)\n  .map(a => ({ title: a.title.trim(), link: a.link, source: a.creator || (a.link.match(/https?:\\/\\/(?:www\\.)?([^/]+)/) || [])[1] || 'unknown', ts: Date.parse(a.isoDate || a.pubDate || '') || 0 }))\n  .filter(a => a.ts >= cutoff)\n  .filter(a => { const k = norm(a.title); if (seen.has(k)) return false; seen.add(k); return true; })\n  .sort((a, b) => b.ts - a.ts)\n  .slice(0, 25);\nconst li = articles.map(a => `<li><a href=\"${a.link}\">${a.title}</a> <small>(${a.source})</small></li>`).join('');\nconst listText = articles.map((a, i) => `${i + 1}. ${a.title} — ${a.link}`).join('\\n');\nreturn [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];"
+      },
+      "id": "f7630bef-81b5-5d7d-8db3-9a665c702088",
+      "name": "Filter · Dedupe · Sort",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.count }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "rightValue": 0
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "447f096e-e449-5251-a01a-8afe77ba4b99",
+      "name": "Anything New?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        920,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=Tech news · {{ $json.count }} stories · {{ $now.toFormat('dd LLL') }}",
+        "emailType": "html",
+        "message": "=<h2>Last 24 hours in AI</h2>{{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "11d12bc8-d7e4-59dd-9942-35cdc37ae958",
+      "name": "Email Digest",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1140,
+        -80
+      ]
+    }
+  ],
+  "connections": {
+    "Every Morning 8 AM": {
+      "main": [
+        [
+          {
+            "node": "Google News · AI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TechCrunch · AI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "The Verge · AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google News · AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TechCrunch · AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "The Verge · AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Feeds": {
+      "main": [
+        [
+          {
+            "node": "Filter · Dedupe · Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter · Dedupe · Sort": {
+      "main": [
+        [
+          {
+            "node": "Anything New?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anything New?": {
+      "main": [
+        [
+          {
+            "node": "Email Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}
