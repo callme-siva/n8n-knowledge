@@ -19,13 +19,17 @@ for i, d in enumerate(dirs):
     s = open(p).read().replace("{{NAV}}", nav)
     open(p, "w").write(s)
 
+p = os.path.join(ROOT, "workflows", "L20a-subworkflow-send-branded-email", "README.md")
+txt = open(p).read()
+open(p, "w").write(txt.replace("{{NAV}}", '<p align="center"><a href="../L20-subworkflows-caller/README.md">← Used by L20 · Sub-workflows</a> &nbsp;·&nbsp; <a href="../../README.md#-the-learning-path">📚 All lessons</a></p>'))
+
 # ---- main README: lesson tables + gallery
 import re
 from lib import REGISTRY, LEVELS
 strip = lambda t: re.sub(r"\*\*|`|\*", "", t)
 blocks = []
 for key, head in [("🟢", "🟢 Level 1 · Basics"), ("🟡", "🟡 Level 2 · Integrations"), ("🟠", "🟠 Level 3 · AI"), ("🔴", "🔴 Level 4 · Multi-agent & production")]:
-    rows = [r for r in REGISTRY if r["level"].startswith(key)]
+    rows = [r for r in REGISTRY if r["level"].startswith(key) and r["num"] != "L20a"]
     blocks += [f"### {head}", "", "| # | Lesson | Domain | Key concepts | Time |", "|:-:|---|---|---|:-:|"]
     for r in rows:
         concepts = " · ".join(strip(x).split(":")[0].split(" (")[0] for x in r["learn"][:2])
@@ -33,7 +37,7 @@ for key, head in [("🟢", "🟢 Level 1 · Basics"), ("🟡", "🟡 Level 2 · 
         blocks.append(f"| **{r['num']}** | [{r['title']}](workflows/{r['slug']}/README.md){extra} | {r['domain']} | {concepts} | {r['time']} |")
     blocks.append("")
 gal = ["<table>"]
-rs = [r for r in REGISTRY]
+rs = [r for r in REGISTRY if r["num"] != "L20a"]
 for i in range(0, len(rs), 2):
     gal.append("<tr>")
     for r in rs[i:i + 2]:

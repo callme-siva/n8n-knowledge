@@ -396,7 +396,15 @@ def L20(root):
     sub.add("Send", "gmail", 2.1, gmail_send("={{ $json.to }}", "={{ $json.title }}", "={{ $json.html }}"), (440, 0))
     sub.add("Return Result", "set", 3.4, assign(sent=True, to="={{ $('Wrap in Template').item.json.to }}", message_id="={{ $json.id }}"), (660, 0))
     sub.chain("When Called by Another Workflow", "Wrap in Template", "Send", "Return Result")
-    write(root, sub, "# L20a · Sub-workflow: send branded email\n\nThis is the **callee** used by [L20 · Sub-workflows](../L20-subworkflows-caller/README.md). Import it first, save it, then copy its workflow ID into the caller.\n\n[← Back to the learning path](../../README.md)")
+    write(root, sub, readme("L20a", "Sub-workflow: send branded email", P, "Reusable building block", "10 min",
+        "This is the **callee** used by [L20 · Sub-workflows](../L20-subworkflows-caller/README.md). It turns a title and body into a branded HTML email and sends it, so every workflow's emails look the same and the design lives in one place.",
+        ["Execute Workflow Trigger with named inputs", "Wrapping content in an HTML template", "Returning a result to the caller"],
+        "Execute Workflow Trigger (to, title, body_html, cta_text, cta_url) → Code (template) → Gmail → Set (return sent=true)",
+        ["Gmail OAuth2"],
+        ["Import this workflow first and **save** it.", "Copy its ID from the browser URL (`/workflow/<ID>`).", "Paste that ID into *Call: Send Branded Email* in L20."],
+        ["Run L20 with a test row dated today. This workflow's execution should appear in *Executions* and return `sent: true`."],
+        [("`Workflow does not exist` in the caller", "Save this workflow and use its exact ID."), ("Fields arrive empty", "Input names must match exactly on both sides.")],
+        ["Add a `reply_to` input.", "Switch Gmail for SMTP or SendGrid. Callers don't change."]))
 
     w = WF("L20-subworkflows-caller", "L20 · Sub-workflows — weekly birthday & anniversary wishes")
     w.note("## 🧱 L20 · Build once, reuse everywhere\nThis caller reads a team sheet, finds today's birthdays / work anniversaries and calls **L20a** once per person.\nSet the sub-workflow in *Call: Send Branded Email* (From list → L20a).", (-60, -360), 480, 240, 6)
