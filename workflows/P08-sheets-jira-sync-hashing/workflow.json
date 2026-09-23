@@ -1,0 +1,457 @@
+{
+  "name": "P08 · Two-system sync: Google Sheets backlog → Jira (create/update with change detection)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔄 P08 · Sync without duplicates\nBusiness users plan in a sheet; engineers work in Jira. Every 15 min: rows **without** a Jira key are created, rows whose content **hash changed** are updated, unchanged rows are skipped. Key + hash are written back.",
+        "width": 580,
+        "height": 300,
+        "color": 7
+      },
+      "id": "803d2190-9bbf-53c5-ac39-f04dbafc6b94",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "cbf7bad1-b163-57c1-8171-2062919852ee",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Backlog"
+        },
+        "options": {}
+      },
+      "id": "cdeaf354-d7fd-550c-94e5-a0d66b193016",
+      "name": "Read Backlog Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "action": "hash",
+        "type": "SHA256",
+        "value": "={{ JSON.stringify([$json.summary, $json.description, $json.priority]) }}",
+        "dataPropertyName": "new_hash"
+      },
+      "id": "6e7072de-0750-5b7e-ab73-f5f4d4518ab5",
+      "name": "Content Hash",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Sheet columns: row_id | summary | description | priority | jira_key | sync_hash | synced_at\nconst r = $json;\nconst op = !r.summary ? 'skip' : !r.jira_key ? 'create' : r.sync_hash !== r.new_hash ? 'update' : 'skip';\nreturn { json: { ...r, op } };"
+      },
+      "id": "6ddb5e6c-323d-55bb-a184-4e0c8dd828fe",
+      "name": "Decide Create / Update / Skip",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "create"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Create"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "update"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Update"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Skip"
+        }
+      },
+      "id": "eb69621e-ba50-5516-8dc8-c3fd9ebf794c",
+      "name": "Operation",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_PROJECT_ID"
+        },
+        "issueType": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_STORY_ISSUE_TYPE_ID"
+        },
+        "summary": "={{ $json.summary }}",
+        "additionalFields": {
+          "description": "={{ $json.description }}\n\n(synced from planning sheet, row {{ $json.row_id }})",
+          "labels": [
+            "from-sheet"
+          ]
+        }
+      },
+      "id": "e9563be2-8163-52a4-a482-db4d2843ae58",
+      "name": "Jira: Create",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -140
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "issueKey": "={{ $json.jira_key }}",
+        "updateFields": {
+          "summary": "={{ $json.summary }}",
+          "description": "={{ $json.description }}\n\n(synced from planning sheet, row {{ $json.row_id }})"
+        }
+      },
+      "id": "2dfb66d9-50f3-5213-9459-7dc96f4ccf2c",
+      "name": "Jira: Update",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        60
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "row_id",
+              "value": "={{ $('Operation').item.json.row_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "jira_key",
+              "value": "={{ $json.key }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "sync_hash",
+              "value": "={{ $('Operation').item.json.new_hash }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "synced_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "55a03b0e-500b-5714-b65c-b3c31abc6c45",
+      "name": "Created → Write Back",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1260,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "row_id",
+              "value": "={{ $('Operation').item.json.row_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "jira_key",
+              "value": "={{ $('Operation').item.json.jira_key }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "sync_hash",
+              "value": "={{ $('Operation').item.json.new_hash }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "synced_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "088eeb64-c2cf-5ec2-b1bf-41c3a7ce7d92",
+      "name": "Updated → Write Back",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1260,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Backlog"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "row_id"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "6394e9df-6cda-5867-96df-9a8456ec4bd9",
+      "name": "Save Key + Hash",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1480,
+        -40
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "1a6d54ce-3fc7-5068-a4f2-c5a5090fd492",
+      "name": "Unchanged",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Read Backlog Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Backlog Sheet": {
+      "main": [
+        [
+          {
+            "node": "Content Hash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Hash": {
+      "main": [
+        [
+          {
+            "node": "Decide Create / Update / Skip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Create / Update / Skip": {
+      "main": [
+        [
+          {
+            "node": "Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Operation": {
+      "main": [
+        [
+          {
+            "node": "Jira: Create",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jira: Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unchanged",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira: Create": {
+      "main": [
+        [
+          {
+            "node": "Created → Write Back",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Created → Write Back": {
+      "main": [
+        [
+          {
+            "node": "Save Key + Hash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira: Update": {
+      "main": [
+        [
+          {
+            "node": "Updated → Write Back",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Updated → Write Back": {
+      "main": [
+        [
+          {
+            "node": "Save Key + Hash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

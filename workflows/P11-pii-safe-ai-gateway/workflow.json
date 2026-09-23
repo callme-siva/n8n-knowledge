@@ -1,0 +1,359 @@
+{
+  "name": "P11 · PII-safe AI gateway (redact → injection check → LLM → audit)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🛡️ P11 · Use AI without leaking personal data\nPOST text to `/ai/ask` → **emails, phones, Aadhaar, PAN, cards (Luhn-checked), IFSC** replaced with tokens → basic **prompt-injection** screen → Gemini → audit log of *redacted* text only → JSON response.\nFits DPDP Act 2023 data-minimisation.",
+        "width": 580,
+        "height": 300,
+        "color": 7
+      },
+      "id": "655085d3-e8fc-587d-8f64-def0f1bd2e57",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai/ask",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "de4351f9-6d4e-5fad-942e-08dacc49d731",
+      "name": "POST /ai/ask",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const text = String($json.body?.text || '');\nconst found = {}; let n = 0;\nconst luhn = s => { const d = s.replace(/\\D/g, ''); let sum = 0; for (let i = 0; i < d.length; i++) { let x = +d[d.length - 1 - i]; if (i % 2) { x *= 2; if (x > 9) x -= 9; } sum += x; } return d.length >= 13 && sum % 10 === 0; };\nconst rules = [\n  ['EMAIL', /[\\w.+-]+@[\\w-]+\\.[\\w.]+/g],\n  ['CARD', /\\b(?:\\d[ -]?){13,19}\\b/g, luhn],\n  ['AADHAAR', /\\b[2-9]\\d{3}[ -]?\\d{4}[ -]?\\d{4}\\b/g],\n  ['PAN', /\\b[A-Z]{5}\\d{4}[A-Z]\\b/g],\n  ['IFSC', /\\b[A-Z]{4}0[A-Z0-9]{6}\\b/g],\n  ['PHONE', /(?:\\+91[ -]?)?\\b[6-9]\\d{9}\\b/g],\n];\nlet red = text;\nfor (const [label, re, check] of rules) red = red.replace(re, m => { if (check && !check(m)) return m; const t = `[${label}_${++n}]`; found[t] = m; return t; });\nconst counts = Object.keys(found).reduce((c, t) => (c[t.slice(1).split('_')[0]] = (c[t.slice(1).split('_')[0]] || 0) + 1, c), {});\nreturn { json: { user: $json.body?.user || 'unknown', redacted: red, counts, tokens: found } };"
+      },
+      "id": "18b80e1f-c7b1-5775-b092-6bfa16793fe9",
+      "name": "Redact PII",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const t = $json.redacted.toLowerCase();\nconst signals = ['ignore previous instructions', 'ignore all previous', 'disregard the system', 'you are now', 'reveal your system prompt', 'act as dan', 'jailbreak', 'print your instructions'];\nconst hit = signals.filter(s => t.includes(s));\nreturn { json: { ...$json, blocked: hit.length > 0, block_reason: hit.join(', ') } };"
+      },
+      "id": "ab74248c-ce78-5b58-b54b-8e8f612b12fb",
+      "name": "Injection Screen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.blocked }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "53963413-de01-5ac0-9c50-c8eb3e68bf01",
+      "name": "Blocked?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.redacted }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a helpful assistant for internal staff. Tokens like [EMAIL_1] or [PHONE_2] stand for redacted personal data: keep them exactly as-is if you need to refer to them, and never try to guess the original values."
+            }
+          ]
+        }
+      },
+      "id": "361ab458-2948-5107-bb51-4e3c631258b9",
+      "name": "Answer",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        900,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "75bc5a55-8c01-552d-88b1-2aca93342930",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// The caller already had this data, so it's safe to put it back in the answer. The LLM never saw it.\nconst src = $('Injection Screen').item.json;\nlet answer = $json.text || '';\nfor (const [tok, val] of Object.entries(src.tokens)) answer = answer.split(tok).join(val);\nreturn { json: { answer, user: src.user, counts: src.counts, redacted_prompt: src.redacted, redacted_answer: $json.text } };"
+      },
+      "id": "ab6abe3f-cdd7-5ab7-8233-e519e463b44f",
+      "name": "Restore Tokens for Caller",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "time",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "user",
+              "value": "={{ $json.user ?? $('Injection Screen').item.json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "outcome",
+              "value": "={{ $json.answer !== undefined ? 'answered' : 'blocked' }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "pii_counts",
+              "value": "={{ JSON.stringify($json.counts ?? $('Injection Screen').item.json.counts) }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "prompt_redacted",
+              "value": "={{ ($json.redacted_prompt ?? $('Injection Screen').item.json.redacted).slice(0, 500) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "90334019-03be-5238-a652-c92cb3431954",
+      "name": "Audit Row",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1340,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "AI_Audit"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "26ff9c01-5b94-5279-8258-33701a3cd246",
+      "name": "Audit Log (no raw PII)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1560,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Audit Row').item.json.outcome === 'blocked' ? { ok: false, error: 'Request blocked by policy' } : { ok: true, answer: $('Restore Tokens for Caller').item.json.answer, pii_redacted: $('Restore Tokens for Caller').item.json.counts } }}",
+        "options": {
+          "responseCode": "={{ $('Audit Row').item.json.outcome === 'blocked' ? 403 : 200 }}"
+        }
+      },
+      "id": "b50c1e59-585f-549c-a22c-c4ec657f0ea4",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1780,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "POST /ai/ask": {
+      "main": [
+        [
+          {
+            "node": "Redact PII",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redact PII": {
+      "main": [
+        [
+          {
+            "node": "Injection Screen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Injection Screen": {
+      "main": [
+        [
+          {
+            "node": "Blocked?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blocked?": {
+      "main": [
+        [
+          {
+            "node": "Audit Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer": {
+      "main": [
+        [
+          {
+            "node": "Restore Tokens for Caller",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Tokens for Caller": {
+      "main": [
+        [
+          {
+            "node": "Audit Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Row": {
+      "main": [
+        [
+          {
+            "node": "Audit Log (no raw PII)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Log (no raw PII)": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

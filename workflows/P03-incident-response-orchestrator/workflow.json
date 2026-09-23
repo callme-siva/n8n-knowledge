@@ -1,0 +1,429 @@
+{
+  "name": "P03 · Incident response orchestrator (alerts → dedupe → Jira + Slack → AI postmortem)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🚨 P03 · From alert storm to one incident\nReceives Alertmanager/Grafana-style webhooks. Groups repeats by **fingerprint** (state kept between runs), opens **one** Jira incident per problem, pages on critical, suppresses repeats, and on *resolved* closes the loop with an **AI postmortem draft**.",
+        "width": 580,
+        "height": 300,
+        "color": 7
+      },
+      "id": "45cf31b9-b071-564a-b340-6af596a95d88",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alerts",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "c72772dd-8e22-50a9-84a9-6c8d1979da3b",
+      "name": "POST /alerts",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.alerts",
+        "options": {}
+      },
+      "id": "dfe82341-b9d7-5915-af01-56d99d9446b6",
+      "name": "One Item per Alert",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Alertmanager payload: alerts[] { status, fingerprint, labels{alertname,severity,service}, annotations{summary,description}, startsAt, endsAt }\nconst state = $getWorkflowStaticData('global'); state.open ??= {};\nreturn $input.all().map(({ json: a }) => {\n  const fp = a.fingerprint || `${a.labels?.alertname}|${a.labels?.service}`;\n  const known = state.open[fp];\n  const sev = (a.labels?.severity || 'warning').toLowerCase();\n  let action;\n  if (a.status === 'resolved') action = known ? 'resolve' : 'ignore';\n  else if (known) { known.count++; action = 'repeat'; }\n  else { state.open[fp] = { since: a.startsAt || new Date().toISOString(), count: 1, sev }; action = sev === 'critical' ? 'page' : 'notify'; }\n  const rec = state.open[fp] || {};\n  const out = { action, fp, sev, name: a.labels?.alertname, service: a.labels?.service || 'unknown', summary: a.annotations?.summary || '', description: a.annotations?.description || '',\n    since: rec.since, repeats: rec.count, jira_key: rec.jira_key || null, duration_min: a.endsAt && rec.since ? Math.round((Date.parse(a.endsAt) - Date.parse(rec.since)) / 60000) : null };\n  if (action === 'resolve') delete state.open[fp];\n  return { json: out };\n});"
+      },
+      "id": "570326b6-2cdc-50b4-8a92-73a0ed970c16",
+      "name": "Decide Action",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "page"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Page (critical)"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "notify"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Notify (warning)"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "resolve"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Resolved"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Suppress (repeat)"
+        }
+      },
+      "id": "f6b36294-72e3-55e5-8d50-bad923050e45",
+      "name": "Route",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_PROJECT_ID"
+        },
+        "issueType": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_INCIDENT_ISSUE_TYPE_ID"
+        },
+        "summary": "=[P1] {{ $json.service }}: {{ $json.name }}",
+        "additionalFields": {
+          "description": "={{ $json.summary }}\n\n{{ $json.description }}\n\nFingerprint: {{ $json.fp }}\nStarted: {{ $json.since }}",
+          "labels": [
+            "incident",
+            "auto"
+          ]
+        }
+      },
+      "id": "2c0d9932-d68d-51bf-a266-29508e6ffc88",
+      "name": "Open Jira Incident",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        840,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Store the new Jira key against the alert fingerprint so repeats and the resolve event can find it.\nconst state = $getWorkflowStaticData('global');\nconst a = $('Route').item.json;\nif (state.open[a.fp]) state.open[a.fp].jira_key = $json.key;\nreturn { json: { ...a, jira_key: $json.key } };"
+      },
+      "id": "e5a1be74-a24d-5cf0-97fa-b24acb7162b8",
+      "name": "Remember Jira Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=🔴 P1 {{ $json.service }}: {{ $json.name }} ({{ $json.jira_key }})",
+        "emailType": "html",
+        "message": "=<p>{{ $json.summary }}</p><p>Jira: {{ $json.jira_key }}</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "27366ccc-f1dd-5733-9073-9ea290ac248b",
+      "name": "Page On-call",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1240,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#incidents"
+        },
+        "text": "=:red_circle: *{{ $json.sev.toUpperCase() }}* {{ $json.service }}: {{ $json.name }}\n{{ $json.summary }}{{ $json.jira_key ? '\\nJira: ' + $json.jira_key : '' }}",
+        "otherOptions": {}
+      },
+      "id": "2550282e-7ebe-5b5e-afc8-f4b08a70005c",
+      "name": "Slack #incidents",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1240,
+        -140
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3be9dc5a-5319-5511-9c24-221b3eaaef23",
+      "name": "Suppress",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        840,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Incident resolved.\nService: {{ $json.service }}\nAlert: {{ $json.name }}\nSeverity: {{ $json.sev }}\nStarted: {{ $json.since }}\nDuration: {{ $json.duration_min }} minutes\nRepeated alerts: {{ $json.repeats }}\nSummary: {{ $json.summary }}\nDetails: {{ $json.description }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Write a blameless postmortem DRAFT in Markdown with sections: Summary, Impact, Timeline (only known facts), Probable cause (clearly marked as hypothesis), Follow-up actions (3 max), Open questions. Never invent facts; write 'unknown' where data is missing."
+            }
+          ]
+        }
+      },
+      "id": "e93caf77-9537-5cdb-9170-2dc493f7f585",
+      "name": "Draft Postmortem",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        840,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "70054ee3-ebfc-5158-8778-86492733bdb4",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        840,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#incidents"
+        },
+        "text": "=:large_green_circle: *Resolved* {{ $('Route').item.json.service }}: {{ $('Route').item.json.name }} after {{ $('Route').item.json.duration_min }} min\n\n*Postmortem draft:*\n{{ $json.text }}",
+        "otherOptions": {}
+      },
+      "id": "4410f7df-c154-50c0-9ef2-3e1cd6f05416",
+      "name": "Post Postmortem Draft",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1100,
+        80
+      ]
+    }
+  ],
+  "connections": {
+    "POST /alerts": {
+      "main": [
+        [
+          {
+            "node": "One Item per Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One Item per Alert": {
+      "main": [
+        [
+          {
+            "node": "Decide Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Action": {
+      "main": [
+        [
+          {
+            "node": "Route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route": {
+      "main": [
+        [
+          {
+            "node": "Open Jira Incident",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack #incidents",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Draft Postmortem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Suppress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Jira Incident": {
+      "main": [
+        [
+          {
+            "node": "Remember Jira Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remember Jira Key": {
+      "main": [
+        [
+          {
+            "node": "Page On-call",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack #incidents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Postmortem": {
+      "main": [
+        [
+          {
+            "node": "Post Postmortem Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Draft Postmortem",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

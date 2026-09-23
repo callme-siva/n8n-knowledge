@@ -1,0 +1,354 @@
+<div align="center">
+
+# P06 · Purchase request with multi-level approval
+
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / operations / HR](https://img.shields.io/badge/domain-Finance_/_operations_/_HR-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 15](https://img.shields.io/badge/nodes-15-7C3AED?style=flat-square)
+
+<img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
+
+</div>
+
+> [!NOTE]
+> **The real-world problem.** Every company has approval flows: purchases, leave, discounts, travel, contract exceptions. They usually run on email threads that get lost, and nobody can later say who approved what. This workflow gives you **routing by amount, timeouts with escalation, notifications and a full audit trail** without buying an approvals tool.
+
+## 🎯 What you'll learn
+
+- Chained **Send and Wait** approvals with time limits
+- A 3-way **Switch** on approved / rejected / **timed out** (missing response)
+- Routing by business rule (amount > threshold → second approver)
+- Generating human-friendly request IDs
+- An **audit trail**: upsert the same row as the status changes
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TB
+  n0(["Purchase Request Form"]):::trigger
+  n1["⚙️ Config"]:::code
+  n2["Create Request"]:::code
+  n3["Audit: Created"]:::data
+  n4["Manager Approval"]:::msg
+  n5{"Manager Decision"}:::logic
+  n6{"Needs Finance?"}:::logic
+  n7["Finance Approval"]:::msg
+  n8{"Finance Approved?"}:::logic
+  n9["Final: Approved"]:::code
+  n10["Final: Rejected"]:::code
+  n11["Final: Escalated (timeout)"]:::code
+  n12["Audit: Decision"]:::data
+  n13["Notify Requester"]:::msg
+  n14["Escalate to Finance"]:::msg
+  n9 --> n12
+  n10 --> n12
+  n11 --> n12
+  n11 --> n14
+  n0 --> n1
+  n1 --> n2
+  n2 --> n3
+  n3 --> n4
+  n4 --> n5
+  n5 -->|"Approved"| n6
+  n5 -->|"Rejected"| n10
+  n5 -->|"Timed out"| n11
+  n6 -->|"true"| n7
+  n6 -->|"false"| n9
+  n7 --> n8
+  n8 -->|"true"| n9
+  n8 -->|"false"| n10
+  n12 --> n13
+  classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
+  classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
+  classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937
+  classDef logic fill:#FFF4E5,stroke:#F59E0B,stroke-width:2px,color:#1F2937
+  classDef code fill:#EEF2F7,stroke:#64748B,stroke-width:2px,color:#1F2937
+  classDef data fill:#EAF3FF,stroke:#2563EB,stroke-width:2px,color:#1F2937
+  classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
+  classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
+```
+
+<details><summary>Plain-text flow</summary>
+
+```
+Form → Config → Create ID → Audit row → Manager approval ⏸3d → Switch
+  ├ Approved → amount > ₹1L? ─ yes → Finance approval ⏸3d → approved? ─ yes/no ┐
+  │                          └ no ─────────────────────────────────────────────┤
+  ├ Rejected ─────────────────────────────────────────────────────────────────────┤→ Set final status → Audit upsert → Notify requester
+  └ Timed out → escalate to finance ──────────────────────────────────────────────┘
+```
+
+</details>
+
+## 🔑 Credentials
+
+| You need | Where to get it |
+|---|---|
+| Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
+| Google Sheets OAuth2 (tab `Requests` | request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided) |
+
+## 📝 Before you run it
+
+Replace these placeholder values with your own:
+
+| Node | Field | Placeholder |
+|---|---|---|
+| ⚙️ Config | `finance_email` | `you@example.com` |
+| Audit: Created | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+| Audit: Decision | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
+
+Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
+
+## 🛠️ Build it step by step
+
+> [!TIP]
+> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
+
+1. Create the `Requests` tab.
+2. Import it, set the finance email and threshold in Config.
+3. For testing, set both approval time limits to a few minutes (Options → *Limit wait time*).
+4. Submit 3 requests: ₹20,000 (manager only), ₹2,00,000 (manager + finance), one you ignore (timeout).
+
+## 🔍 Node-by-node reference
+
+Every node in this workflow and every setting inside it, generated from [`workflow.json`](workflow.json). Click a node to expand it.
+
+<details><summary><b>1. Purchase Request Form</b> · <code>n8n Form Trigger</code> v2.2</summary>
+
+> Hosts a web form; each submission starts one execution. Field labels become JSON keys.
+
+| Property | Value |
+|---|---|
+| `formTitle` | Purchase request |
+| `formFields.values` | Your email *, Manager email *, Item / service *, Amount (INR) *, Cost centre *, Justifi… |
+
+</details>
+
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `finance_email` | you@example.com |
+| `finance_threshold` | 100000 |
+
+</details>
+
+<details><summary><b>3. Create Request</b> · <code>Code</code> v2</summary>
+
+> Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
+
+| Property | Value |
+|---|---|
+| `mode` | runOnceForEachItem |
+| `jsCode` | (JavaScript, 4 lines, shown below) |
+
+**Code:**
+
+```javascript
+const f = $('Purchase Request Form').item.json;
+const id = 'PR-' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+return { json: { request_id: id, requester: f['Your email'], manager: f['Manager email'], item: f['Item / service'], amount: Number(f['Amount (INR)']),
+  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: new Date().toISOString() } };
+```
+
+</details>
+
+<details><summary><b>4. Audit: Created</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | appendOrUpdate |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Requests |
+| `columns.mappingMode` | autoMapInputData |
+| `columns.matchingColumns` | request_id |
+
+</details>
+
+<details><summary><b>5. Manager Approval</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `operation` | sendAndWait |
+| `sendTo` | `{{ $('Create Request').item.json.manager }}` |
+| `subject` | `Approve {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})?` |
+| `message` | `<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>` |
+| `approvalOptions.approvalType` | double |
+| `limitWaitTime.limitType` | afterTimeInterval |
+| `limitWaitTime.resumeAmount` | 3 |
+| `limitWaitTime.resumeUnit` | days |
+
+</details>
+
+<details><summary><b>6. Manager Decision</b> · <code>Switch</code> v3.2</summary>
+
+> Routes items to one of many named outputs.
+
+| Property | Value |
+|---|---|
+| `rule 1.condition` | `{{ $json.data?.approved }} is true` |
+| `rule 1.renameOutput` | ✅ on |
+| `rule 1.outputKey` | Approved |
+| `rule 2.condition` | `{{ $json.data?.approved }} is false` |
+| `rule 2.renameOutput` | ✅ on |
+| `rule 2.outputKey` | Rejected |
+| `fallbackOutput` | extra |
+| `renameFallbackOutput` | Timed out |
+
+</details>
+
+<details><summary><b>7. Needs Finance?</b> · <code>If</code> v2.2</summary>
+
+> Splits items into a **true** and a **false** branch.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $('Create Request').item.json.amount }} > {{ $('⚙️ Config').item.json.finance_thresh…` |
+
+</details>
+
+<details><summary><b>8. Finance Approval</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `operation` | sendAndWait |
+| `sendTo` | `{{ $('⚙️ Config').item.json.finance_email }}` |
+| `subject` | `Finance approval: {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})` |
+| `message` | `<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote><p>✅ Manager approved.</p>` |
+| `approvalOptions.approvalType` | double |
+| `limitWaitTime.limitType` | afterTimeInterval |
+| `limitWaitTime.resumeAmount` | 3 |
+| `limitWaitTime.resumeUnit` | days |
+
+</details>
+
+<details><summary><b>9. Finance Approved?</b> · <code>If</code> v2.2</summary>
+
+> Splits items into a **true** and a **false** branch.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $json.data?.approved }} is true` |
+
+</details>
+
+<details><summary><b>10. Final: Approved</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `request_id` | `{{ $('Create Request').item.json.request_id }}` |
+| `requester` | `{{ $('Create Request').item.json.requester }}` |
+| `status` | approved |
+| `decided` | `{{ $now.toISO() }}` |
+
+</details>
+
+<details><summary><b>11. Final: Rejected</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `request_id` | `{{ $('Create Request').item.json.request_id }}` |
+| `requester` | `{{ $('Create Request').item.json.requester }}` |
+| `status` | rejected |
+| `decided` | `{{ $now.toISO() }}` |
+
+</details>
+
+<details><summary><b>12. Final: Escalated (timeout)</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `request_id` | `{{ $('Create Request').item.json.request_id }}` |
+| `requester` | `{{ $('Create Request').item.json.requester }}` |
+| `status` | timed_out |
+| `decided` | `{{ $now.toISO() }}` |
+
+</details>
+
+<details><summary><b>13. Audit: Decision</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `operation` | appendOrUpdate |
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Requests |
+| `columns.mappingMode` | autoMapInputData |
+| `columns.matchingColumns` | request_id |
+
+</details>
+
+<details><summary><b>14. Notify Requester</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('Create Request').item.json.requester }}` |
+| `subject` | `{{ $('Create Request').item.json.request_id }}: {{ $json.status.replace('_', ' ') }}` |
+| `emailType` | html |
+| `message` | `<p>Your purchase request <b>{{ $('Create Request').item.json.request_id }}</b> for {{ $('Create Request').item.json.item }} is now <b>{{ $json.status.replace('_', ' ') }}</b>.</p>{{ $json.status === 'timed_out' ? '<p>Your manager did not respond in 3 days, so this has been escalated to finance.</p>' : '' }}` |
+| `appendAttribution` | off |
+
+</details>
+
+<details><summary><b>15. Escalate to Finance</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('⚙️ Config').item.json.finance_email }}` |
+| `subject` | `⏰ No manager response on {{ $('Create Request').item.json.request_id }}` |
+| `emailType` | html |
+| `message` | `<p>Manager {{ $('Create Request').item.json.manager }} didn't respond in 3 days.</p>` |
+| `appendAttribution` | off |
+
+</details>
+
+> [!TIP]
+> ⚙️ rows come from each node's **Settings** tab, not its Parameters tab. `{{ … }}` values are **expressions** evaluated at run time. See [workflow anatomy](../../docs/workflow-anatomy.md) for what every property means.
+
+## ✅ Test it
+
+- [ ] Each request's row goes from `pending_manager` to its final status.
+- [ ] The requester gets exactly one final email.
+
+## 🧯 Troubleshooting
+
+Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).
+
+<details><summary><b>Buttons in the email show an error page</b></summary>
+
+Approval links call your n8n. It must be reachable (set `WEBHOOK_URL`).
+
+</details>
+
+<details><summary><b>Timeout path never runs</b></summary>
+
+It only runs after the wait limit. Check *Limit wait time* is on for both approvals.
+
+</details>
+
+## 🚀 Level up
+
+- Use Slack *Send and wait* instead of email for faster approvals.
+- Create the PO in your ERP on approval.
+- A weekly report of pending requests older than 5 days.
+
+---
+
+<p align="center"><a href="../P05-bulk-ai-enrichment-checkpointed/README.md">← P05 · Bulk AI enrichment of 1,000s of rows</a> &nbsp;·&nbsp; <a href="../../README.md#-the-learning-path">📚 All lessons</a> &nbsp;·&nbsp; <a href="../P07-employee-onboarding-orchestrator/README.md">P07 · Employee onboarding orchestrator →</a></p>

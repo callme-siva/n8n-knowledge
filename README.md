@@ -1,16 +1,16 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="n8n Knowledge: 22 real workflows, beginner to multi-agent AI" width="100%">
+<img src="assets/banner.svg" alt="n8n Knowledge: 42 real workflows, beginner to production AI systems" width="100%">
 
 <br/>
 
-![lessons](https://img.shields.io/badge/lessons-22-7C3AED?style=flat-square)
+![workflows](https://img.shields.io/badge/workflows-42-7C3AED?style=flat-square)
 ![n8n](https://img.shields.io/badge/tested_on-n8n_2.40-EA4B71?style=flat-square)
 ![AI](https://img.shields.io/badge/AI-Gemini_free_tier-4285F4?style=flat-square)
 ![CI](https://img.shields.io/badge/CI-validated-2EA44F?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-334155?style=flat-square)
 
-**Learn n8n automation by building real workflows: one new concept at a time, from your first node to multi-agent AI.**
+**Learn n8n by building 42 real workflows: a 22-lesson core path, 8 quick wins, and 12 production-grade projects companies actually run.**
 
 [🚀 Start](#-start-in-3-steps) · [🗺️ Learning path](#-the-learning-path) · [🖼️ Gallery](#-gallery) · [🏗️ Architecture](docs/architecture.md) · [🧯 Mistakes](docs/common-mistakes.md) · [🧪 Testing](docs/testing.md) · [🤝 Contribute](CONTRIBUTING.md)
 
@@ -24,14 +24,14 @@
 <tr>
 <td width="33%" valign="top">
 
-### 🪜 Structured path
-4 levels, 22 lessons. Each adds **one or two concepts** on top of the last, so there's no guessing what to learn next.
+### 🪜 Three tracks
+A **22-lesson core path** (one new concept at a time), **8 quick wins** you can use today, and **12 real-world projects** for production.
 
 </td>
 <td width="33%" valign="top">
 
 ### 🏢 Real problems
-Job alerts, RAID logs, retros, lead scoring, complaint handling, uptime monitoring: things people **actually automate at work**.
+Invoice processing, support copilots, incident response, approvals, onboarding, data sync, MCP servers, PII-safe AI: what companies **actually automate**.
 
 </td>
 <td width="33%" valign="top">
@@ -80,34 +80,10 @@ Every workflow is checked against a real n8n install, and CI blocks credentials 
 
 ## 🗺️ The learning path
 
-```mermaid
-flowchart LR
-  subgraph B["🟢 Basics"]
-    direction TB
-    L01[L01 Hello n8n] --> L02[L02 Schedule + API] --> L03[L03 API auth] --> L04[L04 IF / Switch] --> L05[L05 Code node]
-  end
-  subgraph I["🟡 Integrations"]
-    direction TB
-    L06[L06 Gmail → Drive] --> L07[L07 Forms + Sheets] --> L08[L08 Jira] --> L09[L09 Webhook API] --> L10[L10 Form → Jira]
-  end
-  subgraph A["🟠 AI"]
-    direction TB
-    L11[L11 LLM chain] --> L12[L12 Structured output] --> L13[L13 RAG] --> L14[L14 Agent + tools] --> L15[L15 Human approval]
-  end
-  subgraph P["🔴 Multi-agent & production"]
-    direction TB
-    L16[L16 4 agents] --> L17[L17 5 agents] --> L18[L18 Doc AI] --> L19[L19 Error handler] --> L20[L20 Sub-workflows] --> L21[L21 Monitoring] --> L22[🏁 L22 Capstone]
-  end
-  B --> I --> A --> P
-  classDef b fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
-  classDef i fill:#FEF9C3,stroke:#D4A106,color:#1F2937
-  classDef a fill:#FFEDD5,stroke:#F97316,color:#1F2937
-  classDef p fill:#FEE2E2,stroke:#DC2626,color:#1F2937
-  class L01,L02,L03,L04,L05 b
-  class L06,L07,L08,L09,L10 i
-  class L11,L12,L13,L14,L15 a
-  class L16,L17,L18,L19,L20,L21,L22 p
-```
+<p align="center"><img src="assets/learning-path.svg" alt="Learning roadmap: core path L01–L22, quick wins Q01–Q08, real-world projects P01–P12" width="100%"></p>
+
+> [!TIP]
+> **New to n8n?** Follow the core path in order. **Know the basics?** Pick any ⚡ quick win. **Building for a company?** Go to the 🏭 real-world projects. Each one is a production-grade system with approvals, checkpoints, dedupe, audit logs and guardrails.
 
 <!-- LESSONS:START -->
 ### 🟢 Level 1 · Basics
@@ -151,6 +127,36 @@ flowchart LR
 | **L20** | [Sub-workflows: reusable building blocks](workflows/L20-subworkflows-caller/README.md) <sub>+ [L20a](workflows/L20a-subworkflow-send-branded-email/README.md)</sub> | HR / team culture | Execute Workflow Trigger with typed inputs · Execute Workflow node | 30 min |
 | **L21** | [Website & API uptime monitor](workflows/L21-website-uptime-monitor/README.md) | DevOps / IT | HTTP Request with Full Response + Never Error · Workflow static data | 30 min |
 | **L22** | [AI lead qualifier & router (capstone)](workflows/L22-ai-lead-qualifier-router/README.md) | Sales | Combines everything · AI as a decision-maker with explicit, auditable reasons | 40 min |
+
+### ⚡ Quick wins: useful in 15 minutes
+
+| # | Lesson | Domain | Key concepts | Time |
+|:-:|---|---|---|:-:|
+| **Q01** | [Daily agenda + free focus slots](workflows/Q01-daily-agenda-calendar/README.md) | Personal productivity | Google Calendar Get many events with a time window · $today and Luxon date maths | 15 min |
+| **Q02** | [Price drop tracker](workflows/Q02-price-drop-tracker/README.md) | Shopping / e-commerce ops | HTTP Request returning raw HTML text · HTML node | 20 min |
+| **Q03** | [Telegram quick-capture bot](workflows/Q03-telegram-capture-bot/README.md) | Personal productivity / finance | Telegram Trigger · Parsing simple commands in Code | 20 min |
+| **Q04** | [Stale pull-request reminder](workflows/Q04-github-stale-pr-reminder/README.md) | Engineering / DevOps | GitHub REST API with a predefined credential · Filtering by age and draft status | 15 min |
+| **Q05** | [Weekly KPI chart email](workflows/Q05-weekly-kpi-chart-email/README.md) | Management / sales | Google Sheets read rows · Grouping by ISO week in Code | 20 min |
+| **Q06** | [Invoice due & overdue reminders](workflows/Q06-invoice-due-reminders/README.md) | Finance / freelancers / SMB | Date maths for due in N days / N days overdue · Switch routing to different email tones | 25 min |
+| **Q07** | [Gmail AI auto-labeler](workflows/Q07-gmail-ai-auto-labeler/README.md) | Productivity / support | Text Classifier node · Category descriptions are the prompt, so write them carefully | 20 min |
+| **Q08** | [RSS → Telegram channel with dedupe across runs](workflows/Q08-rss-to-telegram-dedupe/README.md) | Marketing / community | Remove Duplicates → Remove items seen in previous executions · History size and what happens when it fills | 15 min |
+
+### 🏭 Real-world projects: production-grade systems
+
+| # | Lesson | Domain | Key concepts | Time |
+|:-:|---|---|---|:-:|
+| **P01** | [Accounts-payable invoice pipeline](workflows/P01-invoice-processing-pipeline/README.md) | Finance / accounts payable | Information Extractor · Never trust AI numbers | 60 min |
+| **P02** | [Support inbox copilot](workflows/P02-support-inbox-copilot/README.md) | Customer support | Two-stage AI · Grounding in a Google Sheet FAQ | 50 min |
+| **P03** | [Incident response orchestrator](workflows/P03-incident-response-orchestrator/README.md) | SRE / DevOps / IT ops | Receiving real monitoring webhooks · Split Out a batch payload into items | 60 min |
+| **P04** | [Multi-touch sales follow-up sequence](workflows/P04-sales-followup-sequence/README.md) | Sales | Wait node · Reply detection with a Gmail search | 45 min |
+| **P05** | [Bulk AI enrichment with batches and checkpoints](workflows/P05-bulk-ai-enrichment-checkpointed/README.md) | Sales ops / data | Loop Over Items · Checkpointing | 45 min |
+| **P06** | [Purchase request with multi-level approval](workflows/P06-purchase-approval-multilevel/README.md) | Finance / operations / HR | Chained Send and Wait approvals with time limits · A 3-way Switch on approved / rejected / timed out | 50 min |
+| **P07** | [Employee onboarding orchestrator](workflows/P07-employee-onboarding-orchestrator/README.md) | HR / people ops / IT | Fan-out / fan-in · Role-specific checklists generated from data | 50 min |
+| **P08** | [Sheets → Jira sync with change detection](workflows/P08-sheets-jira-sync-hashing/README.md) | Agile / product ops | Idempotent sync design · Crypto → SHA-256 content hash as a cheap change detector | 45 min |
+| **P09** | [Deep research agent](workflows/P09-deep-research-agent/README.md) | Strategy / consulting / product | Agent planning via the system prompt · SerpAPI tool for live Google results | 35 min |
+| **P10** | [MCP server for company tools](workflows/P10-mcp-server-business-tools/README.md) <sub>+ [P10a](workflows/P10a-tool-lookup-customer/README.md)</sub> | AI platform / internal tools | MCP Server Trigger with bearer authentication · Sub-workflows as tools | 30 min |
+| **P11** | [PII-safe AI gateway](workflows/P11-pii-safe-ai-gateway/README.md) | Security / compliance / platform | Redaction with reversible tokens · Validating matches | 45 min |
+| **P12** | [Weekly executive KPI report](workflows/P12-weekly-exec-kpi-report/README.md) | Leadership / PMO / chief of staff | Parallel fan-out to three sources, joined with a 3-input Merge · Aggregating counts in n8n vs in code | 60 min |
 
 <!-- LESSONS:END -->
 
@@ -204,6 +210,46 @@ flowchart LR
 <td width="50%" align="center" valign="top"><a href="workflows/L21-website-uptime-monitor/README.md"><img src="workflows/L21-website-uptime-monitor/canvas.svg" alt="L21 canvas"></a><br/><b>L21</b> · Website & API uptime monitor</td>
 <td width="50%" align="center" valign="top"><a href="workflows/L22-ai-lead-qualifier-router/README.md"><img src="workflows/L22-ai-lead-qualifier-router/canvas.svg" alt="L22 canvas"></a><br/><b>L22</b> · AI lead qualifier & router (capstone)</td>
 </tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/Q01-daily-agenda-calendar/README.md"><img src="workflows/Q01-daily-agenda-calendar/canvas.svg" alt="Q01 canvas"></a><br/><b>Q01</b> · Daily agenda + free focus slots</td>
+<td width="50%" align="center" valign="top"><a href="workflows/Q02-price-drop-tracker/README.md"><img src="workflows/Q02-price-drop-tracker/canvas.svg" alt="Q02 canvas"></a><br/><b>Q02</b> · Price drop tracker</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/Q03-telegram-capture-bot/README.md"><img src="workflows/Q03-telegram-capture-bot/canvas.svg" alt="Q03 canvas"></a><br/><b>Q03</b> · Telegram quick-capture bot</td>
+<td width="50%" align="center" valign="top"><a href="workflows/Q04-github-stale-pr-reminder/README.md"><img src="workflows/Q04-github-stale-pr-reminder/canvas.svg" alt="Q04 canvas"></a><br/><b>Q04</b> · Stale pull-request reminder</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/Q05-weekly-kpi-chart-email/README.md"><img src="workflows/Q05-weekly-kpi-chart-email/canvas.svg" alt="Q05 canvas"></a><br/><b>Q05</b> · Weekly KPI chart email</td>
+<td width="50%" align="center" valign="top"><a href="workflows/Q06-invoice-due-reminders/README.md"><img src="workflows/Q06-invoice-due-reminders/canvas.svg" alt="Q06 canvas"></a><br/><b>Q06</b> · Invoice due & overdue reminders</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/Q07-gmail-ai-auto-labeler/README.md"><img src="workflows/Q07-gmail-ai-auto-labeler/canvas.svg" alt="Q07 canvas"></a><br/><b>Q07</b> · Gmail AI auto-labeler</td>
+<td width="50%" align="center" valign="top"><a href="workflows/Q08-rss-to-telegram-dedupe/README.md"><img src="workflows/Q08-rss-to-telegram-dedupe/canvas.svg" alt="Q08 canvas"></a><br/><b>Q08</b> · RSS → Telegram channel with dedupe across runs</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/P01-invoice-processing-pipeline/README.md"><img src="workflows/P01-invoice-processing-pipeline/canvas.svg" alt="P01 canvas"></a><br/><b>P01</b> · Accounts-payable invoice pipeline</td>
+<td width="50%" align="center" valign="top"><a href="workflows/P02-support-inbox-copilot/README.md"><img src="workflows/P02-support-inbox-copilot/canvas.svg" alt="P02 canvas"></a><br/><b>P02</b> · Support inbox copilot</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/P03-incident-response-orchestrator/README.md"><img src="workflows/P03-incident-response-orchestrator/canvas.svg" alt="P03 canvas"></a><br/><b>P03</b> · Incident response orchestrator</td>
+<td width="50%" align="center" valign="top"><a href="workflows/P04-sales-followup-sequence/README.md"><img src="workflows/P04-sales-followup-sequence/canvas.svg" alt="P04 canvas"></a><br/><b>P04</b> · Multi-touch sales follow-up sequence</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/P05-bulk-ai-enrichment-checkpointed/README.md"><img src="workflows/P05-bulk-ai-enrichment-checkpointed/canvas.svg" alt="P05 canvas"></a><br/><b>P05</b> · Bulk AI enrichment with batches and checkpoints</td>
+<td width="50%" align="center" valign="top"><a href="workflows/P06-purchase-approval-multilevel/README.md"><img src="workflows/P06-purchase-approval-multilevel/canvas.svg" alt="P06 canvas"></a><br/><b>P06</b> · Purchase request with multi-level approval</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/P07-employee-onboarding-orchestrator/README.md"><img src="workflows/P07-employee-onboarding-orchestrator/canvas.svg" alt="P07 canvas"></a><br/><b>P07</b> · Employee onboarding orchestrator</td>
+<td width="50%" align="center" valign="top"><a href="workflows/P08-sheets-jira-sync-hashing/README.md"><img src="workflows/P08-sheets-jira-sync-hashing/canvas.svg" alt="P08 canvas"></a><br/><b>P08</b> · Sheets → Jira sync with change detection</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/P09-deep-research-agent/README.md"><img src="workflows/P09-deep-research-agent/canvas.svg" alt="P09 canvas"></a><br/><b>P09</b> · Deep research agent</td>
+<td width="50%" align="center" valign="top"><a href="workflows/P10-mcp-server-business-tools/README.md"><img src="workflows/P10-mcp-server-business-tools/canvas.svg" alt="P10 canvas"></a><br/><b>P10</b> · MCP server for company tools</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/P11-pii-safe-ai-gateway/README.md"><img src="workflows/P11-pii-safe-ai-gateway/canvas.svg" alt="P11 canvas"></a><br/><b>P11</b> · PII-safe AI gateway</td>
+<td width="50%" align="center" valign="top"><a href="workflows/P12-weekly-exec-kpi-report/README.md"><img src="workflows/P12-weekly-exec-kpi-report/canvas.svg" alt="P12 canvas"></a><br/><b>P12</b> · Weekly executive KPI report</td>
+</tr>
 </table>
 <!-- GALLERY:END -->
 
@@ -213,7 +259,8 @@ flowchart LR
 
 | | Template collections<br/><sub>(280 to 4,000 JSONs)</sub> | Video courses | **n8n Knowledge** |
 |---|:-:|:-:|:-:|
-| Order to learn in | ❌ | ✅ | ✅ 4 levels |
+| Order to learn in | ❌ | ✅ | ✅ core path + 2 tracks |
+| Production-grade projects | a few | rarely | ✅ 12 (approvals, sync, incidents, MCP, PII) |
 | Explains *why* | ❌ | ✅ in video | ✅ written + on canvas |
 | Build-it-yourself steps | ❌ | ✅ | ✅ |
 | Architecture diagram per workflow | ❌ | ❌ | ✅ |
@@ -232,6 +279,7 @@ If you want *any* template for a niche app, the big collections are great. This 
 |---|---|
 | 🚀 [Getting started](docs/getting-started.md) | Install, import, the 5 core ideas |
 | 🔑 [Credentials](docs/credentials.md) | Gemini, Google, Jira, SerpAPI, GitHub |
+| 🏢 [Real-world automation guide](docs/real-world-guide.md) | What to automate first, ROI, build vs buy, and how automation projects fail |
 | 🏗️ [Architecture](docs/architecture.md) | Platform, AI blocks, RAG, multi-agent, reliability, deployment |
 | 🧬 [Workflow anatomy](docs/workflow-anatomy.md) | Every property inside a workflow.json, plus an expressions cheat sheet |
 | 🧯 [Common mistakes](docs/common-mistakes.md) | 40+ mistakes with fixes, a debugging flowchart and a pre-flight checklist |

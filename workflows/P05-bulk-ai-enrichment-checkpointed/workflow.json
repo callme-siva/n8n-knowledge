@@ -1,0 +1,445 @@
+{
+  "name": "P05 · Bulk AI enrichment of 1,000s of rows (batches, rate limits, checkpoints, resume)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🏗️ P05 · Process big lists safely\nReads only `status = pending` rows → **Loop Over Items** in batches of 10 → Gemini classifies each company → writes back `status = done` (or `error`) → waits 2 s → next batch.\nStop it any time; the next run **resumes** where it left off.",
+        "width": 580,
+        "height": 300,
+        "color": 7
+      },
+      "id": "f226fe49-8494-533d-92f8-3c0a5e37d1af",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "cd41a1a6-2d68-576e-b088-c76b6c3fc4ba",
+      "name": "Run Manually or Nightly",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Companies"
+        },
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "pending"
+            }
+          ]
+        }
+      },
+      "id": "871f4aaf-1380-57c9-a390-f43a8677242f",
+      "name": "Pending Rows Only",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 500
+      },
+      "id": "a11c66d7-4c1f-5ef1-b128-43b619d88966",
+      "name": "Max 500 per Run",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "id": "0a867697-2c20-58e4-8410-c0249250bec7",
+      "name": "Loop in Batches of 10",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "text": "=Company: {{ $json.company }}\nWebsite: {{ $json.website }}\nDescription: {{ $json.description }}",
+        "schemaType": "fromAttributes",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "industry",
+              "type": "string",
+              "description": "One of: SaaS, E-commerce, Fintech, Healthcare, Education, Manufacturing, Services, Other",
+              "required": true
+            },
+            {
+              "name": "b2b",
+              "type": "boolean",
+              "description": "true if they mainly sell to businesses",
+              "required": true
+            },
+            {
+              "name": "icp_score",
+              "type": "number",
+              "description": "0-100 fit for a workflow-automation consultancy (needs many repetitive processes, 20-500 staff, digital)",
+              "required": true
+            },
+            {
+              "name": "reason",
+              "type": "string",
+              "description": "One short sentence explaining the score",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "069abb5c-36d4-5213-aea2-323f7059b006",
+      "name": "Classify Company",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        840,
+        -60
+      ],
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "6d7049ac-3d43-503b-9094-1e8ebe797086",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        840,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "row_id",
+              "value": "={{ $('Loop in Batches of 10').item.json.row_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "industry",
+              "value": "={{ $json.output.industry }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "b2b",
+              "value": "={{ $json.output.b2b }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "icp_score",
+              "value": "={{ $json.output.icp_score }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "reason",
+              "value": "={{ $json.output.reason }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "status",
+              "value": "done",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "processed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8cc36ba7-c718-5829-be4a-4af9b73dd9ff",
+      "name": "Mark Done",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1080,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "row_id",
+              "value": "={{ $('Loop in Batches of 10').item.json.row_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "reason",
+              "value": "={{ $json.error?.message || 'unknown error' }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "processed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "baeb5993-b09d-5a2b-a2f3-2024dc71ebfe",
+      "name": "Mark Error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1080,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Companies"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "row_id"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "852bdfe8-5236-557f-8dc4-89a0e1bfeb58",
+      "name": "Checkpoint to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "id": "9b7be7df-0eaa-50fa-a245-6313e1118a40",
+      "name": "Pause 2s (rate limit)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = $('Checkpoint to Sheet').all().length;\nreturn [{ json: { processed: n, finished_at: new Date().toISOString(), note: 'Re-run to continue with remaining pending rows.' } }];"
+      },
+      "id": "bb789ac6-039f-5928-a3f4-7c96e5a9c4d9",
+      "name": "Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        -300
+      ]
+    }
+  ],
+  "connections": {
+    "Run Manually or Nightly": {
+      "main": [
+        [
+          {
+            "node": "Pending Rows Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pending Rows Only": {
+      "main": [
+        [
+          {
+            "node": "Max 500 per Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Max 500 per Run": {
+      "main": [
+        [
+          {
+            "node": "Loop in Batches of 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop in Batches of 10": {
+      "main": [
+        [
+          {
+            "node": "Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Company": {
+      "main": [
+        [
+          {
+            "node": "Mark Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Done": {
+      "main": [
+        [
+          {
+            "node": "Checkpoint to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Error": {
+      "main": [
+        [
+          {
+            "node": "Checkpoint to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checkpoint to Sheet": {
+      "main": [
+        [
+          {
+            "node": "Pause 2s (rate limit)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pause 2s (rate limit)": {
+      "main": [
+        [
+          {
+            "node": "Loop in Batches of 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classify Company",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

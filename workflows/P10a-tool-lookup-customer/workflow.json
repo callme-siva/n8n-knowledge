@@ -1,0 +1,115 @@
+{
+  "name": "P10a · TOOL — Look up customer by email (used by the MCP server)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔧 P10a · A tool as a sub-workflow\nInput: `email`. Returns the matching customer row (plan, MRR, status, last ticket) or `found: false`.",
+        "width": 440,
+        "height": 300,
+        "color": 7
+      },
+      "id": "e6f4effa-00d3-52f9-b85b-f2a8c394461d",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "email"
+            }
+          ]
+        }
+      },
+      "id": "a7613c79-06a3-5606-abbe-a2867e0d7049",
+      "name": "When Called as Tool",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Customers"
+        },
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $json.email.toLowerCase() }}"
+            }
+          ]
+        }
+      },
+      "id": "1c2e639d-71c3-51a6-a384-62aa80b13a28",
+      "name": "Find Customer",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const r = $input.first()?.json || {};\nreturn [{ json: r.email ? { found: true, ...r } : { found: false, message: 'No customer with that email' } }];"
+      },
+      "id": "82e047b9-0509-54cc-971b-817883af3cb4",
+      "name": "Shape Answer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Called as Tool": {
+      "main": [
+        [
+          {
+            "node": "Find Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Customer": {
+      "main": [
+        [
+          {
+            "node": "Shape Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

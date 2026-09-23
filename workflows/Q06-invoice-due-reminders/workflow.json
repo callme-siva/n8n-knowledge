@@ -1,0 +1,332 @@
+{
+  "name": "Q06 · Invoice due & overdue reminders (Sheets as a mini-CRM)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 💸 Q06 · Get paid on time\nDaily: finds unpaid invoices due in 3 days (friendly nudge) or overdue (firm reminder), emails the client, and writes `last_reminded` back so nobody gets spammed.",
+        "width": 480,
+        "height": 300,
+        "color": 7
+      },
+      "id": "6d2229c7-9b74-5fd0-9ca8-3bedd1a1a617",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "02af5f4f-86a4-50cb-aa16-dfee61fdd450",
+      "name": "Daily 10:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Invoices"
+        },
+        "options": {}
+      },
+      "id": "95e91a24-912f-5253-84ce-0f2f4956e00a",
+      "name": "Read Invoices",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Columns: invoice_no | client | email | amount | due_date (YYYY-MM-DD) | status (paid/unpaid) | last_reminded\nconst today = new Date().toISOString().slice(0, 10);\nconst daysTo = d => Math.round((Date.parse(d) - Date.parse(today)) / 86400000);\nreturn $input.all().map(i => i.json)\n  .filter(r => String(r.status).toLowerCase() !== 'paid' && r.due_date && r.last_reminded !== today)\n  .map(r => ({ ...r, days: daysTo(r.due_date) }))\n  .filter(r => r.days === 3 || r.days < 0 && (-r.days) % 7 === 1)   // 3 days before, then weekly once overdue\n  .map(r => ({ json: { ...r, stage: r.days >= 0 ? 'upcoming' : 'overdue' } }));"
+      },
+      "id": "ab5f2a49-eec5-5d8c-9d25-048aa447251f",
+      "name": "Who Needs a Reminder?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.stage }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "upcoming"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Upcoming"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c1",
+                    "leftValue": "={{ $json.stage }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "overdue"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Overdue"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c615a655-c543-576b-8455-b1b2e354da0c",
+      "name": "Stage",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Invoice {{ $json.invoice_no }} due on {{ $json.due_date }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.client }},</p><p>A quick heads-up that invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} is due on {{ $json.due_date }}.</p><p>Thank you!</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "ab9889f6-a340-5dec-8087-19c8ea2d5343",
+      "name": "Friendly Nudge",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        900,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Overdue: invoice {{ $json.invoice_no }} ({{ -$json.days }} days)",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.client }},</p><p>Invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} was due on {{ $json.due_date }} and is now {{ -$json.days }} days overdue.</p><p>Please arrange payment or reply if there's an issue.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "667ed933-8fa0-5e45-8603-dd17bc987a8b",
+      "name": "Firm Reminder",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        900,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "invoice_no",
+              "value": "={{ $('Who Needs a Reminder?').item.json.invoice_no }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "last_reminded",
+              "value": "={{ $today.toISODate() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "81f00a15-f185-5e81-91db-8c118e07c5a5",
+      "name": "Mark Reminded",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Invoices"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "invoice_no"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "779784a0-6a7f-5df7-a3b1-d36157752f8a",
+      "name": "Write Back",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1340,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Daily 10:00": {
+      "main": [
+        [
+          {
+            "node": "Read Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Invoices": {
+      "main": [
+        [
+          {
+            "node": "Who Needs a Reminder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Who Needs a Reminder?": {
+      "main": [
+        [
+          {
+            "node": "Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stage": {
+      "main": [
+        [
+          {
+            "node": "Friendly Nudge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Firm Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Friendly Nudge": {
+      "main": [
+        [
+          {
+            "node": "Mark Reminded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firm Reminder": {
+      "main": [
+        [
+          {
+            "node": "Mark Reminded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Reminded": {
+      "main": [
+        [
+          {
+            "node": "Write Back",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

@@ -32,6 +32,8 @@ class WF:
                        {"modelName": GEMINI_MODEL, "options": {"temperature": temperature}}, pos)
 
     def note(self, content, pos, w=380, h=300, color=7):
+        if tuple(pos) == (0, 0):
+            pos = (-40, -320)
         self.add(f"Note {len([n for n in self.nodes if 'stickyNote' in n['type']]) + 1}",
                  "stickyNote", 1, {"content": content, "width": w, "height": h, "color": color}, pos)
 
@@ -118,7 +120,8 @@ def write(root, wf, doc):
         fh.write(md.strip() + "\n")
 
 
-LEVELS = {"🟢": ("Beginner", "2EA44F"), "🟡": ("Integrations", "D4A106"), "🟠": ("AI", "F97316"), "🔴": ("Multi-agent & production", "DC2626")}
+LEVELS = {"🟢": ("Beginner", "2EA44F"), "🟡": ("Integrations", "D4A106"), "🟠": ("AI", "F97316"), "🔴": ("Multi-agent & production", "DC2626"),
+          "⚡": ("Quick win", "0EA5E9"), "🏭": ("Real-world project", "7C3AED")}
 
 
 def badge(label, value, color):
@@ -166,3 +169,30 @@ def render_readme(r, data, diagram):
         L += [f"<details><summary><b>{a.replace('`', '')}</b></summary>", "", b, "", "</details>", ""]
     L += ["## 🚀 Level up", "", *[f"- {x}" for x in r["extend"]], "", "---", "", "{{NAV}}"]
     return "\n".join(L)
+
+
+# ---------- helpers added for the Quick-wins and Projects tracks ----------
+def slack_post(channel, text):
+    return {"select": "channel", "channelId": {"__rl": True, "mode": "name", "value": channel}, "text": text, "otherOptions": {}}
+
+
+def sheet_read(sheet_name, lookup_column=None, lookup_value=None):
+    p = {"documentId": {"__rl": True, "mode": "url", "value": "PASTE_YOUR_GOOGLE_SHEET_URL"},
+         "sheetName": {"__rl": True, "mode": "name", "value": sheet_name}, "options": {}}
+    if lookup_column:
+        p["filtersUI"] = {"values": [{"lookupColumn": lookup_column, "lookupValue": lookup_value}]}
+    return p
+
+
+def sheet_upsert(sheet_name, key):
+    return {"operation": "appendOrUpdate",
+            "documentId": {"__rl": True, "mode": "url", "value": "PASTE_YOUR_GOOGLE_SHEET_URL"},
+            "sheetName": {"__rl": True, "mode": "name", "value": sheet_name},
+            "columns": {"mappingMode": "autoMapInputData", "value": {}, "matchingColumns": [key], "schema": []},
+            "options": {}}
+
+
+def approval(to, subject, html, days=3):
+    return {"operation": "sendAndWait", "sendTo": to, "subject": subject, "message": html,
+            "approvalOptions": {"values": {"approvalType": "double"}},
+            "options": {"limitWaitTime": {"values": {"limitType": "afterTimeInterval", "resumeAmount": days, "resumeUnit": "days"}}}}

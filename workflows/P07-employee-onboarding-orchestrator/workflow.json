@@ -1,0 +1,396 @@
+{
+  "name": "P07 · Employee onboarding orchestrator (Jira checklist + calendar + welcome + Slack)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 👋 P07 · Day-1 ready, every time\nHR submits one form → a role-specific **Jira checklist** is created for IT/HR/manager, **day-1 calendar events** are booked, the new hire gets a welcome email, the team is told on Slack, and HR gets a summary with every link.",
+        "width": 580,
+        "height": 300,
+        "color": 7
+      },
+      "id": "48039e31-9baa-575d-94b5-1746f635caea",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "New joiner",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Personal email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Role",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Engineer"
+                  },
+                  {
+                    "option": "Sales"
+                  },
+                  {
+                    "option": "Designer"
+                  },
+                  {
+                    "option": "Operations"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Start date",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Manager email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Team Slack channel",
+              "placeholder": "#team-payments"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "23ddc4a3-0d02-5995-aad8-cfabdc16bf11",
+      "name": "New Joiner Form (HR)",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const f = $input.first().json;\nconst common = [['IT', 'Laptop + accessories ready'], ['IT', 'Google Workspace account + 2FA'], ['HR', 'Offer letter, NDA, PF/ESI forms signed'], ['Manager', 'Assign onboarding buddy'], ['Manager', '30-60-90 day plan shared']];\nconst byRole = { Engineer: [['IT', 'GitHub org + SSO access'], ['Manager', 'First good-first-issue ticket']], Sales: [['IT', 'CRM seat'], ['Manager', 'Shadow 3 customer calls']], Designer: [['IT', 'Figma seat'], ['Manager', 'Design system walkthrough']], Operations: [['IT', 'ERP access'], ['Manager', 'Process docs walkthrough']] };\nreturn [...common, ...(byRole[f.Role] || [])].map(([owner, task]) => ({ json: { owner, task, name: f['Full name'], role: f.Role, start: f['Start date'] } }));"
+      },
+      "id": "662611e2-d8f4-5407-80c7-83286b309d86",
+      "name": "Build Checklist",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_PROJECT_ID"
+        },
+        "issueType": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_TASK_ISSUE_TYPE_ID"
+        },
+        "summary": "=[Onboarding · {{ $json.name }}] {{ $json.owner }}: {{ $json.task }}",
+        "additionalFields": {
+          "description": "=New joiner {{ $json.name }} ({{ $json.role }}) starts {{ $json.start }}. Please complete before day 1.",
+          "labels": [
+            "onboarding"
+          ]
+        }
+      },
+      "id": "691d5825-1faf-54fc-8156-3ac4f26f4062",
+      "name": "Create Jira Task",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -140
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateIndividualFields",
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "785a22be-9a88-5f31-847a-dbb5820e37ff",
+      "name": "Collect Jira Keys",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const f = $('New Joiner Form (HR)').first().json;\nconst at = (h, m) => { const d = new Date(f['Start date']); d.setHours(h, m, 0, 0); return d.toISOString(); };\nreturn [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch with the team', 13, 0, 60], ['1:1 with manager', 16, 0, 30]]\n  .map(([t, h, m, dur]) => ({ json: { title: `${t}: ${f['Full name']}`, start: at(h, m), end: new Date(Date.parse(at(h, m)) + dur * 60000).toISOString(), attendee: f['Manager email'] } }));"
+      },
+      "id": "344c582a-8f5f-56e1-81fe-80c3b685aae6",
+      "name": "Day-1 Sessions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "start": "={{ $json.start }}",
+        "end": "={{ $json.end }}",
+        "additionalFields": {
+          "summary": "={{ $json.title }}",
+          "attendees": [
+            "={{ $json.attendee }}"
+          ]
+        }
+      },
+      "id": "cc624cc3-774c-56b3-9687-aac166d33841",
+      "name": "Book Calendar Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        660,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateIndividualFields",
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "htmlLink"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7b489ef3-3d7e-551c-a776-7593662387ae",
+      "name": "Collect Events",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        880,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "6a045e31-4404-51d7-a7c8-e880aeeebb41",
+      "name": "Wait for Both",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('New Joiner Form (HR)').first().json['Personal email'] }}",
+        "subject": "=Welcome aboard, {{ $('New Joiner Form (HR)').first().json['Full name'].split(' ')[0] }}! 🎉",
+        "emailType": "html",
+        "message": "=<p>We're thrilled you're joining us on <b>{{ $('New Joiner Form (HR)').first().json['Start date'] }}</b>.</p><p>Day 1: 10:00 welcome, 11:00 IT setup, 13:00 team lunch, 16:00 1:1 with your manager.</p><p>Bring a government ID and your bank details for payroll. See you soon!</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "fc1cedcd-0889-5a76-90fb-e8f85d4a777f",
+      "name": "Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1320,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $('New Joiner Form (HR)').first().json['Team Slack channel'] || '#general' }}"
+        },
+        "text": "=:wave: Please welcome *{{ $('New Joiner Form (HR)').first().json['Full name'] }}* ({{ $('New Joiner Form (HR)').first().json.Role }}) joining on {{ $('New Joiner Form (HR)').first().json['Start date'] }}!",
+        "otherOptions": {}
+      },
+      "id": "b1b64701-0e6f-5209-8979-74f98c291704",
+      "name": "Tell the Team",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1320,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=Onboarding ready: {{ $('New Joiner Form (HR)').first().json['Full name'] }}",
+        "emailType": "html",
+        "message": "=<p>Jira tasks: {{ $('Wait for Both').first().json.key.join(', ') }}</p><p>Calendar: {{ $('Wait for Both').first().json.htmlLink.length }} events booked.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "0149a16e-f9ba-52d4-b327-e875bb3c0d72",
+      "name": "Summary to HR",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1540,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "New Joiner Form (HR)": {
+      "main": [
+        [
+          {
+            "node": "Build Checklist",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Day-1 Sessions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Checklist": {
+      "main": [
+        [
+          {
+            "node": "Create Jira Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Jira Task": {
+      "main": [
+        [
+          {
+            "node": "Collect Jira Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day-1 Sessions": {
+      "main": [
+        [
+          {
+            "node": "Book Calendar Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book Calendar Event": {
+      "main": [
+        [
+          {
+            "node": "Collect Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Jira Keys": {
+      "main": [
+        [
+          {
+            "node": "Wait for Both",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Events": {
+      "main": [
+        [
+          {
+            "node": "Wait for Both",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wait for Both": {
+      "main": [
+        [
+          {
+            "node": "Welcome Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Tell the Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Summary to HR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

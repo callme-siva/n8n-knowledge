@@ -1,0 +1,634 @@
+{
+  "name": "P04 · Multi-touch sales follow-up sequence (Wait nodes + reply detection)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📬 P04 · Follow-ups that stop when they reply\nNew lead → email 1 → **wait 3 days** → replied? stop : email 2 → **wait 4 days** → replied? stop : final email. Every step updates the CRM sheet.\n⚠️ Long waits need a persistent DB (Postgres) and an always-on n8n.",
+        "width": 580,
+        "height": 300,
+        "color": 7
+      },
+      "id": "cf8d8006-0d0b-5e69-a933-0b1ee7a91974",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Request a callback",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company"
+            },
+            {
+              "fieldLabel": "What do you need?",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a8e0679d-d1b5-5678-9899-f5471471c53d",
+      "name": "New Lead",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "email",
+              "value": "={{ $json.Email.toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "company",
+              "value": "={{ $json.Company || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "need",
+              "value": "={{ $json['What do you need?'] || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "status",
+              "value": "email_1_sent",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "started",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5b144f62-c7d9-55fe-87c1-a28c8baf7ae0",
+      "name": "Lead Record",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "4ae7cf76-cadb-5a8e-880f-a75be36d53f2",
+      "name": "CRM: Add Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Lead Record').item.json.email }}",
+        "subject": "=Quick question about {{ $('Lead Record').item.json.company || 'your team' }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $('Lead Record').item.json.name }},</p><p>Thanks for reaching out about <i>{{ $('Lead Record').item.json.need }}</i>. Would a 20-minute call this week help? Here's my calendar: https://cal.com/your-link</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "086c0dca-731b-5eaa-8f67-71a5faba5bf9",
+      "name": "Email 1: Intro",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 3,
+        "unit": "days"
+      },
+      "id": "50a3e85c-a4c8-53c1-8d77-a06f3fc7b24e",
+      "name": "Wait 3 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "simple": true,
+        "filters": {
+          "q": "=from:{{ $('Lead Record').item.json.email }} after:{{ DateTime.fromISO($('Lead Record').item.json.started).toFormat('yyyy/MM/dd') }}"
+        }
+      },
+      "id": "1896639a-1e21-5de3-b544-4174de796229",
+      "name": "Check Reply #1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8fd7191f-535c-5bda-9b04-1d8d6f1ba8fb",
+      "name": "Replied? #1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Lead Record').item.json.email }}",
+        "subject": "=A 2-minute idea for {{ $('Lead Record').item.json.company || 'you' }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $('Lead Record').item.json.name }},</p><p>Teams like yours usually save 5–10 hours a week by automating the first step of <i>{{ $('Lead Record').item.json.need }}</i>. Happy to show you how. Just reply 'yes'.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "4a36a82e-1f02-5e3a-bc85-743993dbea48",
+      "name": "Email 2: Value",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1400,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 4,
+        "unit": "days"
+      },
+      "id": "aae33a25-664c-5b1d-a53b-8ee347c9351d",
+      "name": "Wait 4 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "simple": true,
+        "filters": {
+          "q": "=from:{{ $('Lead Record').item.json.email }} after:{{ DateTime.fromISO($('Lead Record').item.json.started).toFormat('yyyy/MM/dd') }}"
+        }
+      },
+      "id": "d61bac1e-e803-551f-bee5-34b2976aa660",
+      "name": "Check Reply #2",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1800,
+        100
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5a184f0a-7f16-576f-8312-353bffd6254a",
+      "name": "Replied? #2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Lead Record').item.json.email }}",
+        "subject": "=Should I close your file?",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $('Lead Record').item.json.name }}, I haven't heard back, so I'll assume the timing isn't right. If that changes, just reply to this email. All the best!</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "e7806ff4-eb8f-5d24-8773-9bd7d8d2294d",
+      "name": "Email 3: Close the Loop",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "email",
+              "value": "={{ $('Lead Record').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "replied",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "updated",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f4710d88-d474-504c-acfc-d78ef494f370",
+      "name": "Status: Replied",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1400,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "email",
+              "value": "={{ $('Lead Record').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "no_reply_closed",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "updated",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3c06505e-9bbb-5860-a1d6-ae2cc22956cb",
+      "name": "Status: Sequence Done",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2400,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "383b06f8-1479-5986-ba98-3c822dbb2a71",
+      "name": "CRM: Update",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#sales"
+        },
+        "text": "=:tada: {{ $json.email }} replied. Take it from here.",
+        "otherOptions": {}
+      },
+      "id": "4948ae5c-7c2a-5876-b3c1-da1b05f93dce",
+      "name": "Alert Sales: Reply!",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2800,
+        -140
+      ]
+    }
+  ],
+  "connections": {
+    "New Lead": {
+      "main": [
+        [
+          {
+            "node": "Lead Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Record": {
+      "main": [
+        [
+          {
+            "node": "CRM: Add Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: Add Lead": {
+      "main": [
+        [
+          {
+            "node": "Email 1: Intro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email 1: Intro": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Days": {
+      "main": [
+        [
+          {
+            "node": "Check Reply #1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Reply #1": {
+      "main": [
+        [
+          {
+            "node": "Replied? #1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replied? #1": {
+      "main": [
+        [
+          {
+            "node": "Status: Replied",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email 2: Value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email 2: Value": {
+      "main": [
+        [
+          {
+            "node": "Wait 4 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 4 Days": {
+      "main": [
+        [
+          {
+            "node": "Check Reply #2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Reply #2": {
+      "main": [
+        [
+          {
+            "node": "Replied? #2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replied? #2": {
+      "main": [
+        [
+          {
+            "node": "Status: Replied",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email 3: Close the Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email 3: Close the Loop": {
+      "main": [
+        [
+          {
+            "node": "Status: Sequence Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status: Sequence Done": {
+      "main": [
+        [
+          {
+            "node": "CRM: Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status: Replied": {
+      "main": [
+        [
+          {
+            "node": "CRM: Update",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Alert Sales: Reply!",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

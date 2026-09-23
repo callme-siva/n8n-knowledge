@@ -1,0 +1,156 @@
+{
+  "name": "Q08 · Auto-post new articles to a Telegram channel (dedupe across runs)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📣 Q08 · Channel autopilot\nEvery 30 min: reads feeds, uses **Remove Duplicates → seen in previous executions** so each link is posted exactly once, ever.",
+        "width": 460,
+        "height": 300,
+        "color": 7
+      },
+      "id": "8d70cc7e-99e7-5bda-b84b-9faf270cce7d",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "265cf641-615e-595b-b605-01cf6341f80b",
+      "name": "Every 30 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://blog.n8n.io/rss/",
+        "options": {}
+      },
+      "id": "ab789d0b-60fc-5931-9b99-b36ab02ccf70",
+      "name": "Read Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.link }}",
+        "options": {
+          "historySize": 5000
+        }
+      },
+      "id": "9d1baf6d-75ff-5539-a838-b3a05d8d9a57",
+      "name": "Only New Links",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "id": "656400d8-c0a1-527e-b270-a0ec81e2690d",
+      "name": "Max 5 per Run",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "@your_channel_name",
+        "text": "=📰 <b>{{ $json.title }}</b>\n{{ ($json.contentSnippet || '').slice(0, 200) }}…\n{{ $json.link }}",
+        "additionalFields": {
+          "parse_mode": "HTML",
+          "appendAttribution": false
+        }
+      },
+      "id": "6dcb8d34-e24a-5284-9812-097332aeb697",
+      "name": "Post to Channel",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every 30 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Read Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Feed": {
+      "main": [
+        [
+          {
+            "node": "Only New Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only New Links": {
+      "main": [
+        [
+          {
+            "node": "Max 5 per Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Max 5 per Run": {
+      "main": [
+        [
+          {
+            "node": "Post to Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

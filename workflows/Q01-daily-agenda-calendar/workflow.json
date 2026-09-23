@@ -1,0 +1,140 @@
+{
+  "name": "Q01 · Daily agenda + free slots from Google Calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📅 Q01 · Start the day knowing your time\nToday's meetings, total meeting load, and **free focus slots** ≥ 45 min between 9:00 and 18:00.",
+        "width": 440,
+        "height": 300,
+        "color": 7
+      },
+      "id": "bb8702ec-40d0-5de2-a580-149cd586b0e3",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 7 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "3a89ae39-1844-52ba-9e54-ef6d44a8817c",
+      "name": "Weekdays 7:30",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $today }}",
+        "timeMax": "={{ $today.plus({ days: 1 }) }}",
+        "options": {
+          "singleEvents": true,
+          "orderBy": "startTime"
+        }
+      },
+      "id": "b1058a1b-801f-5730-9a2a-d5f0b5ece2e6",
+      "name": "Today's Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        220,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const DAY_START = 9, DAY_END = 18, MIN_FOCUS = 45; // hours, hours, minutes\nconst ev = $input.all().map(i => i.json).filter(e => e.start?.dateTime && e.status !== 'cancelled');\nconst t = d => new Date(d);\nconst fmt = d => t(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });\nconst mins = ev.reduce((s, e) => s + (t(e.end.dateTime) - t(e.start.dateTime)) / 60000, 0);\n// find gaps between meetings inside working hours\nconst base = new Date(); base.setHours(0, 0, 0, 0);\nlet cursor = new Date(base.getTime() + DAY_START * 3600e3); const end = new Date(base.getTime() + DAY_END * 3600e3);\nconst free = [];\nfor (const e of ev) { const s = t(e.start.dateTime); if (s - cursor >= MIN_FOCUS * 60000) free.push([cursor, s]); if (t(e.end.dateTime) > cursor) cursor = t(e.end.dateTime); }\nif (end - cursor >= MIN_FOCUS * 60000) free.push([cursor, end]);\nconst rows = ev.map(e => `<tr><td>${fmt(e.start.dateTime)}–${fmt(e.end.dateTime)}</td><td>${e.summary || '(no title)'}</td><td>${(e.attendees || []).length}</td></tr>`).join('');\nconst load = mins > 300 ? '🔴 heavy' : mins > 180 ? '🟠 busy' : '🟢 light';\nreturn [{ json: { subject: `📅 ${ev.length} meetings · ${Math.round(mins / 60 * 10) / 10} h · ${load}`,\n  html: `<h3>Meetings</h3>${ev.length ? `<table border=1 cellpadding=6 style=\"border-collapse:collapse\"><tr><th>Time</th><th>Meeting</th><th>People</th></tr>${rows}</table>` : '<p>No meetings 🎉</p>'}`\n      + `<h3>Focus slots (≥ ${MIN_FOCUS} min)</h3><ul>${free.map(([a, b]) => `<li>${fmt(a)}–${fmt(b)}</li>`).join('') || '<li>None. Consider declining something.</li>'}</ul>` } }];"
+      },
+      "id": "c27a5b31-452b-5369-a3c9-63726235e2da",
+      "name": "Build Agenda",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "53d553c3-7cfb-5c45-b56a-d057d031b9e1",
+      "name": "Email Me",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Weekdays 7:30": {
+      "main": [
+        [
+          {
+            "node": "Today's Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Today's Events": {
+      "main": [
+        [
+          {
+            "node": "Build Agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Agenda": {
+      "main": [
+        [
+          {
+            "node": "Email Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

@@ -1,0 +1,259 @@
+{
+  "name": "Q07 · Gmail AI auto-labeler (Text Classifier)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🏷️ Q07 · Inbox zero, assisted\nEvery 5 min: classifies new emails into Billing / Support / Sales lead / Newsletter with Gemini and applies a Gmail label. Nothing is sent or deleted.",
+        "width": 460,
+        "height": 300,
+        "color": 7
+      },
+      "id": "94ee9bd8-c6fd-5f29-bf7b-76ed91afcdda",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "simple": true,
+        "filters": {
+          "readStatus": "unread",
+          "q": "-category:promotions -label:ai-labeled"
+        },
+        "options": {}
+      },
+      "id": "d77723c8-80dd-5bed-b2af-777aafa8ae75",
+      "name": "New Unread Email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "inputText": "=From: {{ $json.From }}\nSubject: {{ $json.Subject }}\n\n{{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Billing",
+              "description": "Invoices, payments, refunds, receipts, subscription charges"
+            },
+            {
+              "category": "Support",
+              "description": "A customer or user reporting a problem or asking how to do something"
+            },
+            {
+              "category": "Sales lead",
+              "description": "Someone interested in buying, requesting a demo, pricing or a quote"
+            },
+            {
+              "category": "Newsletter",
+              "description": "Bulk updates, digests, marketing, notifications from tools"
+            }
+          ]
+        },
+        "options": {
+          "fallback": "other"
+        }
+      },
+      "id": "732d5139-24cd-524f-945b-63340bb8dd11",
+      "name": "Classify",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "58be2c3e-42a4-5b3a-8c33-7a94e5ca7fe3",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "REPLACE_LABEL_ID_BILLING",
+          "REPLACE_LABEL_ID_AI_LABELED"
+        ]
+      },
+      "id": "79fa79fb-0871-59a9-b119-9ada8199ed70",
+      "name": "Label: Billing",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "REPLACE_LABEL_ID_SUPPORT",
+          "REPLACE_LABEL_ID_AI_LABELED"
+        ]
+      },
+      "id": "5649d374-b6fb-5c2a-8a81-0e74d01849b4",
+      "name": "Label: Support",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        -130
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "REPLACE_LABEL_ID_SALES",
+          "REPLACE_LABEL_ID_AI_LABELED"
+        ]
+      },
+      "id": "604c2e1c-04f3-52ed-a400-c68babae492e",
+      "name": "Label: Sales lead",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "REPLACE_LABEL_ID_NEWSLETTER",
+          "REPLACE_LABEL_ID_AI_LABELED"
+        ]
+      },
+      "id": "5c3d4c6d-26c8-544e-b7e2-8238e0aa8aab",
+      "name": "Label: Newsletter",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        130
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "REPLACE_LABEL_ID_OTHER",
+          "REPLACE_LABEL_ID_AI_LABELED"
+        ]
+      },
+      "id": "6cab05a6-7185-5b89-ab67-0efccba52fcf",
+      "name": "Label: Other",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Classify": {
+      "main": [
+        [
+          {
+            "node": "Label: Billing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Sales lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Other",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Unread Email": {
+      "main": [
+        [
+          {
+            "node": "Classify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classify",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

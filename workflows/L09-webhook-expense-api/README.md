@@ -32,8 +32,8 @@ flowchart TB
   n6["400 Bad Request"]:::http
   n0 --> n1
   n1 --> n2
-  n2 -->|true| n3
-  n2 -->|false| n6
+  n2 -->|"true"| n3
+  n2 -->|"false"| n6
   n3 --> n4
   n4 --> n5
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937

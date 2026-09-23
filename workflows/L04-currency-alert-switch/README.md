@@ -36,12 +36,12 @@ flowchart TB
   n0 --> n1
   n1 --> n2
   n2 --> n3
-  n3 -->|true| n4
-  n3 -->|false| n9
+  n3 -->|"true"| n4
+  n3 -->|"false"| n9
   n4 --> n5
-  n5 -->|High| n6
-  n5 -->|Low| n7
-  n5 -->|Normal| n8
+  n5 -->|"High"| n6
+  n5 -->|"Low"| n7
+  n5 -->|"Normal"| n8
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
   classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937

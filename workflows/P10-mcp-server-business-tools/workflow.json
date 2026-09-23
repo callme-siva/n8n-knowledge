@@ -1,0 +1,152 @@
+{
+  "name": "P10 · MCP server: expose company tools to Claude, ChatGPT & IDE agents",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔌 P10 · n8n as an MCP server\nAny MCP client (Claude Desktop, Claude Code, Cursor, ChatGPT connectors…) can call these tools:\n• lookup_customer (sub-workflow P10a)\n• get_exchange_rate (HTTP)\n• calculator\nProtect it with **Bearer auth**. Copy the *Production URL* into your MCP client.",
+        "width": 560,
+        "height": 300,
+        "color": 7
+      },
+      "id": "62ab5ac0-99b0-56be-a504-a6ac2f22d88d",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "bearerAuth",
+        "path": "business-tools",
+        "instructions": "Company tools. Use lookup_customer for any question about a customer's plan, billing status or recent tickets. Use get_exchange_rate for currency conversion and calculator for arithmetic."
+      },
+      "id": "97b1e5f4-4b8a-5923-ade6-b3fcd797ba54",
+      "name": "MCP Server Trigger",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "description": "Look up a customer by email. Returns plan, MRR, status and last ticket, or found=false.",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_P10a_WORKFLOW_ID"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $fromAI('email', 'Customer email address', 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "type": "string",
+              "required": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "removed": false
+            }
+          ]
+        }
+      },
+      "id": "9b6b44c0-89ee-5e04-8abb-ea7a06f57f05",
+      "name": "lookup_customer",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -60,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Latest exchange rates for a base currency (e.g. USD). Returns a map of currency → rate.",
+        "url": "https://open.er-api.com/v6/latest/{base}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "base",
+              "description": "3-letter ISO currency code",
+              "type": "string"
+            }
+          ]
+        },
+        "optimizeResponse": true,
+        "dataField": "rates",
+        "fieldsToInclude": "all"
+      },
+      "id": "0d9ac6f4-d7b7-5c58-844d-0b7b80d94efe",
+      "name": "get_exchange_rate",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        220
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "9ac616b3-37f1-5cff-81b3-3d22c6616803",
+      "name": "calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        260,
+        220
+      ]
+    }
+  ],
+  "connections": {
+    "lookup_customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_exchange_rate": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

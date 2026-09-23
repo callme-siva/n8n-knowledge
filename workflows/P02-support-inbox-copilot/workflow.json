@@ -1,0 +1,442 @@
+{
+  "name": "P02 · Support inbox copilot (classify → answer from FAQ → Gmail draft, or escalate)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🎧 P02 · AI drafts, humans send\nClassifies each support email, answers **only from your FAQ sheet**, scores its own confidence, and either creates a **Gmail draft** for an agent to review or escalates to Slack. It never sends by itself.",
+        "width": 560,
+        "height": 300,
+        "color": 7
+      },
+      "id": "5d2a6034-13e7-5de9-8b64-03841077a97e",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "simple": true,
+        "filters": {
+          "readStatus": "unread",
+          "q": "to:support -label:ai-drafted"
+        },
+        "options": {}
+      },
+      "id": "edebba5e-6507-52c9-8be8-4861e015d8fc",
+      "name": "Support Email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "inputText": "=Subject: {{ $json.Subject }}\n\n{{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Question",
+              "description": "How-to, pricing, policy, account or feature questions that documentation could answer"
+            },
+            {
+              "category": "Problem",
+              "description": "Something is broken, an error, a failed payment or a missing order"
+            },
+            {
+              "category": "Spam",
+              "description": "Marketing, cold outreach, automated notifications"
+            }
+          ]
+        },
+        "options": {
+          "fallback": "other"
+        }
+      },
+      "id": "824fc9e3-b514-51e5-abfb-17ce9cc38548",
+      "name": "Triage",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "84b38a43-4bdc-526a-9d59-ae7f089d8403",
+      "name": "Gemini (triage)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        220,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "FAQ"
+        },
+        "options": {}
+      },
+      "id": "d53a6e1e-fd10-5151-bb10-790ebb63f474",
+      "name": "Load FAQ",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        460,
+        -60
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "faq",
+        "options": {}
+      },
+      "id": "ace58341-bc77-53c3-83d1-aa5886db549f",
+      "name": "FAQ as Text",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "hasOutputParser": true,
+        "text": "=FAQ (question | answer):\n{{ $json.faq.map(f => `${f.question} | ${f.answer}`).join('\\n') }}\n\nCustomer email:\nFrom: {{ $('Support Email').item.json.From }}\nSubject: {{ $('Support Email').item.json.Subject }}\n{{ $('Support Email').item.json.snippet }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a support agent. Answer ONLY using the FAQ. If the FAQ doesn't cover it, set needs_human=true. Be warm and concise (under 120 words), sign as 'Support team'. confidence is 0-1: how fully the FAQ answers the question."
+            }
+          ]
+        }
+      },
+      "id": "da1f031b-dc56-5876-b1b6-7510cd8eceae",
+      "name": "Draft Answer",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        880,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "31d70559-82bf-5499-a8f1-63db006ce768",
+      "name": "Gemini (answer)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        840,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"reply\": \"Hi Priya, you can change your plan from Settings \\u2192 Billing \\u2026\",\n  \"confidence\": 0.86,\n  \"needs_human\": false,\n  \"faq_used\": \"How do I change my plan?\"\n}"
+      },
+      "id": "ee8cc346-7018-5633-bf1a-7d482b69c6cf",
+      "name": "Answer Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.output.confidence }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              },
+              "rightValue": 0.75
+            },
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.output.needs_human }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b1ef7a14-b6b8-5f1b-8fcd-8c767cd9a440",
+      "name": "Confident?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Re: {{ $('Support Email').item.json.Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output.reply }}",
+        "options": {
+          "threadId": "={{ $('Support Email').item.json.threadId }}",
+          "sendTo": "={{ $('Support Email').item.json.From }}"
+        }
+      },
+      "id": "9432f3fa-a298-523d-934a-563f7a1224ed",
+      "name": "Create Gmail Draft",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1320,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Support Email').item.json.id }}",
+        "labelIds": [
+          "REPLACE_LABEL_ID_AI_DRAFTED"
+        ]
+      },
+      "id": "0ebf587d-0456-52c4-bdce-9e7f7fedc6e0",
+      "name": "Mark ai-drafted",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1540,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#support"
+        },
+        "text": "=:rotating_light: *Needs a human*\n*From:* {{ $('Support Email').item.json.From }}\n*Subject:* {{ $('Support Email').item.json.Subject }}\n>{{ $('Support Email').item.json.snippet }}",
+        "otherOptions": {}
+      },
+      "id": "193392a1-ea2c-5d89-a17c-01fd81453d73",
+      "name": "Escalate to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1320,
+        120
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "7641aab0-d0a3-57d6-990b-e8dc8db4e2cf",
+      "name": "Ignore Spam",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        460,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Support Email": {
+      "main": [
+        [
+          {
+            "node": "Triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage": {
+      "main": [
+        [
+          {
+            "node": "Load FAQ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Escalate to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore Spam",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Escalate to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load FAQ": {
+      "main": [
+        [
+          {
+            "node": "FAQ as Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQ as Text": {
+      "main": [
+        [
+          {
+            "node": "Draft Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Answer": {
+      "main": [
+        [
+          {
+            "node": "Confident?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confident?": {
+      "main": [
+        [
+          {
+            "node": "Create Gmail Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Escalate to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Gmail Draft": {
+      "main": [
+        [
+          {
+            "node": "Mark ai-drafted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini (triage)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Triage",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini (answer)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Draft Answer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Draft Answer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

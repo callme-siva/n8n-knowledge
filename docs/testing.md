@@ -24,7 +24,7 @@ python3 tools/validate.py
 Checks every `workflow.json` for: valid JSON, unique node names, connections pointing to real nodes, no credentials, no pinned data, no personal emails, has a trigger, has a README. This runs automatically on every push and PR (`.github/workflows/validate.yml`).
 
 ## Level 3: check against real n8n
-Installs a real n8n and checks every node **type**, **typeVersion**, **parameter** and **option** against n8n's own node definitions. This catches typos that the n8n UI would silently drop.
+Installs a real n8n and checks every node **type**, **typeVersion**, **parameter**, **option** and **dropdown value** against n8n's own node definitions. This catches typos that the n8n UI would silently drop.
 ```bash
 mkdir -p /tmp/n8n-check && cd /tmp/n8n-check && npm init -y && npm i n8n
 ```
@@ -39,7 +39,7 @@ mkdir -p /tmp/imp && for f in workflows/*/workflow.json; do cp "$f" "/tmp/imp/$(
 N8N_USER_FOLDER=/tmp/n8n-test npx n8n import:workflow --separate --input=/tmp/imp
 ```
 
-**Last full run:** n8n 2.40.5 → 23/23 imported, 0 node/parameter issues.
+**Last full run:** n8n 2.40.5 → 44/44 imported; 0 issues across node types, versions, parameter names, option names and dropdown values.
 
 ## Level 4: end-to-end (optional)
 Run each workflow once with real credentials and the inputs from [sample-data.md](sample-data.md). Record the result in your PR description.

@@ -37,8 +37,8 @@ flowchart TB
   n1 --> n4
   n4 --> n5
   n5 --> n6
-  n6 -->|true| n7
-  n6 -->|false| n9
+  n6 -->|"true"| n7
+  n6 -->|"false"| n9
   n7 --> n8
   n2 -.->|languageModel| n1
   n3 -.->|outputParser| n1

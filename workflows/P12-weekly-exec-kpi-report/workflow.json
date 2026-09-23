@@ -1,0 +1,477 @@
+{
+  "name": "P12 · Weekly executive KPI report (Jira + GitHub + Sheets → metrics → chart → AI narrative)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📊 P12 · The Monday report nobody has to write\nPulls **delivery** (Jira), **engineering** (GitHub) and **revenue** (Sheets) in parallel → computes KPIs and week-over-week change (last week stored in static data) → bar chart → Gemini writes a 5-bullet narrative with risks → one HTML email.",
+        "width": 600,
+        "height": 300,
+        "color": 7
+      },
+      "id": "6feadf4b-8583-591b-928a-ccb25b32618c",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "d8a564b3-f6b7-562a-97c9-f7bf6511bbf8",
+      "name": "Mondays 8:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "jira_project",
+              "value": "SCRUM",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "github_repo",
+              "value": "n8n-io/n8n",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "email_to",
+              "value": "you@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "632506bb-1c17-585f-a272-b4825288dec0",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "=project = {{ $('⚙️ Config').item.json.jira_project }} AND statusCategory = Done AND resolved >= -7d",
+          "fields": "key,issuetype,priority"
+        }
+      },
+      "id": "04b46996-80d0-525d-bff0-8d92a5838ad2",
+      "name": "Jira: Done Last 7d",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -160
+      ],
+      "alwaysOutputData": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/search/issues",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=repo:{{ $('⚙️ Config').item.json.github_repo }} is:pr is:merged merged:>={{ $now.minus({ days: 7 }).toISODate() }}"
+            },
+            {
+              "name": "per_page",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "223d953a-cce2-505f-b02c-917db0d1a577",
+      "name": "GitHub: Merged PRs 7d",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sales"
+        },
+        "options": {}
+      },
+      "id": "0f4851d5-e73a-5dba-88d6-87e29951d3ee",
+      "name": "Sheets: Revenue",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        160
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "issues",
+        "options": {}
+      },
+      "id": "2b495c42-ae1d-5df3-a826-9624fa91e97d",
+      "name": "Count Jira",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const since = Date.now() - 7 * 86400000, prevSince = since - 7 * 86400000;\nlet rev = 0, prev = 0, orders = 0;\nfor (const { json: r } of $input.all()) { const t = Date.parse(r.date); if (t >= since) { rev += +r.revenue || 0; orders += +r.orders || 0; } else if (t >= prevSince) prev += +r.revenue || 0; }\nreturn [{ json: { revenue: Math.round(rev), revenue_prev: Math.round(prev), orders } }];"
+      },
+      "id": "a22e4bc4-547b-50dd-90a6-bad3e6231db4",
+      "name": "Sum Revenue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3,
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "1701a193-7b27-5d6a-add0-70bb75357ae4",
+      "name": "Join Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst state = $getWorkflowStaticData('global');\nconst issues = (j.issues || []).filter(i => i.key);\nconst k = { stories_done: issues.length, bugs_fixed: issues.filter(i => (i.fields?.issuetype?.name || '').toLowerCase() === 'bug').length,\n  prs_merged: j.total_count ?? 0, revenue: j.revenue ?? 0, orders: j.orders ?? 0 };\nconst prev = state.last || {};\nconst delta = key => prev[key] ? Math.round((k[key] - prev[key]) / prev[key] * 100) : null;\nconst rows = Object.keys(k).map(key => ({ key, value: k[key], prev: prev[key] ?? '–', change: delta(key) }));\nstate.last = k;\nreturn [{ json: { kpis: k, rows, labels: Object.keys(k), values: Object.values(k), revenue_prev: j.revenue_prev } }];"
+      },
+      "id": "b71ea042-df8c-571b-a5ea-9b5c667fd4c7",
+      "name": "Compute KPIs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chartType": "bar",
+        "labelsMode": "array",
+        "labelsArray": "={{ $json.labels.slice(0, 3) }}",
+        "data": "={{ $json.values.slice(0, 3) }}",
+        "output": "chart",
+        "chartOptions": {
+          "width": 600,
+          "height": 280,
+          "backgroundColor": "#ffffff"
+        },
+        "datasetOptions": {
+          "label": "Delivery this week",
+          "backgroundColor": "#2563EB"
+        }
+      },
+      "id": "317d51d3-efe7-5ed8-baa7-f330947b9e0c",
+      "name": "Chart",
+      "type": "n8n-nodes-base.quickChart",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=KPIs this week vs last week (JSON rows: key, value, prev, change%):\n{{ JSON.stringify($('Compute KPIs').item.json.rows) }}\nRevenue the week before: {{ $('Compute KPIs').item.json.revenue_prev }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a chief of staff writing to the CEO. Write exactly 5 HTML <li> bullets: 2 wins, 2 risks or concerns, 1 recommended action. Use the numbers given; never invent numbers. Plain language, no jargon."
+            }
+          ]
+        }
+      },
+      "id": "595817ac-7354-5f77-b7da-8326da7f68cf",
+      "name": "Write Narrative",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1320,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "bc5b6f03-5960-5c96-b9c2-823771b90439",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('⚙️ Config').item.json.email_to }}",
+        "subject": "=Weekly KPIs · {{ $now.toFormat('dd LLL') }}",
+        "emailType": "html",
+        "message": "=<h2>This week</h2><ul>{{ $('Write Narrative').item.json.text }}</ul><table border=1 cellpadding=6 style=\"border-collapse:collapse\"><tr><th>KPI</th><th>This week</th><th>Last week</th><th>Δ</th></tr>{{ $('Compute KPIs').item.json.rows.map(r => `<tr><td>${r.key.replace(/_/g, ' ')}</td><td>${r.value}</td><td>${r.prev}</td><td>${r.change === null ? '–' : (r.change >= 0 ? '▲ ' : '▼ ') + r.change + '%'}</td></tr>`).join('') }}</table><p>Chart attached.</p>",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "chart"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ab2194e1-bfd5-57b4-8400-d87cc7b28cb6",
+      "name": "Email CEO",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "e290b650-23d8-557f-9150-f03cd242d538",
+      "name": "Chart + Narrative",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1440,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Mondays 8:00": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Jira: Done Last 7d",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GitHub: Merged PRs 7d",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets: Revenue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira: Done Last 7d": {
+      "main": [
+        [
+          {
+            "node": "Count Jira",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count Jira": {
+      "main": [
+        [
+          {
+            "node": "Join Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub: Merged PRs 7d": {
+      "main": [
+        [
+          {
+            "node": "Join Sources",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Sheets: Revenue": {
+      "main": [
+        [
+          {
+            "node": "Sum Revenue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sum Revenue": {
+      "main": [
+        [
+          {
+            "node": "Join Sources",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Join Sources": {
+      "main": [
+        [
+          {
+            "node": "Compute KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute KPIs": {
+      "main": [
+        [
+          {
+            "node": "Chart",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Write Narrative",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chart": {
+      "main": [
+        [
+          {
+            "node": "Chart + Narrative",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Narrative": {
+      "main": [
+        [
+          {
+            "node": "Chart + Narrative",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Chart + Narrative": {
+      "main": [
+        [
+          {
+            "node": "Email CEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write Narrative",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

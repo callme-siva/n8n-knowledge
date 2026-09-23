@@ -2,7 +2,7 @@
 
 # 🏗️ Architecture guide
 
-**How n8n works under the hood, and the design patterns used across the 22 lessons.**
+**How n8n works under the hood, and the design patterns used across all 42 workflows.**
 
 </div>
 
@@ -278,5 +278,15 @@ flowchart LR
 | Error workflow | L19 |
 | Sub-workflows | L20 |
 | Stateful monitoring | L21 |
+| Long waits between steps (Wait node) | P04 |
+| Batches + checkpoints + resume | P05 |
+| Multi-level approval with timeouts | P06, P01 |
+| Fan-out / fan-in (Merge) | P07, P12 |
+| Change detection with hashes | P08 |
+| Dedupe across executions | Q08, P01, P03 |
+| Research agent (search + read + cite) | P09 |
+| MCP server (tools for AI assistants) | P10 |
+| PII redaction + AI gateway | P11 |
+| Text Classifier / Information Extractor | Q07, P01, P02, P05 |
 
 <p align="center"><a href="../README.md">← Back to the learning path</a></p>

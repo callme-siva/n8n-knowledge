@@ -4,8 +4,9 @@ const fs=require('fs'),path=require('path');
 const pkgs={'n8n-nodes-base':'n8n-nodes-base','@n8n/n8n-nodes-langchain':'@n8n/n8n-nodes-langchain'};
 const reg={};
 for(const [prefix,p] of Object.entries(pkgs)){
-  const dir=path.dirname(require.resolve(p+'/package.json'));
-  const pj=require(p+'/package.json');
+  const pkgJson=require.resolve(p+'/package.json',{paths:[process.cwd()]});
+  const dir=path.dirname(pkgJson);
+  const pj=require(pkgJson);
   for(const f of pj.n8n.nodes){
     try{const m=require(path.join(dir,f));for(const C of Object.values(m)){if(typeof C!=='function')continue;let inst;try{inst=new C()}catch{continue}
       const descs=[];
@@ -24,6 +25,11 @@ for(const f of process.argv.slice(2)){
     const d=t[String(n.typeVersion)];
     if(!d){errs.push(`${n.name}: version ${n.typeVersion} not in [${Object.keys(t)}]`);continue;}
     const props=new Set(d.properties.map(p=>p.name));
+    for(const [k,v] of Object.entries(n.parameters)){
+      const optDefs=d.properties.filter(p=>p.name===k&&p.type==='options');
+      if(optDefs.length&&typeof v==='string'&&!v.startsWith('=')){const allowed=new Set(optDefs.flatMap(p=>(p.options||[]).map(o=>o.value)));
+        if(allowed.size&&!allowed.has(v))errs.push(`${n.name}: '${k}' = '${v}' not in [${[...allowed].slice(0,12).join(', ')}]`);}
+    }
     for(const k of Object.keys(n.parameters)){ if(!props.has(k)&&k!=='pollTimes'){errs.push(`${n.name}: unknown param '${k}'`);continue;}
       const defs=d.properties.filter(p=>p.name===k&&p.type==='collection');
       const v=n.parameters[k];

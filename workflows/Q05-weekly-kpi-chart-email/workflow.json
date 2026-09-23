@@ -1,0 +1,181 @@
+{
+  "name": "Q05 · Weekly KPI chart email (Sheets → QuickChart → Gmail)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📈 Q05 · A chart in the inbox\nReads daily numbers from a sheet, groups them by week, draws a chart and emails it every Monday. No BI tool needed.",
+        "width": 440,
+        "height": 300,
+        "color": 7
+      },
+      "id": "bc5f6858-1def-547f-b478-7a6128e083fd",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "6fabb534-8102-5aa2-8f33-a13894d948fd",
+      "name": "Mondays 8:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sales"
+        },
+        "options": {}
+      },
+      "id": "0973bcb3-9a02-5396-b5f6-083bfe7b82a7",
+      "name": "Read Daily Sales",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sheet columns: date (YYYY-MM-DD) | revenue | orders\nconst weekKey = d => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.toISOString().slice(0, 10); };\nconst weeks = {};\nfor (const { json: r } of $input.all()) { if (!r.date) continue; const k = weekKey(r.date); weeks[k] ??= { revenue: 0, orders: 0 }; weeks[k].revenue += Number(r.revenue) || 0; weeks[k].orders += Number(r.orders) || 0; }\nconst keys = Object.keys(weeks).sort().slice(-8);\nconst rev = keys.map(k => Math.round(weeks[k].revenue));\nconst last = rev.at(-1) || 0, prev = rev.at(-2) || 0;\nconst change = prev ? Math.round((last - prev) / prev * 1000) / 10 : 0;\nreturn [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, change } }];"
+      },
+      "id": "4985390a-0deb-5388-829a-cffc67f333a7",
+      "name": "Group by Week",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chartType": "bar",
+        "labelsMode": "array",
+        "labelsArray": "={{ $json.labels }}",
+        "data": "={{ $json.revenue }}",
+        "output": "chart",
+        "chartOptions": {
+          "width": 700,
+          "height": 320,
+          "backgroundColor": "#ffffff"
+        },
+        "datasetOptions": {
+          "label": "Weekly revenue (₹)",
+          "backgroundColor": "#7C3AED"
+        }
+      },
+      "id": "240776a2-8442-5f88-8cd0-60f62bc059ab",
+      "name": "Draw Chart",
+      "type": "n8n-nodes-base.quickChart",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=Weekly revenue ₹{{ $json.last.toLocaleString('en-IN') }} ({{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%)",
+        "emailType": "html",
+        "message": "=<p>Last week: <b>₹{{ $json.last.toLocaleString('en-IN') }}</b>, previous: ₹{{ $json.prev.toLocaleString('en-IN') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "chart"
+              }
+            ]
+          }
+        }
+      },
+      "id": "372a551c-a69c-5288-8fb9-774441f71a82",
+      "name": "Email Report",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Mondays 8:00": {
+      "main": [
+        [
+          {
+            "node": "Read Daily Sales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Daily Sales": {
+      "main": [
+        [
+          {
+            "node": "Group by Week",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group by Week": {
+      "main": [
+        [
+          {
+            "node": "Draw Chart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draw Chart": {
+      "main": [
+        [
+          {
+            "node": "Email Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

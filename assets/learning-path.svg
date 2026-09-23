@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1010" width="1280" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F172A"/><stop offset="1" stop-color="#1E1B4B"/></linearGradient><pattern id="g" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#1E293B" stroke-width="1"/></pattern></defs>
+<rect width="1280" height="1010" rx="20" fill="url(#bg)"/><rect width="1280" height="1010" rx="20" fill="url(#g)" opacity=".7"/>
+<text x="56" y="62" font-size="30" font-weight="800" fill="#F8FAFC">Learning roadmap</text>
+<text x="56" y="90" font-size="15" fill="#94A3B8">Core path in order · Quick wins any time after L07 · Real-world projects after L15</text>
+<rect x="740" y="52" width="26" height="8" rx="4" fill="#22C55E"/><text x="774" y="61" font-size="13" fill="#E2E8F0">Basics</text>
+<rect x="910" y="52" width="26" height="8" rx="4" fill="#EAB308"/><text x="944" y="61" font-size="13" fill="#E2E8F0">Integrations</text>
+<rect x="1080" y="52" width="26" height="8" rx="4" fill="#F97316"/><text x="1114" y="61" font-size="13" fill="#E2E8F0">AI</text>
+<rect x="740" y="82" width="26" height="8" rx="4" fill="#EF4444"/><text x="774" y="91" font-size="13" fill="#E2E8F0">Multi-agent</text>
+<rect x="910" y="82" width="26" height="8" rx="4" fill="#0EA5E9"/><text x="944" y="91" font-size="13" fill="#E2E8F0">Quick wins</text>
+<rect x="1080" y="82" width="26" height="8" rx="4" fill="#A855F7"/><text x="1114" y="91" font-size="13" fill="#E2E8F0">Projects</text>
+<text x="56" y="140" font-size="14" font-weight="700" fill="#F8FAFC" letter-spacing="2">CORE PATH · 22 LESSONS</text>
+<path d="M90.0,190 L200.0,190 L310.0,190 L420.0,190 L530.0,190 L640.0,190" stroke="#22C55E" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+<path d="M640.0,190 L750.0,190 L860.0,190 L970.0,190 L1080.0,190 L1190.0,190" stroke="#EAB308" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+<path d="M1190.0,190 L1240,190 L1240,380 L1190.0,380 L1080.0,380 L970.0,380 L860.0,380 L750.0,380" stroke="#F97316" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+<path d="M750.0,380 L640.0,380 L530.0,380 L420.0,380 L310.0,380 L200.0,380 L90.0,380" stroke="#EF4444" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+<circle cx="90.0" cy="190" r="19" fill="#0B1220" stroke="#22C55E" stroke-width="4"/>
+<text x="90.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L01</text>
+<text x="90.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Hello n8n</text>
+<circle cx="200.0" cy="190" r="19" fill="#0B1220" stroke="#22C55E" stroke-width="4"/>
+<text x="200.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L02</text>
+<text x="200.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Schedule +</text>
+<text x="200.0" y="241" font-size="12" fill="#CBD5E1" text-anchor="middle">API</text>
+<circle cx="310.0" cy="190" r="19" fill="#0B1220" stroke="#22C55E" stroke-width="4"/>
+<text x="310.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L03</text>
+<text x="310.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">API auth</text>
+<circle cx="420.0" cy="190" r="19" fill="#0B1220" stroke="#22C55E" stroke-width="4"/>
+<text x="420.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L04</text>
+<text x="420.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">IF / Switch</text>
+<circle cx="530.0" cy="190" r="19" fill="#0B1220" stroke="#22C55E" stroke-width="4"/>
+<text x="530.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L05</text>
+<text x="530.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Code node</text>
+<circle cx="640.0" cy="190" r="19" fill="#0B1220" stroke="#EAB308" stroke-width="4"/>
+<text x="640.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L06</text>
+<text x="640.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Gmail →</text>
+<text x="640.0" y="241" font-size="12" fill="#CBD5E1" text-anchor="middle">Drive</text>
+<circle cx="750.0" cy="190" r="19" fill="#0B1220" stroke="#EAB308" stroke-width="4"/>
+<text x="750.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L07</text>
+<text x="750.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Forms +</text>
+<text x="750.0" y="241" font-size="12" fill="#CBD5E1" text-anchor="middle">Sheets</text>
+<circle cx="860.0" cy="190" r="19" fill="#0B1220" stroke="#EAB308" stroke-width="4"/>
+<text x="860.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L08</text>
+<text x="860.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Jira + JQL</text>
+<circle cx="970.0" cy="190" r="19" fill="#0B1220" stroke="#EAB308" stroke-width="4"/>
+<text x="970.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L09</text>
+<text x="970.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Webhook API</text>
+<circle cx="1080.0" cy="190" r="19" fill="#0B1220" stroke="#EAB308" stroke-width="4"/>
+<text x="1080.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L10</text>
+<text x="1080.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">Form → Jira</text>
+<circle cx="1190.0" cy="190" r="19" fill="#0B1220" stroke="#F97316" stroke-width="4"/>
+<text x="1190.0" y="194.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L11</text>
+<text x="1190.0" y="226" font-size="12" fill="#CBD5E1" text-anchor="middle">LLM chain</text>
+<circle cx="1190.0" cy="380" r="19" fill="#0B1220" stroke="#F97316" stroke-width="4"/>
+<text x="1190.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L12</text>
+<text x="1190.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Structured</text>
+<text x="1190.0" y="431" font-size="12" fill="#CBD5E1" text-anchor="middle">output</text>
+<circle cx="1080.0" cy="380" r="19" fill="#0B1220" stroke="#F97316" stroke-width="4"/>
+<text x="1080.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L13</text>
+<text x="1080.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">RAG chatbot</text>
+<circle cx="970.0" cy="380" r="19" fill="#0B1220" stroke="#F97316" stroke-width="4"/>
+<text x="970.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L14</text>
+<text x="970.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Agent +</text>
+<text x="970.0" y="431" font-size="12" fill="#CBD5E1" text-anchor="middle">tools</text>
+<circle cx="860.0" cy="380" r="19" fill="#0B1220" stroke="#F97316" stroke-width="4"/>
+<text x="860.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L15</text>
+<text x="860.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Human</text>
+<text x="860.0" y="431" font-size="12" fill="#CBD5E1" text-anchor="middle">approval</text>
+<circle cx="750.0" cy="380" r="19" fill="#0B1220" stroke="#EF4444" stroke-width="4"/>
+<text x="750.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L16</text>
+<text x="750.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">4 agents</text>
+<circle cx="640.0" cy="380" r="19" fill="#0B1220" stroke="#EF4444" stroke-width="4"/>
+<text x="640.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L17</text>
+<text x="640.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">5 agents</text>
+<circle cx="530.0" cy="380" r="19" fill="#0B1220" stroke="#EF4444" stroke-width="4"/>
+<text x="530.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L18</text>
+<text x="530.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Document AI</text>
+<circle cx="420.0" cy="380" r="19" fill="#0B1220" stroke="#EF4444" stroke-width="4"/>
+<text x="420.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L19</text>
+<text x="420.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Error</text>
+<text x="420.0" y="431" font-size="12" fill="#CBD5E1" text-anchor="middle">handler</text>
+<circle cx="310.0" cy="380" r="19" fill="#0B1220" stroke="#EF4444" stroke-width="4"/>
+<text x="310.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L20</text>
+<text x="310.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Sub-workflows</text>
+<circle cx="200.0" cy="380" r="19" fill="#0B1220" stroke="#EF4444" stroke-width="4"/>
+<text x="200.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L21</text>
+<text x="200.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Monitoring</text>
+<circle cx="90.0" cy="380" r="19" fill="#0B1220" stroke="#EF4444" stroke-width="4"/>
+<text x="90.0" y="384.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">L22</text>
+<text x="90.0" y="416" font-size="12" fill="#CBD5E1" text-anchor="middle">Capstone</text>
+<circle cx="90.0" cy="380" r="24" fill="none" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4"/>
+<text x="56.0" y="385" font-size="18" text-anchor="end">🏁</text>
+<text x="56" y="510" font-size="14" font-weight="700" fill="#F8FAFC" letter-spacing="2">⚡ QUICK WINS · 15 MIN EACH · ANY ORDER</text>
+<path d="M90,560 L1190,560" stroke="#0EA5E9" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+<circle cx="90.0" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="90.0" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q01</text>
+<text x="90.0" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">Daily agenda</text>
+<circle cx="247.14285714285714" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="247.14285714285714" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q02</text>
+<text x="247.14285714285714" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">Price</text>
+<text x="247.14285714285714" y="611" font-size="12" fill="#CBD5E1" text-anchor="middle">tracker</text>
+<circle cx="404.2857142857143" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="404.2857142857143" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q03</text>
+<text x="404.2857142857143" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">Telegram bot</text>
+<circle cx="561.4285714285714" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="561.4285714285714" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q04</text>
+<text x="561.4285714285714" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">Stale PRs</text>
+<circle cx="718.5714285714286" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="718.5714285714286" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q05</text>
+<text x="718.5714285714286" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">KPI chart</text>
+<circle cx="875.7142857142857" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="875.7142857142857" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q06</text>
+<text x="875.7142857142857" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">Invoice</text>
+<text x="875.7142857142857" y="611" font-size="12" fill="#CBD5E1" text-anchor="middle">reminders</text>
+<circle cx="1032.857142857143" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="1032.857142857143" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q07</text>
+<text x="1032.857142857143" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">AI labeler</text>
+<circle cx="1190.0" cy="560" r="19" fill="#0B1220" stroke="#0EA5E9" stroke-width="4"/>
+<text x="1190.0" y="564.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">Q08</text>
+<text x="1190.0" y="596" font-size="12" fill="#CBD5E1" text-anchor="middle">Autopost</text>
+<text x="56" y="710" font-size="14" font-weight="700" fill="#F8FAFC" letter-spacing="2">🏭 REAL-WORLD PROJECTS · PRODUCTION-GRADE SYSTEMS</text>
+<path d="M90.0,760 L310.0,760 L530.0,760 L750.0,760 L970.0,760 L1190.0,760 L1240,760 L1240,900 L1190.0,900 L970.0,900 L750.0,900 L530.0,900 L310.0,900 L90.0,900" stroke="#A855F7" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+<circle cx="90.0" cy="760" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="90.0" y="764.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P01</text>
+<text x="90.0" y="796" font-size="12" fill="#CBD5E1" text-anchor="middle">Invoice</text>
+<text x="90.0" y="811" font-size="12" fill="#CBD5E1" text-anchor="middle">pipeline</text>
+<circle cx="310.0" cy="760" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="310.0" y="764.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P02</text>
+<text x="310.0" y="796" font-size="12" fill="#CBD5E1" text-anchor="middle">Support</text>
+<text x="310.0" y="811" font-size="12" fill="#CBD5E1" text-anchor="middle">copilot</text>
+<circle cx="530.0" cy="760" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="530.0" y="764.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P03</text>
+<text x="530.0" y="796" font-size="12" fill="#CBD5E1" text-anchor="middle">Incident</text>
+<text x="530.0" y="811" font-size="12" fill="#CBD5E1" text-anchor="middle">response</text>
+<circle cx="750.0" cy="760" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="750.0" y="764.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P04</text>
+<text x="750.0" y="796" font-size="12" fill="#CBD5E1" text-anchor="middle">Sales</text>
+<text x="750.0" y="811" font-size="12" fill="#CBD5E1" text-anchor="middle">sequence</text>
+<circle cx="970.0" cy="760" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="970.0" y="764.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P05</text>
+<text x="970.0" y="796" font-size="12" fill="#CBD5E1" text-anchor="middle">Bulk AI,</text>
+<text x="970.0" y="811" font-size="12" fill="#CBD5E1" text-anchor="middle">checkpoints</text>
+<circle cx="1190.0" cy="760" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="1190.0" y="764.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P06</text>
+<text x="1190.0" y="796" font-size="12" fill="#CBD5E1" text-anchor="middle">Multi-level</text>
+<text x="1190.0" y="811" font-size="12" fill="#CBD5E1" text-anchor="middle">approval</text>
+<circle cx="1190.0" cy="900" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="1190.0" y="904.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P07</text>
+<text x="1190.0" y="936" font-size="12" fill="#CBD5E1" text-anchor="middle">Onboarding</text>
+<circle cx="970.0" cy="900" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="970.0" y="904.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P08</text>
+<text x="970.0" y="936" font-size="12" fill="#CBD5E1" text-anchor="middle">Sheets ⇄</text>
+<text x="970.0" y="951" font-size="12" fill="#CBD5E1" text-anchor="middle">Jira sync</text>
+<circle cx="750.0" cy="900" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="750.0" y="904.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P09</text>
+<text x="750.0" y="936" font-size="12" fill="#CBD5E1" text-anchor="middle">Research</text>
+<text x="750.0" y="951" font-size="12" fill="#CBD5E1" text-anchor="middle">agent</text>
+<circle cx="530.0" cy="900" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="530.0" y="904.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P10</text>
+<text x="530.0" y="936" font-size="12" fill="#CBD5E1" text-anchor="middle">MCP server</text>
+<circle cx="310.0" cy="900" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="310.0" y="904.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P11</text>
+<text x="310.0" y="936" font-size="12" fill="#CBD5E1" text-anchor="middle">PII-safe</text>
+<text x="310.0" y="951" font-size="12" fill="#CBD5E1" text-anchor="middle">gateway</text>
+<circle cx="90.0" cy="900" r="19" fill="#0B1220" stroke="#A855F7" stroke-width="4"/>
+<text x="90.0" y="904.5" font-size="10" font-weight="800" fill="#F8FAFC" text-anchor="middle">P12</text>
+<text x="90.0" y="936" font-size="12" fill="#CBD5E1" text-anchor="middle">Exec KPI</text>
+<text x="90.0" y="951" font-size="12" fill="#CBD5E1" text-anchor="middle">report</text>
+</svg>

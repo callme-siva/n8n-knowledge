@@ -1,0 +1,247 @@
+{
+  "name": "P09 · Deep research agent (web search + page reading + cited report)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔎 P09 · A junior analyst in a workflow\nForm with a question → agent **plans**, **searches Google**, **reads pages**, checks Wikipedia, then writes a structured report **with sources** and emails it.",
+        "width": 560,
+        "height": 300,
+        "color": 7
+      },
+      "id": "994e1e6e-ccf0-5608-91af-f948e0babb94",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Research request",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Question",
+              "fieldType": "textarea",
+              "requiredField": true,
+              "placeholder": "What are the top 5 open-source alternatives to Zapier in 2026 and how do they compare on pricing and self-hosting?"
+            },
+            {
+              "fieldLabel": "Audience",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Executive (1 page)"
+                  },
+                  {
+                    "option": "Team (detailed)"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Send report to",
+              "fieldType": "email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8514d72a-79eb-5ec7-9671-ef0950c6e2fe",
+      "name": "Research Request",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Question: {{ $json.Question }}\nAudience: {{ $json.Audience }}",
+        "options": {
+          "maxIterations": 15,
+          "systemMessage": "=You are a meticulous research analyst. Today is {{ $now.toFormat('dd LLL yyyy') }}.\nProcess: 1) Break the question into 3-5 sub-questions. 2) Use google_search for each. 3) Use read_page on the 3-6 most authoritative results (official sites, docs, reputable media). 4) Cross-check claims across at least two sources; note disagreements. 5) Write the report.\nReport format (HTML): <h2>Answer in brief</h2> 3-5 bullets · <h2>Details</h2> with sub-headings · <h2>Comparison</h2> table if relevant · <h2>Caveats</h2> · <h2>Sources</h2> numbered list of URLs. Cite inline like [1]. Never invent sources or numbers; say 'not found' instead."
+        }
+      },
+      "id": "bc783bdb-45eb-5454-a658-12781ce76d9c",
+      "name": "Research Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "1b0bbbf2-006c-5aa1-923a-b559d07fbb98",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        100,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "gl": "in",
+          "hl": "en"
+        }
+      },
+      "id": "f3b73b32-d26e-5c03-9de7-7811e2c1d937",
+      "name": "google_search",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        240,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Fetch a web page and return its readable text. Input: a full https URL from search results.",
+        "url": "{url}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "url",
+              "description": "Full https URL of the page to read",
+              "type": "string"
+            }
+          ]
+        },
+        "optimizeResponse": true,
+        "responseType": "html",
+        "cssSelector": "body",
+        "onlyContent": true,
+        "maxLength": 6000
+      },
+      "id": "5b997c71-7750-55d4-bcfe-edcbe745e1cc",
+      "name": "read_page",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        380,
+        220
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "83854977-7669-51d8-af3b-6aa1689206f5",
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        520,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Research Request').item.json['Send report to'] }}",
+        "subject": "=Research: {{ $('Research Request').item.json.Question.slice(0, 80) }}",
+        "emailType": "html",
+        "message": "=<p><i>Automated research draft. Verify key facts before acting on them.</i></p>{{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c5c13fc3-e075-54a0-ab5c-a291dcf0f915",
+      "name": "Email Report",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Research Request": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Email Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google_search": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "read_page": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

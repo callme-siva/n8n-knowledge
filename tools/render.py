@@ -200,7 +200,7 @@ def mermaid(wf):
             continue
         if kind == "main":
             labs = _out_labels(by[src])
-            L.append(f'  {ids[src]} -->|{lab(labs[oi])}| {ids[dst]}' if len(labs) > oi and len(wf["connections"][src]["main"]) > 1 else f"  {ids[src]} --> {ids[dst]}")
+            L.append(f'  {ids[src]} -->|"{lab(labs[oi])}"| {ids[dst]}' if len(labs) > oi and len(wf["connections"][src]["main"]) > 1 else f"  {ids[src]} --> {ids[dst]}")
         else:
             L.append(f'  {ids[src]} -.->|{kind.replace("ai_", "")}| {ids[dst]}')
     for c, (fill, stroke, _) in CATS.items():

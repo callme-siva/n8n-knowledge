@@ -15,12 +15,11 @@
   <!-- title -->
   <text x="72" y="118" font-size="22" fill="#94A3B8" font-weight="600" letter-spacing="3">OPEN LEARNING PATH</text>
   <text x="72" y="182" font-size="60" fill="#F8FAFC" font-weight="800">n8n <tspan fill="url(#accent)">Knowledge</tspan></text>
-  <text x="72" y="230" font-size="24" fill="#CBD5E1">22 real workflows · beginner → multi-agent AI</text>
+  <text x="72" y="230" font-size="24" fill="#CBD5E1">42 real workflows · beginner → production AI</text>
   <g font-size="15" font-weight="700">
-    <rect x="72" y="262" width="118" height="34" rx="17" fill="#14532D"/><text x="131" y="284" text-anchor="middle" fill="#86EFAC">Basics</text>
-    <rect x="200" y="262" width="138" height="34" rx="17" fill="#713F12"/><text x="269" y="284" text-anchor="middle" fill="#FDE68A">Integrations</text>
-    <rect x="348" y="262" width="78" height="34" rx="17" fill="#7C2D12"/><text x="387" y="284" text-anchor="middle" fill="#FDBA74">AI</text>
-    <rect x="436" y="262" width="180" height="34" rx="17" fill="#7F1D1D"/><text x="526" y="284" text-anchor="middle" fill="#FCA5A5">Multi-agent &amp; prod</text>
+    <rect x="72" y="262" width="190" height="34" rx="17" fill="#14532D"/><text x="167" y="284" text-anchor="middle" fill="#86EFAC">Core path · 22</text>
+    <rect x="272" y="262" width="176" height="34" rx="17" fill="#0C4A6E"/><text x="360" y="284" text-anchor="middle" fill="#7DD3FC">Quick wins · 8</text>
+    <rect x="458" y="262" width="176" height="34" rx="17" fill="#4C1D95"/><text x="546" y="284" text-anchor="middle" fill="#D8B4FE">Projects · 12</text>
   </g>
 
   <!-- mini workflow illustration -->

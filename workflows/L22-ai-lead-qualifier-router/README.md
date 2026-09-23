@@ -36,9 +36,9 @@ flowchart TB
   n1 --> n4
   n4 --> n5
   n5 --> n6
-  n6 -->|Hot| n7
-  n6 -->|Warm| n8
-  n6 -->|Cold| n9
+  n6 -->|"Hot"| n7
+  n6 -->|"Warm"| n8
+  n6 -->|"Cold"| n9
   n7 --> n8
   n2 -.->|languageModel| n1
   n3 -.->|outputParser| n1
@@ -276,4 +276,4 @@ Hot goes through alert → reply once. Check you didn't also wire Hot directly t
 
 ---
 
-<p align="center"><a href="../L21-website-uptime-monitor/README.md">← L21 · Website & API uptime monitor</a> &nbsp;·&nbsp; <a href="../../README.md#-the-learning-path">📚 All lessons</a> &nbsp;·&nbsp; 🏁 You finished the path!</p>
+<p align="center"><a href="../L21-website-uptime-monitor/README.md">← L21 · Website & API uptime monitor</a> &nbsp;·&nbsp; <a href="../../README.md#-the-learning-path">📚 All lessons</a> &nbsp;·&nbsp; 🏁 End of the core path</p>
