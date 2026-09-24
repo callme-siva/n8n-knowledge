@@ -28,8 +28,8 @@
 <tr>
 <td width="33%" valign="top">
 
-### 🪜 Three tracks
-A **22-lesson core path** (one new concept at a time), **8 quick wins** you can use today, and **12 real-world projects** for production.
+### 🪜 Three tracks + debugging
+A **22-lesson core path** (one new concept at a time), **8 quick wins** you can use today, **12 real business-process projects**, and **🐞 debug challenges** where you fix a broken workflow.
 
 </td>
 <td width="33%" valign="top">
