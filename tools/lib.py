@@ -206,6 +206,8 @@ def render_readme(r, data, diagram):
          "<img src=\"canvas.svg\" alt=\"Workflow canvas snapshot\" width=\"100%\">", "",
          "</div>", "",
          "> [!NOTE]", f"> **The real-world problem.** {r['story']}", ""]
+    if r.get("before"):
+        L += ["> [!IMPORTANT]", f"> **Before you start:** {r['before']}", ""]
     c = CONCEPTS.get(r["num"])
     if c:
         L += ["## 💡 Concept first", "",

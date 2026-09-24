@@ -11,6 +11,9 @@
 > [!NOTE]
 > **The real-world problem.** Job hunting means checking portals every day. This workflow searches Google Jobs every morning and emails you one clean table of today's postings.
 
+> [!IMPORTANT]
+> **Before you start:** finish L02 (Config node, `$('⚙️ Config')`). You'll also need a free [SerpAPI](https://serpapi.com) account (100 searches a month, no card at the time of writing). If you'd rather not sign up yet, do **L04** first and come back: it uses a keyless API.
+
 ## 💡 Concept first
 
 **📌 Key idea:** Every API is just a URL + method + auth + parameters; the hard part is **reading the JSON it returns**.

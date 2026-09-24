@@ -131,6 +131,7 @@ def L03(root):
          ("Monthly quota used up", "The free tier gives 100 searches a month. A daily run uses about 30.")],
         ["Save jobs to Google Sheets and skip ones you've already seen (dedupe by `job_id`).",
          "Add Gemini to score each job against your resume (see L18)."])
+    r["before"] = "finish L02 (Config node, `$('⚙️ Config')`). You'll also need a free [SerpAPI](https://serpapi.com) account (100 searches a month, no card at the time of writing). If you'd rather not sign up yet, do **L04** first and come back: it uses a keyless API."
     write(root, w, r)
 
 
@@ -162,7 +163,7 @@ def L04(root):
     r = readme("L04", "Currency rate alert", B, "Finance / personal", "20 min",
         "If you send money abroad, pay overseas freelancers or invoice in USD, the exchange rate matters. You don't want to check it by hand, and you don't want an email every hour either. You want one only when the rate crosses a threshold.",
         ["**IF** node: validate an API response before trusting it", "**Switch** node with named outputs plus a fallback",
-         "Comparing numbers against Config values", "**Stop and Error**: fail loudly so your error workflow (L19) catches it",
+         "Comparing numbers against Config values", "`$json` vs `$('Node').item` vs `$('Node').first()`", "**Stop and Error**: fail loudly so your error workflow (L19) catches it",
          "Dynamic URLs: `https://…/latest/{{ $json.base }}`"],
         "Schedule (hourly) → Config → HTTP → IF ok?\n   ├─ true → Extract Rate → Switch ─ High → Gmail\n   │                               ├ Low  → Gmail\n   │                               └ Normal → (nothing)\n   └─ false → Stop and Error",
         ["Gmail OAuth2 (open.er-api.com needs no key)"],
@@ -170,7 +171,7 @@ def L04(root):
          "Config: base, target, high, low, email_to.",
          "HTTP GET `https://open.er-api.com/v6/latest/{{ $json.base }}`.",
          "**IF**: `{{ $json.result }}` *is equal to* `success`.",
-         "On true, add a **Set** node that extracts `rate = {{ $json.rates[$('⚙️ Config').item.json.target] }}` as a *Number*.",
+         "On true, add a **Set** node that extracts `rate = {{ $json.rates[$('⚙️ Config').item.json.target] }}` as a *Number*.\n\n   **`.item` vs `.first()` vs `$json`:** `$json` is the item *this* node is working on. `$('Node').item` is the item from an earlier node that **this item came from** (n8n tracks the link, called *paired items*). `$('Node').first()` is simply that node's first item, whichever item you're on. With one Config item they give the same answer; once several items flow (3 currencies, 50 rows), `.item` keeps each one with its own settings, while `.first()` gives them all the first item's.",
          "Add a **Switch** in *Rules* mode. Rule 1: rate ≥ high, rename the output to `High`. Rule 2: rate ≤ low, `Low`. Options → *Fallback output* → Extra output, named `Normal`.",
          "Connect a Gmail node to High and to Low, and a **No Operation** to Normal.",
          "On IF false, add **Stop and Error**."],
@@ -217,10 +218,11 @@ def L05(root):
          "*On Error → Continue*: one broken feed shouldn't kill the run", "An IF guard so you don't get empty emails"],
         "Schedule ─┬─ RSS Google News ─┐\n          ├─ RSS TechCrunch  ─┼─ Merge → Code (filter/dedupe/sort) → IF count>0 → Gmail\n          └─ RSS The Verge   ─┘",
         ["Gmail OAuth2"],
-        ["Add a Schedule Trigger and 3 **RSS Read** nodes, each connected to the trigger.",
+        ["**Part A: combine the feeds.** Add a Schedule Trigger and 3 **RSS Read** nodes, each connected to the trigger.",
          "On each RSS node: Settings → *On Error* → **Continue**.",
          "Add **Merge** → *Number of inputs* 3, and wire each feed to its own input.",
-         "Add a **Code** node (*Run once for all items*) and paste the code. Read it line by line; each `.filter` / `.map` is one idea.",
+         "**Stop and run it.** Merge should output all articles from all 3 feeds (duplicates included). If that works, Part A is done; take a break if you need one.",
+         "**Part B: clean the list with code.** Add a **Code** node (*Run once for all items*) and paste the code. Read it one step at a time: `filter` (drop items with no title) → `map` to a clean shape → `filter` (last 24 h) → dedupe by title → `sort` newest first → `slice` (top 25) → build the HTML. Run after pasting and compare Merge's item count with Code's.",
          "Add an **IF** node: `count > 0`.",
          "Add Gmail on the true branch."],
         ["Run it and open the Code node output. `listText` is prepared for the AI version in L11.",
@@ -228,6 +230,7 @@ def L05(root):
         [("Merge waits forever or outputs nothing", "Every input must be connected. Check the numbered input dots on Merge."),
          ("All articles filtered out", "Some feeds use `pubDate` and not `isoDate`. The code handles both, so check your feed's field names.")],
         ["Add your own feeds (company blog, Hacker News `https://hnrss.org/frontpage`).", "Continue to **L11** to have Gemini summarise this."])
+    r["before"] = "finish L01–L04. This lesson packs in the most new ideas of Level 1, so it's split into **Part A** (Merge, no code) and **Part B** (Code). You don't need to understand every line of the Code node on the first pass; the practice challenges and X01 revisit it."
     write(root, w, r)
 
 

@@ -24,6 +24,7 @@
 - **IF** node: validate an API response before trusting it
 - **Switch** node with named outputs plus a fallback
 - Comparing numbers against Config values
+- `$json` vs `$('Node').item` vs `$('Node').first()`
 - **Stop and Error**: fail loudly so your error workflow (L19) catches it
 - Dynamic URLs: `https://…/latest/{{ $json.base }}`
 
@@ -104,6 +105,8 @@ Nodes that need a credential selected after import: **Gmail**.
 3. HTTP GET `https://open.er-api.com/v6/latest/{{ $json.base }}`.
 4. **IF**: `{{ $json.result }}` *is equal to* `success`.
 5. On true, add a **Set** node that extracts `rate = {{ $json.rates[$('⚙️ Config').item.json.target] }}` as a *Number*.
+
+   **`.item` vs `.first()` vs `$json`:** `$json` is the item *this* node is working on. `$('Node').item` is the item from an earlier node that **this item came from** (n8n tracks the link, called *paired items*). `$('Node').first()` is simply that node's first item, whichever item you're on. With one Config item they give the same answer; once several items flow (3 currencies, 50 rows), `.item` keeps each one with its own settings, while `.first()` gives them all the first item's.
 6. Add a **Switch** in *Rules* mode. Rule 1: rate ≥ high, rename the output to `High`. Rule 2: rate ≤ low, `Low`. Options → *Fallback output* → Extra output, named `Normal`.
 7. Connect a Gmail node to High and to Low, and a **No Operation** to Normal.
 8. On IF false, add **Stop and Error**.

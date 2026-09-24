@@ -11,6 +11,9 @@
 > [!NOTE]
 > **The real-world problem.** You follow 3 news sites and see the same story three times. This merges the feeds, removes duplicates and sends one clean list.
 
+> [!IMPORTANT]
+> **Before you start:** finish L01–L04. This lesson packs in the most new ideas of Level 1, so it's split into **Part A** (Merge, no code) and **Part B** (Code). You don't need to understand every line of the Code node on the first pass; the practice challenges and X01 revisit it.
+
 ## 💡 Concept first
 
 **📌 Key idea:** The Code node is for **reshaping many items at once**: filter, dedupe, sort, group, and many→one.
@@ -101,12 +104,13 @@ Nodes that need a credential selected after import: **Gmail**.
 > [!TIP]
 > In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
 
-1. Add a Schedule Trigger and 3 **RSS Read** nodes, each connected to the trigger.
+1. **Part A: combine the feeds.** Add a Schedule Trigger and 3 **RSS Read** nodes, each connected to the trigger.
 2. On each RSS node: Settings → *On Error* → **Continue**.
 3. Add **Merge** → *Number of inputs* 3, and wire each feed to its own input.
-4. Add a **Code** node (*Run once for all items*) and paste the code. Read it line by line; each `.filter` / `.map` is one idea.
-5. Add an **IF** node: `count > 0`.
-6. Add Gmail on the true branch.
+4. **Stop and run it.** Merge should output all articles from all 3 feeds (duplicates included). If that works, Part A is done; take a break if you need one.
+5. **Part B: clean the list with code.** Add a **Code** node (*Run once for all items*) and paste the code. Read it one step at a time: `filter` (drop items with no title) → `map` to a clean shape → `filter` (last 24 h) → dedupe by title → `sort` newest first → `slice` (top 25) → build the HTML. Run after pasting and compare Merge's item count with Code's.
+6. Add an **IF** node: `count > 0`.
+7. Add Gmail on the true branch.
 
 ## 🔍 Node-by-node reference
 
