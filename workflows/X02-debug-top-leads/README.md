@@ -40,7 +40,7 @@ flowchart TB
   n2["Companies"]:::code
   n3["Join on Company"]:::logic
   n4["Size"]:::code
-  n5["Biggest First"]:::msg
+  n5["Biggest First"]:::logic
   n6["Top 2"]:::logic
   n7["✅ Check"]:::code
   n0 --> n1
@@ -54,7 +54,6 @@ flowchart TB
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
   classDef logic fill:#FFF4E5,stroke:#F59E0B,stroke-width:2px,color:#1F2937
   classDef code fill:#EEF2F7,stroke:#64748B,stroke-width:2px,color:#1F2937
-  classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
 ```
 
 </details>
@@ -67,12 +66,9 @@ flowchart TB
 
 ## 📝 Before you run it
 
-No placeholder values. It runs as-is once the credentials are connected.
+No placeholder values. It runs as-is.
 
-## 🛠️ Build it step by step
-
-> [!TIP]
-> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
+## 🔎 How to debug it
 
 1. Import `workflow.json` (not `solution.json`) and click **Execute workflow**.
 2. Open **✅ Check** and read the error. It changes as you fix bugs, because a later bug can hide behind an earlier one.

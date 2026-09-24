@@ -16,7 +16,7 @@ CATS = {
 GLYPH = {"gmail": "✉", "googleSheets": "▦", "googleDrive": "▲", "jira": "◆", "httpRequest": "⇄", "rssFeedRead": "◉",
          "webhook": "⚓", "formTrigger": "☰", "scheduleTrigger": "◷", "manualTrigger": "▶", "gmailTrigger": "✉",
          "errorTrigger": "⚠", "chatTrigger": "💬", "if": "⑂", "switch": "⑃", "filter": "⊻", "merge": "⊕", "code": "{ }",
-         "set": "✎", "wait": "⏸", "splitInBatches": "⟳", "limit": "⤓", "removeDuplicates": "⧉", "aggregate": "Σ", "crypto": "#", "quickChart": "▮", "html": "</>", "googleCalendar": "📅", "telegram": "✈", "telegramTrigger": "✈", "slack": "#", "textClassifier": "⑃", "informationExtractor": "✦", "mcpTrigger": "⚡", "toolWorkflow": "↗", "toolSerpApi": "🔍", "splitOut": "⇶", "noOp": "→", "stopAndError": "⛔", "respondToWebhook": "↩", "executeWorkflow": "↗",
+         "set": "✎", "wait": "⏸", "splitInBatches": "⟳", "limit": "⤓", "sort": "⇅", "removeDuplicates": "⧉", "aggregate": "Σ", "crypto": "#", "quickChart": "▮", "html": "</>", "googleCalendar": "📅", "telegram": "✈", "telegramTrigger": "✈", "slack": "#", "textClassifier": "⑃", "informationExtractor": "✦", "mcpTrigger": "⚡", "toolWorkflow": "↗", "toolSerpApi": "🔍", "splitOut": "⇶", "noOp": "→", "stopAndError": "⛔", "respondToWebhook": "↩", "executeWorkflow": "↗",
          "executeWorkflowTrigger": "↘", "extractFromFile": "⎙", "agent": "🤖", "chainLlm": "✦",
          "lmChatGoogleGemini": "G", "outputParserStructured": "{}", "memoryBufferWindow": "🧠", "toolCalculator": "±",
          "toolWikipedia": "W", "toolHttpRequest": "⇄", "vectorStoreInMemory": "▤", "embeddingsGoogleGemini": "≋",
@@ -52,7 +52,7 @@ def cat(n):
         return "sub"
     if re.search(r"[Tt]rigger$|^webhook$", s):
         return "trigger"
-    if s in ("if", "switch", "filter", "merge", "noOp", "stopAndError", "splitOut", "wait", "splitInBatches", "limit", "removeDuplicates", "aggregate"):
+    if s in ("if", "switch", "filter", "merge", "noOp", "stopAndError", "splitOut", "wait", "splitInBatches", "limit", "sort", "removeDuplicates", "aggregate"):
         return "logic"
     if s in ("code", "set"):
         return "code"

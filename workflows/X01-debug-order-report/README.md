@@ -61,12 +61,9 @@ flowchart TB
 
 ## 📝 Before you run it
 
-No placeholder values. It runs as-is once the credentials are connected.
+No placeholder values. It runs as-is.
 
-## 🛠️ Build it step by step
-
-> [!TIP]
-> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
+## 🔎 How to debug it
 
 1. Import `workflow.json` (not `solution.json`) and click **Execute workflow**.
 2. Open **✅ Check** and read the error. It lists every bug that's still there.

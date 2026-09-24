@@ -57,7 +57,7 @@ flowchart TB
   n1["⚙️ Config"]:::code
   n2["Read Feed"]:::http
   n3{"Recent Only"}:::logic
-  n4["Oldest First"]:::msg
+  n4["Oldest First"]:::logic
   n5["Only New Links"]:::logic
   n6["Post to Channel"]:::msg
   n0 --> n1
@@ -83,7 +83,7 @@ flowchart TB
 
 ## 📝 Before you run it
 
-No placeholder values. It runs as-is once the credentials are connected.
+No placeholder values. It runs as-is.
 
 ## 🛠️ Build it step by step
 

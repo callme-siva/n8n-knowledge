@@ -178,7 +178,7 @@ def placeholders(wf):
         L += [f"| {a} | `{b}` | `{_fmt(c)}` |" for a, b, c in hits]
         L.append("")
     else:
-        L += ["No placeholder values. It runs as-is once the credentials are connected.", ""]
+        L += ["No placeholder values. " + ("It runs as-is once the credentials are connected." if creds else "It runs as-is."), ""]
     if creds:
         L += ["Nodes that need a credential selected after import: " + ", ".join(f"**{c}**" for c in creds) + ".", ""]
     return "\n".join(L)

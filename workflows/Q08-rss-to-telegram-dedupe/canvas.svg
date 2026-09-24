@@ -43,9 +43,9 @@
 <rect x="22" y="284" width="56" height="56" rx="12" fill="#FFF4E5"/>
 <text x="50" y="321" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⊻</text>
 <text x="50.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Recent Only</text>
-<rect x="220" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" filter="url(#sh)"/>
-<rect x="242" y="284" width="56" height="56" rx="12" fill="#FFEDEF"/>
-<text x="270" y="321" font-size="24" text-anchor="middle" fill="#E11D48" font-weight="700">✉</text>
+<rect x="220" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
+<rect x="242" y="284" width="56" height="56" rx="12" fill="#FFF4E5"/>
+<text x="270" y="321" font-size="24" text-anchor="middle" fill="#F59E0B" font-weight="700">⇅</text>
 <text x="270.0" y="386" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Oldest First</text>
 <rect x="440" y="266" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#sh)"/>
 <rect x="462" y="284" width="56" height="56" rx="12" fill="#FFF4E5"/>

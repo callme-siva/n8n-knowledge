@@ -230,8 +230,12 @@ def render_readme(r, data, diagram):
             L.append(f"| {name.strip()} | {rest.strip() or '[docs/credentials.md](../../docs/credentials.md)'} |")
     else:
         L.append("| Nothing | Runs with zero setup |")
-    L += ["", placeholders(data), *starter_files(r.get("slug", ""), r["num"]), "## 🛠️ Build it step by step", "",
-          "> [!TIP]", "> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.", ""]
+    L += ["", placeholders(data), *starter_files(r.get("slug", ""), r["num"])]
+    if r["level"].startswith("🐞"):
+        L += ["## 🔎 How to debug it", ""]
+    else:
+        L += ["## 🛠️ Build it step by step", "",
+              "> [!TIP]", "> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.", ""]
     L += [f"{i}. {s}" for i, s in enumerate(r["steps"], 1)]
     L += ["", node_reference(data), "## ✅ Test it", ""]
     if t and t.get("expected_failure"):
