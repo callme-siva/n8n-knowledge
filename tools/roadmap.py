@@ -94,7 +94,7 @@ def build(path):
 
     # ---- projects: two rows of 6
     py1, py2 = 760, 920
-    o.append(f'<text x="56" y="{py1 - 50}" font-size="14" font-weight="700" fill="#F8FAFC" letter-spacing="2">🏭 REAL-WORLD PROJECTS · PRODUCTION-GRADE SYSTEMS</text>')
+    o.append(f'<text x="56" y="{py1 - 50}" font-size="14" font-weight="700" fill="#F8FAFC" letter-spacing="2">🏭 PROJECTS · REAL BUSINESS PROCESSES</text>')
     ps = [f"P{i:02d}" for i in range(1, 13)]
     pstep = (x1 - x0) / 5
     ppos = {n: (x0 + i * pstep, py1) for i, n in enumerate(ps[:6])}

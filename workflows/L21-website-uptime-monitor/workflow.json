@@ -39,7 +39,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [\n  { url: 'https://n8n.io', name: 'n8n website' },\n  { url: 'https://api.github.com', name: 'GitHub API' },\n  { url: 'https://httpstat.us/503', name: 'Demo: always down' },\n].map(s => ({ json: { ...s, started: Date.now() } }));"
+        "jsCode": "const ALERT_TO = 'you@example.com';   // who gets UP/DOWN emails\nreturn [\n  { url: 'https://n8n.io', name: 'n8n website' },\n  { url: 'https://api.github.com', name: 'GitHub API' },\n  { url: 'https://httpstat.us/503', name: 'Demo: always down' },\n].map(s => ({ json: { ...s, alert_to: ALERT_TO, started: Date.now() } }));"
       },
       "id": "0802f2be-a98f-52a4-9660-aea89a93f942",
       "name": "Sites to Watch",
@@ -171,7 +171,7 @@
     },
     {
       "parameters": {
-        "sendTo": "you@example.com",
+        "sendTo": "={{ $('Sites to Watch').first().json.alert_to }}",
         "subject": "={{ $json.status === 'DOWN' ? '🔴' : '🟢' }} {{ $json.name }} is {{ $json.status }}",
         "emailType": "html",
         "message": "=<p><b>{{ $json.name }}</b> ({{ $json.url }}) is now <b>{{ $json.status }}</b>.</p><p>HTTP {{ $json.code }} · {{ $json.ms }} ms · since {{ $json.since }}</p><p>{{ $json.error }}</p>",
@@ -186,7 +186,10 @@
       "position": [
         1100,
         80
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     }
   ],
   "connections": {

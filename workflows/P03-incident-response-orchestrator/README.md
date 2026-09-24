@@ -2,7 +2,7 @@
 
 # P03 · Incident response orchestrator
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: SRE / DevOps / IT ops](https://img.shields.io/badge/domain-SRE_/_DevOps_/_IT_ops-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 12](https://img.shields.io/badge/nodes-12-7C3AED?style=flat-square) ![e2e test: passed · 4 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_4_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: SRE / DevOps / IT ops](https://img.shields.io/badge/domain-SRE_/_DevOps_/_IT_ops-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 13](https://img.shields.io/badge/nodes-13-7C3AED?style=flat-square) [![e2e test: passed · 4 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_4_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -35,7 +35,7 @@
 ```mermaid
 flowchart LR
   s0(["🌐 Calling app / service"]):::ext
-  core{{"⚙️ n8n workflow<br/><small>12 nodes</small>"}}:::n8n
+  core{{"⚙️ n8n workflow<br/><small>13 nodes</small>"}}:::n8n
   state[("🗄️ memory<br/>between runs")]:::store
   core -.- state
   s1["🧭 Jira 🔑"]:::saas
@@ -61,29 +61,31 @@ flowchart LR
 ```mermaid
 flowchart TB
   n0(["POST /alerts"]):::trigger
-  n1["One Item per Alert"]:::logic
-  n2["Decide Action"]:::code
-  n3{"Route"}:::logic
-  n4["Open Jira Incident"]:::data
-  n5["Remember Jira Key"]:::code
-  n6["Page On-call"]:::msg
-  n7["Slack #incidents"]:::msg
-  n8["Suppress"]:::logic
-  n9[["Draft Postmortem"]]:::ai
-  n10("Gemini"):::sub
-  n11["Post Postmortem Draft"]:::msg
+  n1["⚙️ Config"]:::code
+  n2["One Item per Alert"]:::logic
+  n3["Decide Action"]:::code
+  n4{"Route"}:::logic
+  n5["Open Jira Incident"]:::data
+  n6["Remember Jira Key"]:::code
+  n7["Page On-call"]:::msg
+  n8["Slack #incidents"]:::msg
+  n9["Suppress"]:::logic
+  n10[["Draft Postmortem"]]:::ai
+  n11("Gemini"):::sub
+  n12["Post Postmortem Draft"]:::msg
   n0 --> n1
   n1 --> n2
   n2 --> n3
-  n3 -->|"Page (critical)"| n4
-  n3 -->|"Notify (warning)"| n7
-  n3 -->|"Resolved"| n9
-  n3 -->|"Suppress (repeat)"| n8
-  n4 --> n5
+  n3 --> n4
+  n4 -->|"Page (critical)"| n5
+  n4 -->|"Notify (warning)"| n8
+  n4 -->|"Resolved"| n10
+  n4 -->|"Suppress (repeat)"| n9
   n5 --> n6
-  n5 --> n7
-  n9 --> n11
-  n10 -.->|languageModel| n9
+  n6 --> n7
+  n6 --> n8
+  n10 --> n12
+  n11 -.->|languageModel| n10
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
   classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937
@@ -136,9 +138,10 @@ Replace these placeholder values with your own:
 
 | Node | Field | Placeholder |
 |---|---|---|
+| ⚙️ Config | `oncall_email` | `you@example.com` |
+| ⚙️ Config | `slack_channel_id` | `REPLACE_SLACK_CHANNEL_ID` |
 | Open Jira Incident | `project` | `REPLACE_PROJECT_ID` |
 | Open Jira Incident | `issueType` | `REPLACE_INCIDENT_ISSUE_TYPE_ID` |
-| Page On-call | `sendTo` | `you@example.com` |
 
 Nodes that need a credential selected after import: **Gmail**, **Google Gemini Chat Model**, **Jira Software**.
 
@@ -147,7 +150,7 @@ Nodes that need a credential selected after import: **Gmail**, **Google Gemini C
 > [!TIP]
 > In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
 
-1. Import it and set the Jira project and issue-type IDs (an *Incident* or *Bug* type).
+1. Import it and set the Jira project and issue-type IDs (an *Incident* or *Bug* type). Put the on-call email and the Slack **channel ID** (not its name, which breaks on rename) in **⚙️ Config**.
 2. Create a **Header Auth** credential on the webhook. Alertmanager: `http_config.authorization.credentials`; Grafana contact point: *Authorization header*.
 3. **Activate** it (static data and production webhooks need an active workflow).
 4. Point Alertmanager (`webhook_configs.url`) or a Grafana contact point at `https://<n8n>/webhook/alerts`, or simulate one with curl (below).
@@ -169,7 +172,20 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>2. One Item per Alert</b> · <code>Split Out</code> v1</summary>
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `oncall_email` | you@example.com |
+| `slack_channel_id` | REPLACE_SLACK_CHANNEL_ID |
+| `includeOtherFields` | ✅ on |
+| `include` | all |
+
+</details>
+
+<details><summary><b>3. One Item per Alert</b> · <code>Split Out</code> v1</summary>
 
 > Turns one item holding an array into one item per array element.
 
@@ -179,13 +195,13 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>3. Decide Action</b> · <code>Code</code> v2</summary>
+<details><summary><b>4. Decide Action</b> · <code>Code</code> v2</summary>
 
 > Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 16 lines, shown below) |
+| `jsCode` | (JavaScript, 17 lines, shown below) |
 
 **Code:**
 
@@ -198,6 +214,7 @@ return $input.all().map(({ json: a }) => {
   const sev = (a.labels?.severity || 'warning').toLowerCase();
   let action;
   if (a.status === 'resolved') action = known ? 'resolve' : 'ignore';
+  else if (known && !known.jira_key && known.sev === 'critical') { known.count++; action = 'page'; }  // last Jira create failed: try again
   else if (known) { known.count++; action = 'repeat'; }
   else { state.open[fp] = { since: a.startsAt || new Date().toISOString(), count: 1, sev }; action = sev === 'critical' ? 'page' : 'notify'; }
   const rec = state.open[fp] || {};
@@ -210,7 +227,7 @@ return $input.all().map(({ json: a }) => {
 
 </details>
 
-<details><summary><b>4. Route</b> · <code>Switch</code> v3.2</summary>
+<details><summary><b>5. Route</b> · <code>Switch</code> v3.2</summary>
 
 > Routes items to one of many named outputs.
 
@@ -230,7 +247,7 @@ return $input.all().map(({ json: a }) => {
 
 </details>
 
-<details><summary><b>5. Open Jira Incident</b> · <code>Jira Software</code> v1</summary>
+<details><summary><b>6. Open Jira Incident</b> · <code>Jira Software</code> v1</summary>
 
 > Creates, searches or updates Jira issues.
 
@@ -241,10 +258,13 @@ return $input.all().map(({ json: a }) => {
 | `summary` | `[P1] {{ $json.service }}: {{ $json.name }}` |
 | `additionalFields.description` | `{{ $json.summary }}  {{ $json.description }}  Fingerprint: {{ $json.fp }} Started: {{ $…` |
 | `additionalFields.labels` | incident, auto |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
-<details><summary><b>6. Remember Jira Key</b> · <code>Code</code> v2</summary>
+<details><summary><b>7. Remember Jira Key</b> · <code>Code</code> v2</summary>
 
 > Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
 
@@ -265,33 +285,39 @@ return { json: { ...a, jira_key: $json.key } };
 
 </details>
 
-<details><summary><b>7. Page On-call</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>8. Page On-call</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
 | Property | Value |
 |---|---|
-| `sendTo` | you@example.com |
+| `sendTo` | `{{ $('⚙️ Config').first().json.oncall_email }}` |
 | `subject` | `🔴 P1 {{ $json.service }}: {{ $json.name }} ({{ $json.jira_key }})` |
 | `emailType` | html |
 | `message` | `<p>{{ $json.summary }}</p><p>Jira: {{ $json.jira_key }}</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
-<details><summary><b>8. Slack #incidents</b> · <code>slack</code> v2.3</summary>
+<details><summary><b>9. Slack #incidents</b> · <code>slack</code> v2.3</summary>
 
 
 
 | Property | Value |
 |---|---|
 | `select` | channel |
-| `channelId` | #incidents |
+| `channelId` | `{{ $('⚙️ Config').first().json.slack_channel_id }}` |
 | `text` | `:red_circle: *{{ $json.sev.toUpperCase() }}* {{ $json.service }}: {{ $json.name }} {{ $json.summary }}{{ $json.jira_key ? '\nJira: ' + $json.jira_key : '' }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
-<details><summary><b>9. Suppress</b> · <code>No Operation</code> v1</summary>
+<details><summary><b>10. Suppress</b> · <code>No Operation</code> v1</summary>
 
 > Does nothing. Marks a branch that intentionally ends.
 
@@ -299,7 +325,7 @@ return { json: { ...a, jira_key: $json.key } };
 
 </details>
 
-<details><summary><b>10. Draft Postmortem</b> · <code>Basic LLM Chain</code> v1.5</summary>
+<details><summary><b>11. Draft Postmortem</b> · <code>Basic LLM Chain</code> v1.5</summary>
 
 > Sends one prompt to a model and returns the answer. Simplest AI node.
 
@@ -311,7 +337,7 @@ return { json: { ...a, jira_key: $json.key } };
 
 </details>
 
-<details><summary><b>11. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
+<details><summary><b>12. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
 
 > The language model plugged into a chain or agent.
 
@@ -322,15 +348,18 @@ return { json: { ...a, jira_key: $json.key } };
 
 </details>
 
-<details><summary><b>12. Post Postmortem Draft</b> · <code>slack</code> v2.3</summary>
+<details><summary><b>13. Post Postmortem Draft</b> · <code>slack</code> v2.3</summary>
 
 
 
 | Property | Value |
 |---|---|
 | `select` | channel |
-| `channelId` | #incidents |
+| `channelId` | `{{ $('⚙️ Config').first().json.slack_channel_id }}` |
 | `text` | `:large_green_circle: *Resolved* {{ $('Route').item.json.service }}: {{ $('Route').item.json.name }} after {{ $('Route').item.json.duration_min }} min  *Postmortem draft:* {{ $json.text }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -340,7 +369,7 @@ return { json: { ...a, jira_key: $json.key } };
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 9/11 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 4 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 10/12 nodes executed in real n8n (6 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 4 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] ```bash
 curl -X POST https://<n8n>/webhook/alerts -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{"alerts":[{"status":"firing","fingerprint":"abc","labels":{"alertname":"HighErrorRate","severity":"critical","service":"payments"},"annotations":{"summary":"5xx > 5% for 5m"},"startsAt":"2026-09-23T10:00:00Z"}]}'
@@ -361,6 +390,18 @@ The workflow isn't active (static data isn't saved in manual runs), or the finge
 <details><summary><b>State lost after a restart</b></summary>
 
 Static data survives restarts but not re-imports. For production, keep state in a DB table instead.
+
+</details>
+
+<details><summary><b>Two incidents for one alert storm</b></summary>
+
+Static data is saved when an execution ends, so two webhook calls running at the same moment (burst alerts, queue mode) can both see the fingerprint as new. For high volume, keep state in Postgres/Redis with a unique key on the fingerprint.
+
+</details>
+
+<details><summary><b>Jira was down during a critical alert</b></summary>
+
+*Open Jira Incident* retries 3 times. If it still fails, the fingerprint has no Jira key, so the next repeat of that critical alert tries to open the incident again instead of being suppressed.
 
 </details>
 

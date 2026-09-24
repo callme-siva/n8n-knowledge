@@ -302,7 +302,10 @@
       "position": [
         1024,
         112
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {

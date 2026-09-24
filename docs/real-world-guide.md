@@ -46,13 +46,13 @@ quadrantChart
 > [!TIP]
 > Ask each team one question: *"What do you copy-paste between two tools every week?"* That list is your automation backlog.
 
-**Automations that pay back in almost every company** (and their lesson here):
+**Automations that pay back in almost every company** (and their lesson here). Time saved is a rough guide from typical manual steps, not a measured benchmark; measure your own before and after:
 
 | Area | Automation | Typical time saved | Lesson |
 |---|---|---|---|
 | Finance | Invoice data capture + approval | 5–10 min per invoice | P01 |
 | Finance | Payment reminders | Days of DSO (days sales outstanding) | Q06 |
-| Support | Triage + draft replies | 30–50% of first-response time | P02, Q07 |
+| Support | Triage + draft replies | Faster first response; agents edit drafts instead of writing | P02, Q07 |
 | Sales | Lead capture → CRM → follow-ups | Leads no longer forgotten | L07, L22, P04 |
 | HR | Onboarding checklist | 3–5 h per joiner, better day 1 | P07 |
 | Ops | Approvals with audit trail | No more chasing email threads | P06 |
@@ -78,7 +78,7 @@ Managers fund what they can measure. Use this before building, and again 30 days
 | **Payback** | Under 1 month |
 
 > [!IMPORTANT]
-> Log every execution's outcome (like P01's Ledger and Exceptions sheets, or P11's audit log). "The pipeline processed 1,284 invoices and caught 9 duplicates this quarter" wins budget; "it works" doesn't.
+> Log every execution's outcome (like P01's Ledger and Exceptions sheets, or P11's audit log). A sentence like "the pipeline processed N invoices and caught M duplicates this quarter", with your real numbers, wins budget; "it works" doesn't.
 
 ---
 

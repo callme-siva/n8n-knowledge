@@ -2,7 +2,7 @@
 
 # Q04 · Stale pull-request reminder
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Engineering / DevOps](https://img.shields.io/badge/domain-Engineering_/_DevOps-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 6](https://img.shields.io/badge/nodes-6-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Engineering / DevOps](https://img.shields.io/badge/domain-Engineering_/_DevOps-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 6](https://img.shields.io/badge/nodes-6-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -190,6 +190,9 @@ return [{ json: { count: prs.length, text: `:hourglass: *${prs.length} PRs waiti
 | `select` | channel |
 | `channelId` | `{{ $('⚙️ Config').item.json.slack_channel }}` |
 | `text` | `{{ $json.text }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -199,7 +202,7 @@ return [{ json: { count: prs.length, text: `:hourglass: *${prs.length} PRs waiti
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 6/6 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 6/6 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Point it at a busy public repo (the default `n8n-io/n8n`) with `stale_days = 1`. You should see a list.
 

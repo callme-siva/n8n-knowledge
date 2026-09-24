@@ -36,6 +36,37 @@
     },
     {
       "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "oncall_email",
+              "value": "you@example.com",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "slack_channel_id",
+              "value": "REPLACE_SLACK_CHANNEL_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {},
+        "includeOtherFields": true,
+        "include": "all"
+      },
+      "id": "e602613d-533e-5e78-8b30-24f1a386ae68",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
         "fieldToSplitOut": "body.alerts",
         "options": {}
       },
@@ -44,20 +75,20 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        200,
+        400,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// Alertmanager payload: alerts[] { status, fingerprint, labels{alertname,severity,service}, annotations{summary,description}, startsAt, endsAt }\nconst state = $getWorkflowStaticData('global'); state.open ??= {};\nreturn $input.all().map(({ json: a }) => {\n  const fp = a.fingerprint || `${a.labels?.alertname}|${a.labels?.service}`;\n  const known = state.open[fp];\n  const sev = (a.labels?.severity || 'warning').toLowerCase();\n  let action;\n  if (a.status === 'resolved') action = known ? 'resolve' : 'ignore';\n  else if (known) { known.count++; action = 'repeat'; }\n  else { state.open[fp] = { since: a.startsAt || new Date().toISOString(), count: 1, sev }; action = sev === 'critical' ? 'page' : 'notify'; }\n  const rec = state.open[fp] || {};\n  const out = { action, fp, sev, name: a.labels?.alertname, service: a.labels?.service || 'unknown', summary: a.annotations?.summary || '', description: a.annotations?.description || '',\n    since: rec.since, repeats: rec.count, jira_key: rec.jira_key || null, duration_min: a.endsAt && rec.since ? Math.round((Date.parse(a.endsAt) - Date.parse(rec.since)) / 60000) : null };\n  if (action === 'resolve') delete state.open[fp];\n  return { json: out };\n});"
+        "jsCode": "// Alertmanager payload: alerts[] { status, fingerprint, labels{alertname,severity,service}, annotations{summary,description}, startsAt, endsAt }\nconst state = $getWorkflowStaticData('global'); state.open ??= {};\nreturn $input.all().map(({ json: a }) => {\n  const fp = a.fingerprint || `${a.labels?.alertname}|${a.labels?.service}`;\n  const known = state.open[fp];\n  const sev = (a.labels?.severity || 'warning').toLowerCase();\n  let action;\n  if (a.status === 'resolved') action = known ? 'resolve' : 'ignore';\n  else if (known && !known.jira_key && known.sev === 'critical') { known.count++; action = 'page'; }  // last Jira create failed: try again\n  else if (known) { known.count++; action = 'repeat'; }\n  else { state.open[fp] = { since: a.startsAt || new Date().toISOString(), count: 1, sev }; action = sev === 'critical' ? 'page' : 'notify'; }\n  const rec = state.open[fp] || {};\n  const out = { action, fp, sev, name: a.labels?.alertname, service: a.labels?.service || 'unknown', summary: a.annotations?.summary || '', description: a.annotations?.description || '',\n    since: rec.since, repeats: rec.count, jira_key: rec.jira_key || null, duration_min: a.endsAt && rec.since ? Math.round((Date.parse(a.endsAt) - Date.parse(rec.since)) / 60000) : null };\n  if (action === 'resolve') delete state.open[fp];\n  return { json: out };\n});"
       },
       "id": "570326b6-2cdc-50b4-8a92-73a0ed970c16",
       "name": "Decide Action",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        400,
+        600,
         0
       ]
     },
@@ -149,7 +180,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        600,
+        800,
         0
       ]
     },
@@ -179,9 +210,12 @@
       "type": "n8n-nodes-base.jira",
       "typeVersion": 1,
       "position": [
-        840,
+        1040,
         -260
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {
@@ -193,13 +227,13 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1040,
+        1240,
         -260
       ]
     },
     {
       "parameters": {
-        "sendTo": "you@example.com",
+        "sendTo": "={{ $('⚙️ Config').first().json.oncall_email }}",
         "subject": "=🔴 P1 {{ $json.service }}: {{ $json.name }} ({{ $json.jira_key }})",
         "emailType": "html",
         "message": "=<p>{{ $json.summary }}</p><p>Jira: {{ $json.jira_key }}</p>",
@@ -212,17 +246,20 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1240,
+        1440,
         -320
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {
         "select": "channel",
         "channelId": {
           "__rl": true,
-          "mode": "name",
-          "value": "#incidents"
+          "mode": "id",
+          "value": "={{ $('⚙️ Config').first().json.slack_channel_id }}"
         },
         "text": "=:red_circle: *{{ $json.sev.toUpperCase() }}* {{ $json.service }}: {{ $json.name }}\n{{ $json.summary }}{{ $json.jira_key ? '\\nJira: ' + $json.jira_key : '' }}",
         "otherOptions": {}
@@ -232,9 +269,12 @@
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
       "position": [
-        1240,
+        1440,
         -140
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {},
@@ -243,7 +283,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        840,
+        1040,
         260
       ]
     },
@@ -264,7 +304,7 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
       "position": [
-        840,
+        1040,
         80
       ]
     },
@@ -280,7 +320,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        840,
+        1040,
         280
       ]
     },
@@ -289,8 +329,8 @@
         "select": "channel",
         "channelId": {
           "__rl": true,
-          "mode": "name",
-          "value": "#incidents"
+          "mode": "id",
+          "value": "={{ $('⚙️ Config').first().json.slack_channel_id }}"
         },
         "text": "=:large_green_circle: *Resolved* {{ $('Route').item.json.service }}: {{ $('Route').item.json.name }} after {{ $('Route').item.json.duration_min }} min\n\n*Postmortem draft:*\n{{ $json.text }}",
         "otherOptions": {}
@@ -300,13 +340,27 @@
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
       "position": [
-        1100,
+        1300,
         80
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     }
   ],
   "connections": {
     "POST /alerts": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
       "main": [
         [
           {

@@ -2,7 +2,7 @@
 
 # L05 · Tech news digest with the Code node
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -230,6 +230,9 @@ return [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];
 | `emailType` | html |
 | `message` | `<h2>Last 24 hours in AI</h2>{{ $json.html }}` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -239,7 +242,7 @@ return [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (1 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Run it and open the Code node output. `listText` is prepared for the AI version in L11.
 - [ ] Replace one feed URL with a broken one. The workflow should still finish.

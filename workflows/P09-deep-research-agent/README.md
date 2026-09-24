@@ -2,7 +2,7 @@
 
 # P09 · Deep research agent
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Strategy / consulting / product](https://img.shields.io/badge/domain-Strategy_/_consulting_/_product-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Strategy / consulting / product](https://img.shields.io/badge/domain-Strategy_/_consulting_/_product-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -214,6 +214,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | html |
 | `message` | `<p><i>Automated research draft. Verify key facts before acting on them.</i></p>{{ $json.output }}` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -223,7 +226,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 3/3 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 3/3 nodes executed in real n8n (3 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Check 3 cited facts against their sources.
 - [ ] Ask something obscure → it should say "not found" rather than invent.

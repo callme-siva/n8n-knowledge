@@ -2,7 +2,7 @@
 
 # L16 · Sprint progress report with 4 cooperating agents
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Agile / engineering management](https://img.shields.io/badge/domain-Agile_/_engineering_management-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 14](https://img.shields.io/badge/nodes-14-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Agile / engineering management](https://img.shields.io/badge/domain-Agile_/_engineering_management-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 14](https://img.shields.io/badge/nodes-14-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -183,6 +183,9 @@ return [{ json: { body: JSON.stringify({ query, variables: { login, number } }) 
 | `contentType` | raw |
 | `rawContentType` | application/json |
 | `body` | `{{ $json.body }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -332,6 +335,9 @@ return [{ json: { projectTitle: project.title || '', iteration: iterationTitle, 
 | `subject` | `Daily Sprint Progress Report - {{ $('Compute Sprint Metrics').item.json.reportDate }}` |
 | `emailType` | text |
 | `message` | `{{ $json.output }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -352,7 +358,7 @@ return [{ json: { projectTitle: project.title || '', iteration: iterationTitle, 
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 10/10 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 10/10 nodes executed in real n8n (6 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Change a few issue statuses in GitHub, run it again, and compare the burndown text.
 

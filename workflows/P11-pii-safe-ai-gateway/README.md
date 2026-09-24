@@ -2,7 +2,7 @@
 
 # P11 · PII-safe AI gateway
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Security / compliance / platform](https://img.shields.io/badge/domain-Security_/_compliance_/_platform-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) ![e2e test: passed · 6 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_6_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Security / compliance / platform](https://img.shields.io/badge/domain-Security_/_compliance_/_platform-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) [![e2e test: passed · 6 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_6_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -112,7 +112,7 @@ Why it's built this way, and what it costs.
 | You need | Where to get it |
 |---|---|
 | Header Auth credential (e.g. `X-API-Key | <long random>`) |
-| Google Gemini API key | [docs/credentials.md](../../docs/credentials.md) |
+| Google Gemini API key | use a **paid-tier** key for real data. On the free tier, Google may use prompts to improve its products, which defeats the point of a PII gateway (see ai.google.dev/gemini-api/terms) |
 | Google Sheets OAuth2 (tab `AI_Audit` | time, user, outcome, pii_counts, prompt_redacted) |
 
 ## 📝 Before you run it
@@ -312,7 +312,7 @@ return { json: { answer, user: src.user, counts: src.counts, redacted_prompt: sr
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 9/9 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 6 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 9/9 nodes executed in real n8n (3 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 6 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] ```bash
 curl -X POST https://<n8n>/webhook/ai/ask -H 'X-API-Key: <key>' -H 'Content-Type: application/json' -d '{"user":"asha","text":"Draft a polite reply to Rahul (rahul@example.com, 9876543210) about refund to card 4111 1111 1111 1111"}'

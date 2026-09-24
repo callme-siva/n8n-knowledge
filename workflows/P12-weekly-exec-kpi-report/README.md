@@ -2,7 +2,7 @@
 
 # P12 · Weekly executive KPI report
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Leadership / PMO / chief of staff](https://img.shields.io/badge/domain-Leadership_/_PMO_/_chief_of_staff-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 14](https://img.shields.io/badge/nodes-14-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Leadership / PMO / chief of staff](https://img.shields.io/badge/domain-Leadership_/_PMO_/_chief_of_staff-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 14](https://img.shields.io/badge/nodes-14-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -233,6 +233,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 |---|---|
 | `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
 | `sheetName` | Sales |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 | `⚙️ Always output data` | ✅ on |
 
 </details>
@@ -358,6 +361,9 @@ return [{ json: { kpis: k, rows, labels: Object.keys(k), values: Object.values(k
 | `message` | `<h2>This week</h2><ul>{{ $('Write Narrative').item.json.text }}</ul><table border=1 cellpadding=6 style="border-collapse:collapse"><tr><th>KPI</th><th>This week</th><th>Last week</th><th>Δ</th></tr>{{ $('Compute KPIs').item.json.rows.map(r => `<tr><td>${r.key.replace(/_/g, ' ')}</td><td>${r.value}</td><td>${r.prev}</td><td>${r.change === null ? '–' : (r.change >= 0 ? '▲ ' : '▼ ') + r.change + '%'}</td></tr>`).join('') }}</table><p>Chart attached.</p>` |
 | `appendAttribution` | off |
 | `attachmentsUi.attachmentsBinary.property` | chart |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -378,7 +384,7 @@ return [{ json: { kpis: k, rows, labels: Object.keys(k), values: Object.values(k
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 13/13 nodes executed in real n8n (5 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 13/13 nodes executed in real n8n (5 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Compare each KPI against Jira/GitHub/Sheets by hand once.
 - [ ] Check the AI narrative only uses numbers present in the table.

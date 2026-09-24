@@ -2,7 +2,7 @@
 
 # L13 · HR policy chatbot with RAG
 
-![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: HR / internal support](https://img.shields.io/badge/domain-HR_/_internal_support-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: HR / internal support](https://img.shields.io/badge/domain-HR_/_internal_support-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -252,7 +252,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 2/4 nodes executed in real n8n (4 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 2/4 nodes executed in real n8n (4 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Use the sample policy in [docs/sample-data.md](../../docs/sample-data.md#hr-policy) (save it as a PDF).
 - [ ] Ask something that *isn't* in the policy ("What's the CEO's salary?"). It must refuse.

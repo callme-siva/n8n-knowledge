@@ -52,10 +52,12 @@ def Q02(root):
     w.add("Every 6 Hours", "scheduleTrigger", 1.2, {"rule": {"interval": [{"field": "hours", "hoursInterval": 6}]}}, (0, 0))
     w.add("⚙️ Products", "code", 2, {"jsCode":
         "// Add as many products as you like. selector = CSS selector of the price element.\n"
+        "// The first demo target (55) is ABOVE the current price (51.77) so your first test run sends an alert. Lower it afterwards.\n"
+        "const ALERT_TO = 'you@example.com';\n"
         "return [\n"
-        "  { name: 'A Light in the Attic', url: 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html', selector: 'p.price_color', target: 45 },\n"
+        "  { name: 'A Light in the Attic', url: 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html', selector: 'p.price_color', target: 55 },\n"
         "  { name: 'Tipping the Velvet', url: 'https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html', selector: 'p.price_color', target: 50 },\n"
-        "].map(p => ({ json: p }));"}, (220, 0))
+        "].map(p => ({ json: { ...p, alert_to: ALERT_TO } }));"}, (220, 0))
     w.add("Fetch Page", "httpRequest", 4.2, {"url": "={{ $json.url }}", "options": {"response": {"response": {"responseFormat": "text"}},
         "timeout": 15000}}, (440, 0), retryOnFail=True, onError="continueRegularOutput")
     w.add("Extract Price", "html", 1.2, {"operation": "extractHtmlContent", "dataPropertyName": "data",
@@ -74,7 +76,7 @@ def Q02(root):
         "});"}, (880, 0))
     w.note("⚠️ **No email?** Check `alert` in this node's output.\nFires only if `price ≤ target` **or** it dropped `≥5%` since the last check (set in *Compare with Last Price*).\nTo test: set `target` above the current price, then run it.", (1100, 220), 300, 160, 4)
     w.add("Worth Alerting?", "filter", 2.2, {"conditions": conditions(cond("={{ $json.alert }}", "boolean", "true")), "options": {}}, (1100, 0))
-    w.add("Price Alert", "gmail", 2.1, gmail_send(EMAIL, "=🏷️ {{ $json.name }} now {{ $json.price }} ({{ $json.dropPct }}% drop)",
+    w.add("Price Alert", "gmail", 2.1, gmail_send("={{ $json.alert_to }}", "=🏷️ {{ $json.name }} now {{ $json.price }} ({{ $json.dropPct }}% drop)",
         "=<p><b>{{ $json.name }}</b> is now <b>{{ $json.price }}</b> (was {{ $json.last ?? 'unknown' }}, target {{ $json.target }}).</p><p><a href=\"{{ $json.url }}\">Open product</a></p>"), (1320, 0))
     w.chain("Every 6 Hours", "⚙️ Products", "Fetch Page", "Extract Price", "Compare with Last Price", "Worth Alerting?", "Price Alert")
     write(root, w, readme("Q02", "Price drop tracker", Q, "Shopping / e-commerce ops", "20 min",
@@ -88,7 +90,8 @@ def Q02(root):
          "**HTML → Extract HTML content** from the `data` field with your selector.",
          "Paste the compare Code node, then Filter `alert is true` → Gmail.",
          "**Activate** it. Static data only persists in active runs."],
-        ["Set `target` above the current price, then run it. You should get an alert.", "Check that a broken URL doesn't stop the other products (*On Error → Continue*)."],
+        ["Run it once as-is: the first demo product's target (55) is above its price, so you get an alert. Run it again with targets below the price: no alert, because nothing dropped.",
+         "**Manual runs don't save static data.** *Compare with Last Price* only remembers prices between **active** (scheduled) runs, so `last` stays `null` while you test by hand. See L21 for the same pattern.", "Check that a broken URL doesn't stop the other products (*On Error → Continue*)."],
         [("Price is `NaN`", "The selector matched nothing. Check it in the browser dev tools; many shops render prices with JavaScript (use their API or a headless-browser service instead)."),
          ("Blocked / 403", "Some sites block bots. Respect robots.txt and terms of service, and prefer official APIs or affiliate feeds.")],
         ["Log every price to Sheets and chart the history (see Q05).", "Send to Telegram instead of email (see Q03)."]))
@@ -285,26 +288,31 @@ def Q07(root):
 
 def Q08(root):
     w = WF("Q08-rss-to-telegram-dedupe", "Q08 · Auto-post new articles to a Telegram channel (dedupe across runs)")
-    w.note("## 📣 Q08 · Channel autopilot\nEvery 30 min: reads feeds, uses **Remove Duplicates → seen in previous executions** so each link is posted exactly once, ever.", (0, 0), 460)
+    w.note("## 📣 Q08 · Channel autopilot\nEvery 30 min: reads a feed, keeps the last few days, and uses **Remove Duplicates → seen in previous executions** so each link is posted exactly once, ever.", (0, 0), 460)
     w.add("Every 30 Minutes", "scheduleTrigger", 1.2, {"rule": {"interval": [{"field": "minutes", "minutesInterval": 30}]}}, (0, 0))
-    w.add("Read Feed", "rssFeedRead", 1.1, {"url": "https://blog.n8n.io/rss/", "options": {}}, (220, 0), onError="continueRegularOutput")
-    w.add("Only New Links", "removeDuplicates", 2, {"operation": "removeItemsSeenInPreviousExecutions", "dedupeValue": "={{ $json.link }}", "options": {"historySize": 5000}}, (440, 0))
-    w.add("Max 5 per Run", "limit", 1, {"maxItems": 5}, (660, 0))
-    w.add("Post to Channel", "telegram", 1.2, {"chatId": "@your_channel_name", "text": "=📰 <b>{{ $json.title }}</b>\n{{ ($json.contentSnippet || '').slice(0, 200) }}…\n{{ $json.link }}",
-        "additionalFields": {"parse_mode": "HTML", "appendAttribution": False}}, (880, 0))
-    w.chain("Every 30 Minutes", "Read Feed", "Only New Links", "Max 5 per Run", "Post to Channel")
+    w.add("⚙️ Config", "set", 3.4, assign(feed_url="https://blog.n8n.io/rss/", channel="@your_channel_name", max_age_days=3), (220, 0))
+    w.add("Read Feed", "rssFeedRead", 1.1, {"url": "={{ $json.feed_url }}", "options": {}}, (440, 0), onError="continueRegularOutput")
+    w.add("Recent Only", "filter", 2.2, {"conditions": conditions(cond("={{ $json.isoDate }}", "dateTime", "after", "={{ $now.minus({ days: $('⚙️ Config').first().json.max_age_days }).toISO() }}")), "options": {}}, (660, 0))
+    w.add("Oldest First", "sort", 1, {"sortFieldsUi": {"sortField": [{"fieldName": "isoDate"}]}, "options": {}}, (880, 0))
+    w.note("⚠️ **Nothing posted?** A link is remembered the moment it passes this node, so a 2nd run posts nothing (that's the point).\nTo re-test: change `historySize` or recreate the node.\nNo `Limit` after this node on purpose: anything cut after dedupe would be marked seen and never posted.", (1100, 200), 320, 190, 4)
+    w.add("Only New Links", "removeDuplicates", 2, {"operation": "removeItemsSeenInPreviousExecutions", "dedupeValue": "={{ $json.link }}", "options": {"historySize": 5000}}, (1100, 0))
+    w.add("Post to Channel", "telegram", 1.2, {"chatId": "={{ $('⚙️ Config').first().json.channel }}", "text": "=📰 <b>{{ $json.title }}</b>\n{{ ($json.contentSnippet || '').slice(0, 200) }}…\n{{ $json.link }}",
+        "additionalFields": {"parse_mode": "HTML", "appendAttribution": False}}, (1320, 0))
+    w.chain("Every 30 Minutes", "⚙️ Config", "Read Feed", "Recent Only", "Oldest First", "Only New Links", "Post to Channel")
     write(root, w, readme("Q08", "RSS → Telegram channel with dedupe across runs", Q, "Marketing / community", "15 min",
         "Communities and company channels need a steady flow of relevant links, and nobody wants to post them by hand. The hard part is never posting the same link twice, even across restarts. n8n's *Remove Duplicates* node now remembers what it has seen between executions.",
         ["**Remove Duplicates → Remove items seen in previous executions**", "History size and what happens when it fills",
-         "**Limit** node to avoid flooding a channel on the first run", "Telegram HTML formatting"],
-        "Schedule (30 min) → RSS → Remove Duplicates (by link, across runs) → Limit 5 → Telegram channel",
+         "Why **filter before dedupe, never limit after it**: anything dropped after dedupe is marked seen and lost", "Sorting so the channel reads in publish order", "Telegram HTML formatting"],
+        "Schedule (30 min) → Config → RSS → keep last 3 days → oldest first → Remove Duplicates (by link, across runs) → Telegram channel",
         ["Telegram bot token (add the bot as an **admin** of your channel)"],
-        ["Create a channel and add your bot as admin with *Post messages*.", "RSS Read → your feed URL.",
+        ["Create a channel and add your bot as admin with *Post messages*.", "Set the feed URL, channel and `max_age_days` in **⚙️ Config**.",
+         "**Filter** `isoDate` is after `{{ $now.minus({ days: 3 }) }}`, then **Sort** by `isoDate` (ascending). This stops the first run flooding the channel with the whole feed.",
          "**Remove Duplicates** → operation *Remove items processed in previous executions*, value `{{ $json.link }}`.",
-         "**Limit** 5, then Telegram *Send message* to `@your_channel_name`, parse mode HTML."],
-        ["Run twice. The second run should post nothing.", "The first run posts only 5 thanks to Limit, and the rest come next time."],
+         "Telegram *Send message* to `{{ $('⚙️ Config').first().json.channel }}`, parse mode HTML."],
+        ["Run twice. The second run should post nothing.", "The first run posts only articles from the last 3 days, oldest first.", "**Activate** it. Like static data, dedupe history only builds up in real (active) runs you keep."],
         [("`chat not found`", "Use `@channelusername` for public channels, or the numeric `-100…` ID for private ones. The bot must be an admin."),
-         ("Posts everything again after editing", "Dedupe history is per node. Deleting or recreating the node resets it.")],
+         ("Posts everything again after editing", "Dedupe history is per node. Deleting or recreating the node resets it."),
+         ("A post failed and never came back", "The link was already marked seen. *Post to Channel* retries 3 times; if Telegram is down longer, repost by hand.")],
         ["Add AI to write a one-line hook per article.", "Merge several feeds (see L05)."]))
 
 

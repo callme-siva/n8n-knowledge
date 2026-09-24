@@ -2,7 +2,7 @@
 
 # L19 · Global error handler
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Operations / reliability](https://img.shields.io/badge/domain-Operations_/_reliability-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Operations / reliability](https://img.shields.io/badge/domain-Operations_/_reliability-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -190,7 +190,7 @@ return [{ json: { time: new Date().toISOString(), workflow: wf.name, workflow_id
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (3 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Activate **L04** with `base = XYZ` (or disconnect a credential) and let it run. The alert should arrive within seconds.
 - [ ] Note: error workflows fire for **production** executions, not manual test runs.

@@ -2,7 +2,7 @@
 
 # L08 · Daily stale Jira stories report
 
-![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Agile / Scrum](https://img.shields.io/badge/domain-Agile_/_Scrum-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 5](https://img.shields.io/badge/nodes-5-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Agile / Scrum](https://img.shields.io/badge/domain-Agile_/_Scrum-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 5](https://img.shields.io/badge/nodes-5-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -150,6 +150,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `returnAll` | ✅ on |
 | `jql` | `project = {{ $json.project_key }} AND statusCategory = "In Progress" AND updated <= -{{…` |
 | `fields` | summary,status,assignee,updated,priority |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 | `⚙️ Always output data` | ✅ on |
 
 </details>
@@ -193,6 +196,9 @@ return [{ json: { count: rows.length,
 | `emailType` | html |
 | `message` | `{{ $json.html }}` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -202,7 +208,7 @@ return [{ json: { count: rows.length,
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Set `stale_days` to 0 so you see every in-progress story.
 - [ ] Use a project key that doesn't exist. You should get a clear Jira error.

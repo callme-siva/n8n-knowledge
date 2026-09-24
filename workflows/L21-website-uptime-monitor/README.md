@@ -2,7 +2,7 @@
 
 # L21 · Website & API uptime monitor
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: DevOps / IT](https://img.shields.io/badge/domain-DevOps_/_IT-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: DevOps / IT](https://img.shields.io/badge/domain-DevOps_/_IT-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -106,7 +106,6 @@ Replace these placeholder values with your own:
 | Node | Field | Placeholder |
 |---|---|---|
 | Log Every Check | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
-| Alert | `sendTo` | `you@example.com` |
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
@@ -152,16 +151,17 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 5 lines, shown below) |
+| `jsCode` | (JavaScript, 6 lines, shown below) |
 
 **Code:**
 
 ```javascript
+const ALERT_TO = 'you@example.com';   // who gets UP/DOWN emails
 return [
   { url: 'https://n8n.io', name: 'n8n website' },
   { url: 'https://api.github.com', name: 'GitHub API' },
   { url: 'https://httpstat.us/503', name: 'Demo: always down' },
-].map(s => ({ json: { ...s, started: Date.now() } }));
+].map(s => ({ json: { ...s, alert_to: ALERT_TO, started: Date.now() } }));
 ```
 
 </details>
@@ -239,11 +239,14 @@ return $input.all().map((r, i) => {
 
 | Property | Value |
 |---|---|
-| `sendTo` | you@example.com |
+| `sendTo` | `{{ $('Sites to Watch').first().json.alert_to }}` |
 | `subject` | `{{ $json.status === 'DOWN' ? '🔴' : '🟢' }} {{ $json.name }} is {{ $json.status }}` |
 | `emailType` | html |
 | `message` | `<p><b>{{ $json.name }}</b> ({{ $json.url }}) is now <b>{{ $json.status }}</b>.</p><p>HTTP {{ $json.code }} · {{ $json.ms }} ms · since {{ $json.since }}</p><p>{{ $json.error }}</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -253,7 +256,7 @@ return $input.all().map((r, i) => {
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 6/7 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 6/7 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] The `httpstat.us/503` demo site should alert DOWN on the second automatic run.
 - [ ] Replace it with `https://httpstat.us/200` and you should get an 🟢 recovery alert.

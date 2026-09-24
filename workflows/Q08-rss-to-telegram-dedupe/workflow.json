@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 📣 Q08 · Channel autopilot\nEvery 30 min: reads feeds, uses **Remove Duplicates → seen in previous executions** so each link is posted exactly once, ever.",
+        "content": "## 📣 Q08 · Channel autopilot\nEvery 30 min: reads a feed, keeps the last few days, and uses **Remove Duplicates → seen in previous executions** so each link is posted exactly once, ever.",
         "width": 460,
         "height": 300,
         "color": 7
@@ -39,7 +39,42 @@
     },
     {
       "parameters": {
-        "url": "https://blog.n8n.io/rss/",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "feed_url",
+              "value": "https://blog.n8n.io/rss/",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "channel",
+              "value": "@your_channel_name",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "max_age_days",
+              "value": 3,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "21990595-8d3d-54cc-be78-f99ee39db440",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.feed_url }}",
         "options": {}
       },
       "id": "ab789d0b-60fc-5931-9b99-b36ab02ccf70",
@@ -47,10 +82,79 @@
       "type": "n8n-nodes-base.rssFeedRead",
       "typeVersion": 1.1,
       "position": [
-        220,
+        440,
         0
       ],
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.isoDate }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              },
+              "rightValue": "={{ $now.minus({ days: $('⚙️ Config').first().json.max_age_days }).toISO() }}"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6e9273e1-5cf5-587c-870f-ca5f316ac716",
+      "name": "Recent Only",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "isoDate"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "24d5eacc-e541-5211-b3b8-7c906a32814c",
+      "name": "Oldest First",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "⚠️ **Nothing posted?** A link is remembered the moment it passes this node, so a 2nd run posts nothing (that's the point).\nTo re-test: change `historySize` or recreate the node.\nNo `Limit` after this node on purpose: anything cut after dedupe would be marked seen and never posted.",
+        "width": 320,
+        "height": 190,
+        "color": 4
+      },
+      "id": "448d7ca5-8fc3-5d5d-8107-94fa061a3406",
+      "name": "Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        200
+      ]
     },
     {
       "parameters": {
@@ -65,26 +169,13 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        440,
+        1100,
         0
       ]
     },
     {
       "parameters": {
-        "maxItems": 5
-      },
-      "id": "656400d8-c0a1-527e-b270-a0ec81e2690d",
-      "name": "Max 5 per Run",
-      "type": "n8n-nodes-base.limit",
-      "typeVersion": 1,
-      "position": [
-        660,
-        0
-      ]
-    },
-    {
-      "parameters": {
-        "chatId": "@your_channel_name",
+        "chatId": "={{ $('⚙️ Config').first().json.channel }}",
         "text": "=📰 <b>{{ $json.title }}</b>\n{{ ($json.contentSnippet || '').slice(0, 200) }}…\n{{ $json.link }}",
         "additionalFields": {
           "parse_mode": "HTML",
@@ -96,13 +187,27 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        880,
+        1320,
         0
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     }
   ],
   "connections": {
     "Every 30 Minutes": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
       "main": [
         [
           {
@@ -117,6 +222,28 @@
       "main": [
         [
           {
+            "node": "Recent Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recent Only": {
+      "main": [
+        [
+          {
+            "node": "Oldest First",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Oldest First": {
+      "main": [
+        [
+          {
             "node": "Only New Links",
             "type": "main",
             "index": 0
@@ -125,17 +252,6 @@
       ]
     },
     "Only New Links": {
-      "main": [
-        [
-          {
-            "node": "Max 5 per Run",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Max 5 per Run": {
       "main": [
         [
           {

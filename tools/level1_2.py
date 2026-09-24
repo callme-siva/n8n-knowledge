@@ -6,7 +6,7 @@ I = "🟡 Integrations"
 
 def L01(root):
     w = WF("L01-hello-n8n", "L01 · Hello n8n — your first workflow")
-    w.note("## 👋 L01 · Hello n8n\n1. Click **Execute workflow**\n2. Click each node → look at the **OUTPUT** panel\n3. Change the name in *Set Your Data* and run again\n\nData in n8n = a list of **items**, each item = JSON.", (-60, -260), 420, 240, 5)
+    w.note("## 👋 L01 · Hello n8n\n1. Click **Execute workflow**\n2. Click each node → look at the **OUTPUT** panel\n3. Change the name in *Set Your Data* and run again\n\nData in n8n = a list of **items**, each item = JSON.\n**No Gmail yet?** Skip it: the lesson is done once *Build Greeting* shows your message.", (-60, -300), 420, 280, 5)
     w.add("When clicking 'Execute workflow'", "manualTrigger", 1, {}, (0, 0))
     w.add("Set Your Data", "set", 3.4, assign(name="Learner", city="Chennai", tasks_done=3), (220, 0))
     w.add("Build Greeting", "code", 2, {"jsCode":
@@ -15,7 +15,7 @@ def L01(root):
         "  json: {\n"
         "    ...item.json,\n"
         "    greeting: `Hello ${item.json.name} from ${item.json.city}! You finished ${item.json.tasks_done} tasks today.`,\n"
-        "    generated_at: new Date().toISOString(),\n"
+        "    generated_at: $now.toISO(),   // $now uses your n8n timezone; new Date() is always UTC\n"
         "  }\n"
         "}));"}, (440, 0))
     w.add("Send to Yourself", "gmail", 2.1, gmail_send(EMAIL, "My first n8n workflow 🎉",
@@ -31,14 +31,14 @@ def L01(root):
         ["Create a new workflow and name it `L01 · Hello n8n`.",
          "Add a **Manual Trigger** node.",
          "Add an **Edit Fields (Set)** node with three fields: `name` (string), `city` (string), `tasks_done` (number).",
-         "Add a **Code** node and paste the code from `workflow.json`. Look at how it spreads `...item.json` to keep the old fields.",
-         "Add a **Gmail → Send message** node. In *To*, put your own email. In *Message*, drag `greeting` from the INPUT panel.",
-         "Click **Execute workflow**."],
+         "Add a **Code** node and type the code shown in the *Node-by-node reference* below. `...item.json` keeps the old fields, and `greeting` is the new one. (A Set node could build this string too; Code is here so you see what a node does with items.)",
+         "Click **Execute workflow** and open *Build Greeting* → **OUTPUT**. If you see your greeting, you've finished the lesson.",
+         "*Optional, needs Gmail:* add a **Gmail → Send message** node ([set up Gmail first](../../docs/credentials.md#gmail), about 10 minutes the first time). In *To*, put your own email. In *Message*, drag `greeting` from the INPUT panel. Run it again."],
         ["Click each node and open the **OUTPUT** tab: Table, JSON and Schema views show the same data in different shapes.",
          "Change `tasks_done` to 10 and run again."],
         [("`Credentials not found` on Gmail", "Open the node → Credential → *Create new* and sign in with Google."),
          ("Code node: `Cannot read properties of undefined`", "Check the field name spelling — JSON keys are case-sensitive.")],
-        ["Add a second item in the Set node (turn on *Include Other Input Fields*) or return two items from Code — watch Gmail send two emails.",
+        ["Return two items from the Code node and watch Gmail send two emails (see practice challenge ⭐ below).",
          "Replace Gmail with Telegram or Slack."])
     write(root, w, r)
 

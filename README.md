@@ -10,7 +10,9 @@
 [![CI](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml/badge.svg)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 ![license](https://img.shields.io/badge/license-MIT-334155?style=flat-square)
 
-**Learn n8n by building 42 real workflows: a 22-lesson core path, 8 quick wins, and 12 production-grade projects companies actually run.**
+**Learn n8n by building 42 workflows, from your first node to multi-agent AI: a 22-lesson core path, 8 quick wins and 12 real business processes. Each one comes with a guide, a canvas snapshot and a CI run.**
+
+<sub>Examples use India defaults (INR, GSTIN, Asia/Kolkata). Change them in each ⚙️ Config node.</sub>
 
 [🚀 Start](#-start-in-3-steps) · [🗺️ Learning path](#-the-learning-path) · [🖼️ Gallery](#-gallery) · [🏗️ Architecture](docs/architecture.md) · [🧯 Mistakes](docs/common-mistakes.md) · [🧪 Testing](docs/testing.md) · [🤝 Contribute](CONTRIBUTING.md)
 
@@ -38,8 +40,8 @@ Invoice processing, support copilots, incident response, approvals, onboarding, 
 </td>
 <td width="33%" valign="top">
 
-### 🛡️ Production habits
-Retries, guards, idempotency, human approval, a global error handler. You learn good habits from lesson 2.
+### 🛡️ Built to fail safely
+Config nodes, retries on every external call, empty-result guards, human approval and an error workflow (L19). The projects add idempotency, checkpoints and audit logs.
 
 </td>
 </tr>
@@ -52,14 +54,14 @@ Every lesson: **concept first**, build steps, **84 practice challenges** with hi
 </td>
 <td valign="top">
 
-### 🆓 Free to run
-Google Gemini free tier, free public APIs and free tiers of Google, Jira and GitHub. No credit card needed.
+### 🆓 Free to learn
+Runs on self-hosted n8n with the Gemini free tier, free public APIs and free tiers of Google, Jira and GitHub. 24/7 schedules need n8n Cloud (paid after the trial) or a small server.
 
 </td>
 <td valign="top">
 
-### ✅ Tested end-to-end
-Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, and blocks leaked credentials, personal data and unauthenticated webhooks.
+### ✅ Executed in CI
+Every push imports all 44 workflows into n8n 2.40.5 and **runs 43 of them** (P10 is an MCP server, so it's structure-checked). Logic, code, branching, loops and public APIs run for real; credentialed and AI nodes are replaced with fixtures. 90 behaviour checks across 43 workflows.
 
 </td>
 </tr>
@@ -85,7 +87,7 @@ Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, a
 <p align="center"><img src="assets/learning-path.svg" alt="Learning roadmap: core path L01–L22, quick wins Q01–Q08, real-world projects P01–P12" width="100%"></p>
 
 > [!TIP]
-> **New to n8n?** Follow the core path in order. **Know the basics?** Pick any ⚡ quick win. **Building for a company?** Go to the 🏭 real-world projects. Each one is a production-grade system with approvals, checkpoints, dedupe, audit logs and guardrails.
+> **New to n8n?** Follow the core path in order. **Know the basics?** Pick any ⚡ quick win. **Building for a company?** Go to the 🏭 real-world projects. Each one models a real business process: approvals, checkpoints, dedupe and audit logs. Read its credentials and troubleshooting sections before running it for real.
 
 <!-- LESSONS:START -->
 ### 🟢 Level 1 · Basics
@@ -143,7 +145,7 @@ Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, a
 | **Q07** | [Gmail AI auto-labeler](workflows/Q07-gmail-ai-auto-labeler/README.md) | Productivity / support | Text Classifier node · Category descriptions are the prompt, so write them carefully | 20 min |
 | **Q08** | [RSS → Telegram channel with dedupe across runs](workflows/Q08-rss-to-telegram-dedupe/README.md) | Marketing / community | Remove Duplicates → Remove items seen in previous executions · History size and what happens when it fills | 15 min |
 
-### 🏭 Real-world projects: production-grade systems
+### 🏭 Projects: real business processes
 
 | # | Lesson | Domain | Key concepts | Time |
 |:-:|---|---|---|:-:|
@@ -259,10 +261,10 @@ Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, a
 
 ## 🆚 How this compares
 
-| | Template collections<br/><sub>(280 to 4,000 JSONs)</sub> | Video courses | **n8n Knowledge** |
+| | Template collections | Video courses | **n8n Knowledge** |
 |---|:-:|:-:|:-:|
 | Order to learn in | ❌ | ✅ | ✅ core path + 2 tracks |
-| Production-grade projects | a few | rarely | ✅ 12 (approvals, sync, incidents, MCP, PII) |
+| Real business-process projects | a few | rarely | ✅ 12 (approvals, sync, incidents, MCP, PII) |
 | Explains *why* | ❌ | ✅ in video | ✅ written + on canvas |
 | Build-it-yourself steps | ❌ | ✅ | ✅ |
 | Concept-first + system-context architecture per workflow | ❌ | ❌ | ✅ |
@@ -271,7 +273,7 @@ Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, a
 | Practice challenges with solutions | ❌ | sometimes | ✅ 84 + 30-question quiz |
 | Troubleshooting per workflow | ❌ | ❌ | ✅ |
 | Production practices | rarely | rarely | ✅ |
-| Every workflow executed in CI | ❌ | n/a | ✅ 44 workflows · 61 behaviour checks |
+| Every workflow executed in CI | ❌ | n/a | ✅ 43 run · 90 behaviour checks · AI and credentialed nodes mocked |
 
 If you want *any* template for a niche app, the big collections are great. This repo is for **learning to design workflows yourself**.
 

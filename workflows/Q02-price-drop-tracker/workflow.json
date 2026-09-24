@@ -39,7 +39,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Add as many products as you like. selector = CSS selector of the price element.\nreturn [\n  { name: 'A Light in the Attic', url: 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html', selector: 'p.price_color', target: 45 },\n  { name: 'Tipping the Velvet', url: 'https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html', selector: 'p.price_color', target: 50 },\n].map(p => ({ json: p }));"
+        "jsCode": "// Add as many products as you like. selector = CSS selector of the price element.\n// The first demo target (55) is ABOVE the current price (51.77) so your first test run sends an alert. Lower it afterwards.\nconst ALERT_TO = 'you@example.com';\nreturn [\n  { name: 'A Light in the Attic', url: 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html', selector: 'p.price_color', target: 55 },\n  { name: 'Tipping the Velvet', url: 'https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html', selector: 'p.price_color', target: 50 },\n].map(p => ({ json: { ...p, alert_to: ALERT_TO } }));"
       },
       "id": "1c680c47-d2d6-5b21-8946-e9308ea18c1d",
       "name": "⚙️ Products",
@@ -161,7 +161,7 @@
     },
     {
       "parameters": {
-        "sendTo": "you@example.com",
+        "sendTo": "={{ $json.alert_to }}",
         "subject": "=🏷️ {{ $json.name }} now {{ $json.price }} ({{ $json.dropPct }}% drop)",
         "emailType": "html",
         "message": "=<p><b>{{ $json.name }}</b> is now <b>{{ $json.price }}</b> (was {{ $json.last ?? 'unknown' }}, target {{ $json.target }}).</p><p><a href=\"{{ $json.url }}\">Open product</a></p>",
@@ -176,7 +176,10 @@
       "position": [
         1320,
         0
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     }
   ],
   "connections": {

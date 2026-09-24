@@ -2,7 +2,7 @@
 
 # P02 · Support inbox copilot
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 13](https://img.shields.io/badge/nodes-13-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 13](https://img.shields.io/badge/nodes-13-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -215,6 +215,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 |---|---|
 | `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
 | `sheetName` | FAQ |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 | `⚙️ Execute once` | ✅ on |
 
 </details>
@@ -297,6 +300,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `message` | `{{ $json.output.reply }}` |
 | `threadId` | `{{ $('Support Email').item.json.threadId }}` |
 | `sendTo` | `{{ $('Support Email').item.json.From }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -309,6 +315,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `operation` | addLabels |
 | `messageId` | `{{ $('Support Email').item.json.id }}` |
 | `labelIds` | REPLACE_LABEL_ID_AI_DRAFTED |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -321,6 +330,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `select` | channel |
 | `channelId` | #support |
 | `text` | `:rotating_light: *Needs a human* *From:* {{ $('Support Email').item.json.From }} *Subject:* {{ $('Support Email').item.json.Subject }} >{{ $('Support Email').item.json.snippet }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -338,7 +350,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 8/10 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 8/10 nodes executed in real n8n (7 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] The FAQ question should produce a draft reply in the same Gmail thread, with confidence ≥ 0.75.
 - [ ] The uncovered question should go to Slack.

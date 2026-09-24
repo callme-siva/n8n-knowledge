@@ -2,7 +2,7 @@
 
 # Q06 · Invoice due & overdue reminders
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Finance / freelancers / SMB](https://img.shields.io/badge/domain-Finance_/_freelancers_/_SMB-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Finance / freelancers / SMB](https://img.shields.io/badge/domain-Finance_/_freelancers_/_SMB-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) [![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -150,6 +150,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 |---|---|
 | `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
 | `sheetName` | Invoices |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -203,6 +206,9 @@ return $input.all().map(i => i.json)
 | `emailType` | html |
 | `message` | `<p>Hi {{ $json.client }},</p><p>A quick heads-up that invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} is due on {{ $json.due_date }}.</p><p>Thank you!</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -217,6 +223,9 @@ return $input.all().map(i => i.json)
 | `emailType` | html |
 | `message` | `<p>Hi {{ $json.client }},</p><p>Invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} was due on {{ $json.due_date }} and is now {{ -$json.days }} days overdue.</p><p>Please arrange payment or reply if there's an issue.</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -242,6 +251,9 @@ return $input.all().map(i => i.json)
 | `sheetName` | Invoices |
 | `columns.mappingMode` | autoMapInputData |
 | `columns.matchingColumns` | invoice_no |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -251,7 +263,7 @@ return $input.all().map(i => i.json)
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (4 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (4 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Add a row due in exactly 3 days with your own email, then run it. You should get one email, and `last_reminded` should be filled in.
 - [ ] Run again the same day. There should be no second email.

@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 👋 L01 · Hello n8n\n1. Click **Execute workflow**\n2. Click each node → look at the **OUTPUT** panel\n3. Change the name in *Set Your Data* and run again\n\nData in n8n = a list of **items**, each item = JSON.",
+        "content": "## 👋 L01 · Hello n8n\n1. Click **Execute workflow**\n2. Click each node → look at the **OUTPUT** panel\n3. Change the name in *Set Your Data* and run again\n\nData in n8n = a list of **items**, each item = JSON.\n**No Gmail yet?** Skip it: the lesson is done once *Build Greeting* shows your message.",
         "width": 420,
-        "height": 240,
+        "height": 280,
         "color": 5
       },
       "id": "a08264ed-5ac5-5319-b61f-41b2a4c4d941",
@@ -14,7 +14,7 @@
       "typeVersion": 1,
       "position": [
         -60,
-        -260
+        -300
       ]
     },
     {
@@ -65,7 +65,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Every node receives items and returns items.\nreturn $input.all().map(item => ({\n  json: {\n    ...item.json,\n    greeting: `Hello ${item.json.name} from ${item.json.city}! You finished ${item.json.tasks_done} tasks today.`,\n    generated_at: new Date().toISOString(),\n  }\n}));"
+        "jsCode": "// Every node receives items and returns items.\nreturn $input.all().map(item => ({\n  json: {\n    ...item.json,\n    greeting: `Hello ${item.json.name} from ${item.json.city}! You finished ${item.json.tasks_done} tasks today.`,\n    generated_at: $now.toISO(),   // $now uses your n8n timezone; new Date() is always UTC\n  }\n}));"
       },
       "id": "f964ff58-c69e-52ce-a098-a4bc86cdf7be",
       "name": "Build Greeting",
@@ -93,7 +93,10 @@
       "position": [
         660,
         0
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     }
   ],
   "connections": {

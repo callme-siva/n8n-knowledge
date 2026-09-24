@@ -3,7 +3,7 @@
 CONCEPTS = {
     "L01": ("A workflow is a pipeline of nodes; each node receives a **list of items** (JSON objects) and returns a list of items.",
             "An assembly line: each station (node) takes the trays (items) coming in, does one job, and passes trays on.",
-            "Don't reach for the Code node for things a Set or IF node can do. Visual nodes are easier for the next person to read."),
+            "This lesson uses a Code node so you can see items directly. In real workflows, prefer Set, IF and Filter when they can do the job: visual nodes are easier for the next person to read."),
     "L02": ("Triggers decide **when** a workflow runs; a Config node decides **with what settings**.",
             "An alarm clock (Schedule) wakes a worker who first reads the sticky note on the fridge (Config) before starting the day.",
             "Don't schedule every minute \"just in case\". Choose the slowest schedule the business can live with, since APIs rate-limit and executions cost money."),

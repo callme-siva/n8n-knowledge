@@ -2,7 +2,7 @@
 
 # L18 · Resume ↔ job fit analyser
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Career / HR / recruiting](https://img.shields.io/badge/domain-Career_/_HR_/_recruiting-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Career / HR / recruiting](https://img.shields.io/badge/domain-Career_/_HR_/_recruiting-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -248,6 +248,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `sendTo` | `{{ $node["Candidate Submission"].json.Email }}` |
 | `subject` | `Your Resume & Job Fit Analysis, {{ $node["Candidate Submission"].json["Candidate Name"] }}` |
 | `message` | `<h2>Hi {{ $node["Candidate Submission"].json["Candidate Name"] }},</h2><p>Here is your personalized resume and job fit analysis.</p><h3>1. Resume Analysis</h3><div style="white-space:pre-wrap">{{ $node["Resume Analyst"].json.output }}</div><h3>2. Job Fit &amp; Comparison</h3><div style="white-space:pre-wrap">{{ $node["Job Fit Analyst"].json.output }}</div><h3>3. Interview Questions</h3><div style="white-space:pre-wrap">{{ $node["Interview Question Generator"].json.output }}</div><h3>4. Personalized Learning Plan</h3><div style="white-space:pre-wrap">{{ $node["Learning Plan Builder"].json.output }}</div><p>Best of luck!</p>` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -257,7 +260,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (6 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Try the same resume against 2 very different JDs. The scores should differ clearly.
 

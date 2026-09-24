@@ -1,16 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -234 940 420" width="940" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -268 940 454" width="940" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-234" width="940" height="420" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-234" width="940" height="420" rx="14" fill="url(#dots)"/>
-<rect x="-100" y="-234" width="940" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-214" width="940" height="16" fill="#1F2937"/>
-<circle cx="-80" cy="-216" r="5" fill="#FF5F57"/><circle cx="-62" cy="-216" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-216" r="5" fill="#28C840"/>
-<text x="-24" y="-211" font-size="13" fill="#E5E7EB" font-weight="600">L01 · Hello n8n — your first workflow</text>
-<rect x="-60" y="-158" width="420" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-46" y="-130" font-size="15" fill="#5B4B12" font-weight="700">👋 L01 · Hello n8n</text>
-<text x="-46" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">1. Click Execute workflow</text>
-<text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">2. Click each node → look at the OUTPUT panel</text>
-<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">3. Change the name in Set Your Data and run again</text>
-<text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">Data in n8n = a list of items, each item = JSON.</text>
+<rect x="-100" y="-268" width="940" height="454" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-268" width="940" height="454" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-268" width="940" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-248" width="940" height="16" fill="#1F2937"/>
+<circle cx="-80" cy="-250" r="5" fill="#FF5F57"/><circle cx="-62" cy="-250" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-250" r="5" fill="#28C840"/>
+<text x="-24" y="-245" font-size="13" fill="#E5E7EB" font-weight="600">L01 · Hello n8n — your first workflow</text>
+<rect x="-60" y="-192" width="420" height="152" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-46" y="-164" font-size="15" fill="#5B4B12" font-weight="700">👋 L01 · Hello n8n</text>
+<text x="-46" y="-142" font-size="12.5" fill="#5B4B12" font-weight="400">1. Click Execute workflow</text>
+<text x="-46" y="-125" font-size="12.5" fill="#5B4B12" font-weight="400">2. Click each node → look at the OUTPUT panel</text>
+<text x="-46" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">3. Change the name in Set Your Data and run again</text>
+<text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Data in n8n = a list of items, each item = JSON.</text>
+<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">No Gmail yet? Skip it: the lesson is done once Build</text>
+<text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">Greeting shows your message.</text>
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,50.0 C380.0,50.0 380.0,50.0 436,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M540,50.0 C600.0,50.0 600.0,50.0 656,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>

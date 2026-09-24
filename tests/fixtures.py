@@ -41,7 +41,7 @@ TRIGGERS = {
         {"status": "firing", "fingerprint": "fp-disk-1", "labels": {"alertname": "DiskFilling", "severity": "warning", "service": "db"}, "annotations": {"summary": "Disk 85%"}, "startsAt": "2026-09-24T10:01:00Z"},
         {"status": "resolved", "fingerprint": "fp-unknown", "labels": {"alertname": "Old", "severity": "warning", "service": "x"}, "annotations": {}, "endsAt": "2026-09-24T10:05:00Z"}]}}],
     "P04-sales-followup-sequence": [{"Name": "Karan", "Email": "Karan@Studio.example.com", "Company": "Pixel Studio", "What do you need?": "Automate social posting"}],
-    "P06-purchase-approval-multilevel": [{"Your email": "req@example.com", "Manager email": "mgr@example.com", "Item / service": "MacBook Pro", "Amount (INR)": "215000", "Cost centre": "Engineering", "Justification": "Laptop replacement"}],
+    "P06-purchase-approval-multilevel": [{"Your email": "req@example.com", "Item / service": "MacBook Pro", "Amount (INR)": "215000", "Cost centre": "Engineering", "Justification": "Laptop replacement"}],
     "P07-employee-onboarding-orchestrator": [{"Full name": "Meera Iyer", "Personal email": "meera@example.com", "Role": "Engineer", "Start date": "2026-10-01", "Manager email": "mgr@example.com", "Team Slack channel": "#team-payments"}],
     "P09-deep-research-agent": [{"Question": "Top open-source Zapier alternatives?", "Audience": "Executive (1 page)", "Send report to": "you@example.com"}],
     "P10a-tool-lookup-customer": [{"email": "Asha@Finlytics.example.com"}],
@@ -88,6 +88,8 @@ FIXTURES = {
         {"name": "Ravi", "email": "ravi@example.com", "birthday": "1991-01-02", "joined": "2024-03-01"}])},
     "L22-ai-lead-qualifier-router": {"Qualify Lead": AI(output={"score": 82, "tier": "hot", "reason": "Clear need, right size, this month", "use_case": "Invoice extraction", "suggested_reply": "Hi Asha, …"})},
     "P01-invoice-processing-pipeline": {
+        "Read Ledger": ("all", [{"invoice_no": "INV-4411", "logged_at": "2026-09-20T10:15:00+05:30", "vendor": "Acme Supplies Pvt Ltd", "dedupe_key": "acmesuppliespvtltd|INV-4411", "approval": "auto (under limit)",
+                                  "currency": "INR", "due_date": "2026-10-01", "file": "INV-4411.pdf", "gstin": "29ABCDE1234F1Z5", "invoice_date": "2026-09-01", "subtotal": 10000, "tax": 1800, "total": 11800}]),   # already processed → must be skipped
         # Stand-in for the AI extractor: deterministic regex over the REAL text pdf.js extracted from the sample PDFs
         "Extract Invoice Fields": ("code", r"""const t = $json.text || '';
 const num = re => { const m = t.match(re); return m ? Number(m[1].replace(/,/g, '')) : undefined; };
@@ -102,6 +104,7 @@ return { json: { output: { vendor_name: str(/TAX INVOICE\s+(.+?)\s+\d+ MG Road/)
     "P05-bulk-ai-enrichment-checkpointed": {
         "Pending Rows Only": ("all", [{"row_id": str(i), "company": f"Co {i}", "website": f"https://co{i}.example.com", "description": "B2B SaaS for invoices", "status": "pending"} for i in range(1, 24)]),
         "Classify Company": AI(output={"industry": "SaaS", "b2b": True, "icp_score": 78, "reason": "Digital, process-heavy"})},
+    "P06-purchase-approval-multilevel": {"Lookup Manager": ("all", [{"email": "req@example.com", "manager_email": "mgr@example.com"}])},
     "P08-sheets-jira-sync-hashing": {"Read Backlog Sheet": ("all", [
         {"row_id": "1", "summary": "New story", "description": "d1", "priority": "High", "jira_key": "", "sync_hash": ""},
         {"row_id": "2", "summary": "Changed story", "description": "edited", "priority": "Low", "jira_key": "SCRUM-7", "sync_hash": "stale"},
@@ -126,6 +129,9 @@ return { json: { output: { vendor_name: str(/TAX INVOICE\s+(.+?)\s+\d+ MG Road/)
         {"invoice_no": "INV-2", "client": "Beta", "email": "b@example.com", "amount": "5000", "due_date": D(-1), "status": "unpaid", "last_reminded": ""},
         {"invoice_no": "INV-3", "client": "Gamma", "email": "c@example.com", "amount": "900", "due_date": D(3), "status": "paid", "last_reminded": ""}])},
     "Q07-gmail-ai-auto-labeler": {"Classify": 0},
+    # 6 recent + 2 old articles, newest first like a real feed → 6 posted, oldest first
+    "Q08-rss-to-telegram-dedupe": {"Read Feed": ("all", [{"title": f"Post {i}", "link": f"https://blog.example.com/p{i}", "contentSnippet": "…",
+                                                           "isoDate": f"{D(-(i // 2) if i < 6 else -20)}T08:00:00.000Z"} for i in range(8)])},
 }
 
 
@@ -133,6 +139,20 @@ return { json: { output: { vendor_name: str(/TAX INVOICE\s+(.+?)\s+\d+ MG Road/)
 # Each check: ("count", node, output_index, expected_items)  or  ("contains", node, text)  or  ("absent", node, text)
 # count = total items that node emitted on that output (summed over loop iterations).
 EXPECT = {
+    "L01-hello-n8n": [("contains", "Build Greeting", "Hello "), ("count", "Send to Yourself", 0, 1)],
+    "L02-daily-weather-email": [("contains", "Fetch Weather", "temperature_2m"), ("count", "Email Summary", 0, 1)],
+    "L03-job-search-api": [("count", "Format Email", 0, 1), ("contains", "Format Email", "<tr>")],
+    "L11-ai-news-digest-llm-chain": [("count", "Filter · Dedupe · Sort", 0, 1), ("count", "Email Briefing", 0, 1)],
+    "L16-sprint-report-multi-agent": [("contains", "Compute Sprint Metrics", "Sprint 24"), ("count", "Email Daily Report", 0, 1)],
+    "L20a-subworkflow-send-branded-email": [("contains", "Wrap in Template", "Happy birthday!"), ("contains", "Return Result", "\"sent\":true")],
+    "L21-website-uptime-monitor": [("count", "Compare with Last State", 0, 3), ("count", "State Changed?", 0, 0)],   # first run: no previous state → no alert
+    "Q02-price-drop-tracker": [("contains", "Compare with Last Price", "\"price\":51.77"), ("count", "Worth Alerting?", 0, 1)],   # demo target 55 > price
+    # AI-only workflows: every node that matters is an AI node, so these checks prove the wiring and routing, not the AI output
+    "L13-rag-policy-chatbot": [("count", "Store in Vector DB", 0, 1)],
+    "L14-ai-agent-with-tools": [("contains", "Assistant Agent", "2,249.82")],
+    "L17-complaint-handler-multi-agent": [("count", "Send Response Email", 0, 1)],
+    "P09-deep-research-agent": [("count", "Email Report", 0, 1)],
+    "Q07-gmail-ai-auto-labeler": [("count", "Label: Billing", 0, 1)],
     "L04-currency-alert-switch": [("count", "API OK?", 0, 1)],
     "L05-rss-news-code-node": [("count", "Filter · Dedupe · Sort", 0, 1)],
     "L06-gmail-pdf-to-drive": [("count", "Split PDF Attachments", 0, 1), ("contains", "Split PDF Attachments", "_bill.pdf")],
@@ -147,13 +167,13 @@ EXPECT = {
     "L18-resume-job-fit-multi-agent": [("contains", "Extract Resume Text", "Certified Scrum Master")],
     "L22-ai-lead-qualifier-router": [("count", "Route by Tier", 0, 1)],
     "P01-invoice-processing-pipeline": [("count", "Valid?", 0, 2), ("count", "Valid?", 1, 1), ("count", "Needs Approval?", 0, 1),
-                                        ("count", "Append to Ledger", 0, 2), ("contains", "Log Exception", "≠ total"), ("contains", "Validate", "\"invoice_number\":\"INV-9001\""),
+                                        ("count", "New Invoice?", 1, 1), ("count", "Append to Ledger", 0, 1), ("contains", "Log Exception", "≠ total"), ("contains", "Validate", "\"invoice_number\":\"INV-9001\""),
                                         ("contains", "PDF → Text", "Grand Total: INR 11,800.00")],
     "P02-support-inbox-copilot": [("count", "Confident?", 0, 1), ("count", "Create Gmail Draft", 0, 1)],
     "P03-incident-response-orchestrator": [("count", "Route", 0, 1), ("count", "Route", 1, 1), ("count", "Route", 3, 1), ("count", "Open Jira Incident", 0, 1)],
     "P04-sales-followup-sequence": [("count", "Replied? #1", 1, 1), ("count", "Replied? #2", 1, 1), ("contains", "CRM: Closed, No Reply", "no_reply_closed")],
     "P05-bulk-ai-enrichment-checkpointed": [("count", "Checkpoint to Sheet", 0, 23), ("contains", "Summary", "\"processed\":23"), ("contains", "Summary", "\"errors\":0")],
-    "P06-purchase-approval-multilevel": [("count", "Needs Finance?", 0, 1), ("contains", "Final: Approved", "\"status\":\"approved\"")],
+    "P06-purchase-approval-multilevel": [("count", "Manager OK?", 0, 1), ("contains", "Create Request", "\"manager\":\"mgr@example.com\""), ("count", "Needs Finance?", 0, 1), ("contains", "Final: Approved", "\"status\":\"approved\"")],
     "P07-employee-onboarding-orchestrator": [("count", "Create Jira Task", 0, 7), ("count", "Book Calendar Event", 0, 4), ("count", "Wait for Both", 0, 1)],
     "P08-sheets-jira-sync-hashing": [("count", "Operation", 0, 1), ("count", "Operation", 1, 1), ("count", "Operation", 2, 1)],
     "P10a-tool-lookup-customer": [("contains", "Shape Answer", "\"found\":true")],
@@ -164,5 +184,6 @@ EXPECT = {
     "Q03-telegram-capture-bot": [("count", "Valid Command?", 0, 1), ("contains", "Parse Command", "\"amount\":120")],
     "Q04-github-stale-pr-reminder": [("contains", "Find Stale", "\"count\":1")],
     "Q05-weekly-kpi-chart-email": [("contains", "Group by Week", "\"labels\"")],
+    "Q08-rss-to-telegram-dedupe": [("count", "Recent Only", 0, 6), ("count", "Post to Channel", 0, 6), ("contains", "Oldest First", "p5\"")],
     "Q06-invoice-due-reminders": [("count", "Stage", 0, 1), ("count", "Stage", 1, 1), ("count", "Write Back", 0, 2)],
 }

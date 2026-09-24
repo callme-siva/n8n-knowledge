@@ -2,7 +2,7 @@
 
 # L10 · Bug report form → Jira issue
 
-![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Agile / product support](https://img.shields.io/badge/domain-Agile_/_product_support-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Agile / product support](https://img.shields.io/badge/domain-Agile_/_product_support-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -156,6 +156,9 @@ return { json: { ...$json, priority,
 | `summary` | `{{ $json.summary }}` |
 | `additionalFields.description` | `{{ $json.description }}` |
 | `additionalFields.labels` | from-form |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -170,6 +173,9 @@ return { json: { ...$json, priority,
 | `emailType` | html |
 | `message` | `<p>Thanks! Your report is now ticket <b>{{ $json.key }}</b> with priority {{ $('Map Severity → Priority').item.json.priority }}.</p><p>We'll update you when it's fixed.</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -179,7 +185,7 @@ return { json: { ...$json, priority,
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (3 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Submit a Blocker bug. Check that the Jira issue exists and that the email shows the key.
 

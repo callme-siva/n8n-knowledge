@@ -2,7 +2,7 @@
 
 # L09 · Expense logger API with Webhook
 
-![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Finance / developer](https://img.shields.io/badge/domain-Finance_/_developer-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Finance / developer](https://img.shields.io/badge/domain-Finance_/_developer-334155?style=flat-square) ![build time: 25 min](https://img.shields.io/badge/build_time-25_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -199,6 +199,9 @@ return { json: { valid: errors.length === 0, errors,
 | `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
 | `sheetName` | Expenses |
 | `columns.mappingMode` | autoMapInputData |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -232,7 +235,7 @@ return { json: { valid: errors.length === 0, errors,
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 6/7 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 6/7 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] `curl ... -H 'X-API-Key: <key>' -d '{"amount":450,"category":"food"}'` should return 201.
 - [ ] `curl ... -H 'X-API-Key: <key>' -d '{"amount":-5,"category":"pizza"}'` should return 400 with 2 errors.

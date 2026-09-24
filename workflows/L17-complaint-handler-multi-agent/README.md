@@ -2,7 +2,7 @@
 
 # L17 · Customer complaint handler (5 agents)
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 20](https://img.shields.io/badge/nodes-20-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Customer support](https://img.shields.io/badge/domain-Customer_support-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 20](https://img.shields.io/badge/nodes-20-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -448,6 +448,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | text |
 | `message` | `{{ $json.output }}` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -457,7 +460,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (7 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Try an angry high-value complaint (it should escalate) and a mild one (it shouldn't).
 

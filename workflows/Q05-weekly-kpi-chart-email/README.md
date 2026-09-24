@@ -2,7 +2,7 @@
 
 # Q05 · Weekly KPI chart email
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Management / sales](https://img.shields.io/badge/domain-Management_/_sales-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 5](https://img.shields.io/badge/nodes-5-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Management / sales](https://img.shields.io/badge/domain-Management_/_sales-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 5](https://img.shields.io/badge/nodes-5-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -146,6 +146,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 |---|---|
 | `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
 | `sheetName` | Sales |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -204,6 +207,9 @@ return [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, c
 | `message` | `<p>Last week: <b>₹{{ $json.last.toLocaleString('en-IN') }}</b>, previous: ₹{{ $json.prev.toLocaleString('en-IN') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>` |
 | `appendAttribution` | off |
 | `attachmentsUi.attachmentsBinary.property` | chart |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -213,7 +219,7 @@ return [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, c
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Run it and open the PNG in the QuickChart output's Binary tab before emailing.
 

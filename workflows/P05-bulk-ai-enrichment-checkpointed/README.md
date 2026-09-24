@@ -2,7 +2,7 @@
 
 # P05 · Bulk AI enrichment with batches and checkpoints
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales ops / data](https://img.shields.io/badge/domain-Sales_ops_/_data-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales ops / data](https://img.shields.io/badge/domain-Sales_ops_/_data-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) [![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -172,6 +172,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `sheetName` | Companies |
 | `filtersUI.lookupColumn` | status |
 | `filtersUI.lookupValue` | pending |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -277,6 +280,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `sheetName` | Companies |
 | `columns.mappingMode` | autoMapInputData |
 | `columns.matchingColumns` | row_id |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -318,7 +324,7 @@ return [{ json: { processed: rows.length, done: rows.length - errors, errors, fi
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 9/10 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 9/10 nodes executed in real n8n (3 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Break one row on purpose (empty description) → `status = error` with a reason, and the rest continue.
 

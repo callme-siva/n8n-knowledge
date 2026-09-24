@@ -2,7 +2,7 @@
 
 # L04 · Currency rate alert
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Finance / personal](https://img.shields.io/badge/domain-Finance_/_personal-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Finance / personal](https://img.shields.io/badge/domain-Finance_/_personal-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -215,6 +215,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | html |
 | `message` | `<p>Rate is <b>{{ $json.rate }}</b>, above your threshold. Good time to send money home.</p><p>Updated: {{ $json.updated }}</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -229,6 +232,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | html |
 | `message` | `<p>Rate is <b>{{ $json.rate }}</b>, below your threshold. Good time to buy USD.</p><p>Updated: {{ $json.updated }}</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -256,7 +262,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 7/10 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 7/10 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Set `high` to 1 and run it. You should get the HIGH email.
 - [ ] Set `base` to `XYZ` and run it. You should hit the Stop and Error branch.

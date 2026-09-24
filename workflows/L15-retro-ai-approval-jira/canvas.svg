@@ -1,17 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -234 940 1058" width="940" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -404 940 1228" width="940" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-234" width="940" height="1058" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-234" width="940" height="1058" rx="14" fill="url(#dots)"/>
-<rect x="-100" y="-234" width="940" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-214" width="940" height="16" fill="#1F2937"/>
-<circle cx="-80" cy="-216" r="5" fill="#FF5F57"/><circle cx="-62" cy="-216" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-216" r="5" fill="#28C840"/>
-<text x="-24" y="-211" font-size="13" fill="#E5E7EB" font-weight="600">L15 · Retrospective → AI action items → human approval → Jira</text>
-<rect x="-60" y="-158" width="500" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
-<text x="-46" y="-130" font-size="15" fill="#5B4B12" font-weight="700">✋ L15 · Human-in-the-loop</text>
-<text x="-46" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">AI drafts the action items, but a human approves before anything is</text>
-<text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">created in Jira.</text>
-<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">Gmail Send and Wait for Response pauses the execution until the Scrum</text>
-<text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">Master clicks Approve / Decline.</text>
-<path d="M100,50.0 C170.0,50.0 170.0,50.0 236,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<rect x="-100" y="-404" width="940" height="1228" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-404" width="940" height="1228" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-404" width="940" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-384" width="940" height="16" fill="#1F2937"/>
+<circle cx="-80" cy="-386" r="5" fill="#FF5F57"/><circle cx="-62" cy="-386" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-386" r="5" fill="#28C840"/>
+<text x="-24" y="-381" font-size="13" fill="#E5E7EB" font-weight="600">L15 · Retrospective → AI action items → human approval → Jira</text>
+<rect x="-60" y="-328" width="500" height="118" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="-46" y="-300" font-size="15" fill="#5B4B12" font-weight="700">✋ L15 · Human-in-the-loop</text>
+<text x="-46" y="-278" font-size="12.5" fill="#5B4B12" font-weight="400">AI drafts the action items, but a human approves before anything is</text>
+<text x="-46" y="-261" font-size="12.5" fill="#5B4B12" font-weight="400">created in Jira.</text>
+<text x="-46" y="-244" font-size="12.5" fill="#5B4B12" font-weight="400">Gmail Send and Wait for Response pauses the execution until the Scrum</text>
+<text x="-46" y="-227" font-size="12.5" fill="#5B4B12" font-weight="400">Master clicks Approve / Decline.</text>
+<path d="M100,50.0 C140,50.0 80,-120.0 116,-120.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<path d="M220,-120.0 C260,-120.0 200,50.0 236,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M340,50.0 C450.0,50.0 450.0,50.0 556,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M660,50.0 H684 Q694,50.0 694,60.0 V343 Q694,353 684,353 H-34 Q-44,353 -44,363 V558.0 Q-44,568.0 -34,568.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M100,568.0 C160.0,568.0 160.0,568.0 216,568.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
@@ -27,6 +28,10 @@
 <rect x="22" y="18" width="56" height="56" rx="12" fill="#E8F7EE"/>
 <text x="50" y="55" font-size="24" text-anchor="middle" fill="#2EA44F" font-weight="700">☰</text>
 <text x="50.0" y="120" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">Retrospective Form</text>
+<rect x="120" y="-170" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#sh)"/>
+<rect x="142" y="-152" width="56" height="56" rx="12" fill="#EEF2F7"/>
+<text x="170" y="-115" font-size="24" text-anchor="middle" fill="#64748B" font-weight="700">✎</text>
+<text x="170.0" y="-50" font-size="12.5" text-anchor="middle" fill="#1F2937" font-weight="600">⚙️ Config</text>
 <rect x="240" y="0" width="100" height="100" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" filter="url(#sh)"/>
 <rect x="262" y="18" width="56" height="56" rx="12" fill="#F1EBFF"/>
 <text x="290" y="55" font-size="24" text-anchor="middle" fill="#7C3AED" font-weight="700">✦</text>

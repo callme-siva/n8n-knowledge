@@ -2,7 +2,7 @@
 
 # Q07 · Gmail AI auto-labeler
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Productivity / support](https://img.shields.io/badge/domain-Productivity_/_support-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Productivity / support](https://img.shields.io/badge/domain-Productivity_/_support-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 8](https://img.shields.io/badge/nodes-8-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -177,6 +177,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `operation` | addLabels |
 | `messageId` | `{{ $json.id }}` |
 | `labelIds` | REPLACE_LABEL_ID_BILLING, REPLACE_LABEL_ID_AI_LABELED |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -189,6 +192,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `operation` | addLabels |
 | `messageId` | `{{ $json.id }}` |
 | `labelIds` | REPLACE_LABEL_ID_SUPPORT, REPLACE_LABEL_ID_AI_LABELED |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -201,6 +207,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `operation` | addLabels |
 | `messageId` | `{{ $json.id }}` |
 | `labelIds` | REPLACE_LABEL_ID_SALES, REPLACE_LABEL_ID_AI_LABELED |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -213,6 +222,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `operation` | addLabels |
 | `messageId` | `{{ $json.id }}` |
 | `labelIds` | REPLACE_LABEL_ID_NEWSLETTER, REPLACE_LABEL_ID_AI_LABELED |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -225,6 +237,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `operation` | addLabels |
 | `messageId` | `{{ $json.id }}` |
 | `labelIds` | REPLACE_LABEL_ID_OTHER, REPLACE_LABEL_ID_AI_LABELED |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -234,7 +249,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 3/7 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 3/7 nodes executed in real n8n (7 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Send yourself test emails: a fake invoice, a "your app is broken", a "can I get pricing?". Check the labels.
 

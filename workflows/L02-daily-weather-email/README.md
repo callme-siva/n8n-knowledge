@@ -2,7 +2,7 @@
 
 # L02 · Daily weather email
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -169,6 +169,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | html |
 | `message` | `<h2>{{ $('⚙️ Config').item.json.city }} today</h2><ul><li>Now: {{ $json.current.temperature_2m }}°C, humidity {{ $json.current.relative_humidity_2m }}%, wind {{ $json.current.wind_speed_10m }} km/h</li><li>High / Low: {{ $json.daily.temperature_2m_max[0] }}°C / {{ $json.daily.temperature_2m_min[0] }}°C</li><li>Chance of rain: {{ $json.daily.precipitation_probability_max[0] }}% {{ $json.daily.precipitation_probability_max[0] > 50 ? '☔ carry an umbrella' : '' }}</li></ul>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -178,7 +181,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (1 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Click *Execute workflow*. A schedule workflow can always be run manually for testing.
 - [ ] Check **Executions** (left sidebar) the next morning to see the automatic run.

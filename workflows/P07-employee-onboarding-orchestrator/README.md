@@ -2,7 +2,7 @@
 
 # P07 · Employee onboarding orchestrator
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: HR / people ops / IT](https://img.shields.io/badge/domain-HR_/_people_ops_/_IT-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: HR / people ops / IT](https://img.shields.io/badge/domain-HR_/_people_ops_/_IT-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) [![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -233,6 +233,9 @@ return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch
 | `end` | `{{ $json.end }}` |
 | `additionalFields.summary` | `{{ $json.title }}` |
 | `additionalFields.attendees` | `{{ $json.attendee }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -269,6 +272,9 @@ return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch
 | `emailType` | html |
 | `message` | `<p>We're thrilled you're joining us on <b>{{ $('New Joiner Form (HR)').first().json['Start date'] }}</b>.</p><p>Day 1: 10:00 welcome, 11:00 IT setup, 13:00 team lunch, 16:00 1:1 with your manager.</p><p>Bring a government ID and your bank details for payroll. See you soon!</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -281,6 +287,9 @@ return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch
 | `select` | channel |
 | `channelId` | `{{ $('New Joiner Form (HR)').first().json['Team Slack channel'] \|\| '#general' }}` |
 | `text` | `:wave: Please welcome *{{ $('New Joiner Form (HR)').first().json['Full name'] }}* ({{ $('New Joiner Form (HR)').first().json.Role }}) joining on {{ $('New Joiner Form (HR)').first().json['Start date'] }}!` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -295,6 +304,9 @@ return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch
 | `emailType` | html |
 | `message` | `<p>Jira tasks: {{ $('Wait for Both').first().json.key.join(', ') }}</p><p>Calendar: {{ $('Wait for Both').first().json.htmlLink.length }} events booked.</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -304,7 +316,7 @@ return [['Welcome & company intro', 10, 0, 45], ['IT setup', 11, 0, 60], ['Lunch
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 11/11 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 11/11 nodes executed in real n8n (6 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] 7 Jira tasks, 4 calendar events, a welcome email, a Slack post and an HR summary.
 - [ ] Try each role and check the checklists differ.

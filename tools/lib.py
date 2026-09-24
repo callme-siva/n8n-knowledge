@@ -10,6 +10,11 @@ def _id(seed):
     return str(uuid.uuid5(uuid.NAMESPACE_URL, seed))
 
 
+# Nodes that call an external service. Unless a spec says otherwise they retry 3× (tools/validate.py enforces it).
+EXTERNAL = {"httpRequest", "gmail", "googleSheets", "jira", "slack", "telegram", "googleDrive", "googleCalendar", "rssFeedRead"}
+RETRY = {"retryOnFail": True, "maxTries": 3, "waitBetweenTries": 3000}
+
+
 class WF:
     def __init__(self, slug, name):
         self.slug, self.name = slug, name
@@ -51,6 +56,10 @@ class WF:
         self.link(src, dst, kind=kind)
 
     def to_json(self):
+        for n in self.nodes:   # also covers nodes loaded from exported JSON
+            if n["type"].split(".")[-1] in EXTERNAL and n["parameters"].get("operation") != "sendAndWait" \
+                    and not n.get("retryOnFail") and n.get("onError") is None:
+                n.update(RETRY)
         return {"name": self.name, "nodes": self.nodes, "connections": self.conns,
                 "active": False, "settings": {"executionOrder": "v1"},
                 "tags": [], "pinData": {}}
@@ -183,11 +192,12 @@ def render_readme(r, data, diagram):
     nodes = [n for n in data["nodes"] if "stickyNote" not in n["type"]]
     t = _test_result(r.get("slug", ""))
     if t and t.get("status") == "passed":
-        tbadge = badge("e2e test", f"passed · {t.get('checks', 0)} checks", "2EA44F")
+        tbadge = badge("e2e test", f"passed · {t.get('checks', 0)} checks", "2EA44F") if t.get("checks") else badge("e2e test", "smoke run only", "D4A106")
     elif t and t.get("status") == "structure-only":
         tbadge = badge("e2e test", "structure only", "64748B")
     else:
         tbadge = badge("e2e test", "not run", "9CA3AF")
+    tbadge = f"[{tbadge}](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)"   # CI re-runs it on every push
     L = ['<div align="center">', "", f"# {r['num']} · {r['title']}", "",
          " ".join([badge("level", lvl_name, color), badge("domain", r["domain"], "334155"),
                    badge("build time", r["time"], "0EA5E9"), badge("nodes", str(len(nodes)), "7C3AED"), tbadge]), "",
@@ -223,7 +233,7 @@ def render_readme(r, data, diagram):
     L += ["", node_reference(data), "## ✅ Test it", ""]
     if t and t.get("status") == "passed":
         L += ["> [!TIP]", f"> **Automated end-to-end test: passed.** {t.get('nodes_ran')}/{t.get('real_nodes', 0) + t.get('mocked_nodes', 0)} nodes executed in real n8n "
-              f"({t.get('mocked_nodes')} credentialed nodes replaced by realistic mocks), {t.get('checks', 0)} behaviour checks. See [tests/](../../tests/README.md).", ""]
+              f"({t.get('mocked_nodes')} credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), {t.get('checks', 0)} behaviour checks. See [tests/](../../tests/README.md).", ""]
     L += [*[f"- [ ] {x}" for x in r["test"]], "",
           "## 🧯 Troubleshooting", "",
           "Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).", ""]
@@ -244,6 +254,11 @@ def render_readme(r, data, diagram):
 # ---------- helpers added for the Quick-wins and Projects tracks ----------
 def slack_post(channel, text):
     return {"select": "channel", "channelId": {"__rl": True, "mode": "name", "value": channel}, "text": text, "otherOptions": {}}
+
+
+def slack_post_id(text):
+    """Post to the channel ID stored in ⚙️ Config (IDs survive channel renames)."""
+    return {"select": "channel", "channelId": {"__rl": True, "mode": "id", "value": "={{ $('⚙️ Config').first().json.slack_channel_id }}"}, "text": text, "otherOptions": {}}
 
 
 def sheet_read(sheet_name, lookup_column=None, lookup_value=None):

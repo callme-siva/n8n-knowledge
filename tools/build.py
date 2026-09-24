@@ -38,7 +38,7 @@ from lib import REGISTRY, LEVELS
 strip = lambda t: re.sub(r"\*\*|`|\*", "", t)
 blocks = []
 for key, head in [("🟢", "🟢 Level 1 · Basics"), ("🟡", "🟡 Level 2 · Integrations"), ("🟠", "🟠 Level 3 · AI"), ("🔴", "🔴 Level 4 · Multi-agent & production"),
-                  ("⚡", "⚡ Quick wins: useful in 15 minutes"), ("🏭", "🏭 Real-world projects: production-grade systems")]:
+                  ("⚡", "⚡ Quick wins: useful in 15 minutes"), ("🏭", "🏭 Projects: real business processes")]:
     rows = [r for r in REGISTRY if r["level"].startswith(key) and not r["num"].endswith("a")]
     blocks += [f"### {head}", "", "| # | Lesson | Domain | Key concepts | Time |", "|:-:|---|---|---|:-:|"]
     for r in rows:
@@ -59,6 +59,16 @@ s = re.sub(r"<!-- LESSONS:START -->.*<!-- LESSONS:END -->", lambda m: "<!-- LESS
 s = re.sub(r"<!-- GALLERY:START -->.*<!-- GALLERY:END -->", lambda m: "<!-- GALLERY:START -->\n" + "\n".join(gal) + "\n<!-- GALLERY:END -->", s, flags=re.S)
 open(p, "w").write(s)
 print("README tables + gallery updated")
+
+# ---- counts quoted in the docs come from the test fixtures, never typed by hand
+sys.path.insert(0, os.path.join(ROOT, "tests"))
+from fixtures import EXPECT
+n_checks = sum(map(len, EXPECT.values()))
+for f in ("README.md", "tests/README.md", "docs/testing.md"):
+    p = os.path.join(ROOT, f); t = open(p).read()
+    t = re.sub(r"\d+ behaviour checks", f"{n_checks} behaviour checks", t)
+    open(p, "w").write(t)
+print(n_checks, "behaviour checks")
 
 import roadmap
 roadmap.build(os.path.join(ROOT, "assets", "learning-path.svg"))

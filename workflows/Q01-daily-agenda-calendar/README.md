@@ -2,7 +2,7 @@
 
 # Q01 · Daily agenda + free focus slots
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Personal productivity](https://img.shields.io/badge/domain-Personal_productivity-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -135,6 +135,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `timeMax` | `{{ $today.plus({ days: 1 }) }}` |
 | `singleEvents` | ✅ on |
 | `orderBy` | startTime |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 | `⚙️ Always output data` | ✅ on |
 
 </details>
@@ -181,6 +184,9 @@ return [{ json: { subject: `📅 ${ev.length} meetings · ${Math.round(mins / 60
 | `emailType` | html |
 | `message` | `{{ $json.html }}` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -190,7 +196,7 @@ return [{ json: { subject: `📅 ${ev.length} meetings · ${Math.round(mins / 60
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Run on a day with 2+ meetings and check that the gaps are right.
 - [ ] Run on a weekend. You should get "No meetings 🎉".

@@ -2,7 +2,7 @@
 
 # Q02 · Price drop tracker
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Shopping / e-commerce ops](https://img.shields.io/badge/domain-Shopping_/_e--commerce_ops-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Shopping / e-commerce ops](https://img.shields.io/badge/domain-Shopping_/_e--commerce_ops-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -96,11 +96,7 @@ Schedule (6 h) → Code (product list) → HTTP GET page → HTML extract price 
 
 ## 📝 Before you run it
 
-Replace these placeholder values with your own:
-
-| Node | Field | Placeholder |
-|---|---|---|
-| Price Alert | `sendTo` | `you@example.com` |
+No placeholder values. It runs as-is once the credentials are connected.
 
 Nodes that need a credential selected after import: **Gmail**.
 
@@ -136,16 +132,18 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `jsCode` | (JavaScript, 5 lines, shown below) |
+| `jsCode` | (JavaScript, 7 lines, shown below) |
 
 **Code:**
 
 ```javascript
 // Add as many products as you like. selector = CSS selector of the price element.
+// The first demo target (55) is ABOVE the current price (51.77) so your first test run sends an alert. Lower it afterwards.
+const ALERT_TO = 'you@example.com';
 return [
-  { name: 'A Light in the Attic', url: 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html', selector: 'p.price_color', target: 45 },
+  { name: 'A Light in the Attic', url: 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html', selector: 'p.price_color', target: 55 },
   { name: 'Tipping the Velvet', url: 'https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html', selector: 'p.price_color', target: 50 },
-].map(p => ({ json: p }));
+].map(p => ({ json: { ...p, alert_to: ALERT_TO } }));
 ```
 
 </details>
@@ -220,11 +218,14 @@ return $input.all().map((it, i) => {
 
 | Property | Value |
 |---|---|
-| `sendTo` | you@example.com |
+| `sendTo` | `{{ $json.alert_to }}` |
 | `subject` | `🏷️ {{ $json.name }} now {{ $json.price }} ({{ $json.dropPct }}% drop)` |
 | `emailType` | html |
 | `message` | `<p><b>{{ $json.name }}</b> is now <b>{{ $json.price }}</b> (was {{ $json.last ?? 'unknown' }}, target {{ $json.target }}).</p><p><a href="{{ $json.url }}">Open product</a></p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -234,9 +235,10 @@ return $input.all().map((it, i) => {
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 6/7 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (1 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
-- [ ] Set `target` above the current price, then run it. You should get an alert.
+- [ ] Run it once as-is: the first demo product's target (55) is above its price, so you get an alert. Run it again with targets below the price: no alert, because nothing dropped.
+- [ ] **Manual runs don't save static data.** *Compare with Last Price* only remembers prices between **active** (scheduled) runs, so `last` stays `null` while you test by hand. See L21 for the same pattern.
 - [ ] Check that a broken URL doesn't stop the other products (*On Error → Continue*).
 
 ## 🧯 Troubleshooting

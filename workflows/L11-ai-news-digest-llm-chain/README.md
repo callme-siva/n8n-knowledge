@@ -2,7 +2,7 @@
 
 # L11 · AI news briefing with a Basic LLM Chain
 
-![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 9](https://img.shields.io/badge/nodes-9-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Learning / research](https://img.shields.io/badge/domain-Learning_/_research-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 9](https://img.shields.io/badge/nodes-9-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -246,6 +246,9 @@ return [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];
 | `emailType` | html |
 | `message` | `{{ $json.text }}<hr><details><summary>All {{ $('Filter · Dedupe · Sort').item.json.count }} headlines</summary>{{ $('Filter · Dedupe · Sort').item.json.html }}</details>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -255,7 +258,7 @@ return [{ json: { count: articles.length, html: `<ol>${li}</ol>`, listText } }];
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (2 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 8/8 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Run it and compare the briefing to the raw headlines. Did the model invent anything?
 - [ ] Change the system prompt to *Explain like I'm a school student* and run it again.

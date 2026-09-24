@@ -1,3 +1,2 @@
-invoice_no,logged_at,vendor,approval,currency,due_date,file,gstin,invoice_date,subtotal,tax,total
-INV-9001,2026-09-24T03:10:53.383Z,Acme Supplies Pvt Ltd,approved,INR,2026-10-01,INV-9001.pdf,27PQRSX5678K1Z2,2026-09-01,100000,18000,118000
-INV-4411,2026-09-24T03:10:53.387Z,Acme Supplies Pvt Ltd,auto (under limit),INR,2026-10-01,INV-4411.pdf,29ABCDE1234F1Z5,2026-09-01,10000,1800,11800
+invoice_no,logged_at,vendor,approval,currency,dedupe_key,due_date,file,gstin,invoice_date,subtotal,tax,total
+INV-4411,2026-09-20T10:15:00+05:30,Acme Supplies Pvt Ltd,auto (under limit),INR,acmesuppliespvtltd|INV-4411,2026-10-01,INV-4411.pdf,29ABCDE1234F1Z5,2026-09-01,10000,1800,11800

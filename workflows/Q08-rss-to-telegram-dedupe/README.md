@@ -2,7 +2,7 @@
 
 # Q08 · RSS → Telegram channel with dedupe across runs
 
-![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Marketing / community](https://img.shields.io/badge/domain-Marketing_/_community-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 5](https://img.shields.io/badge/nodes-5-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Quick win](https://img.shields.io/badge/level-Quick_win-0EA5E9?style=flat-square) ![domain: Marketing / community](https://img.shields.io/badge/domain-Marketing_/_community-334155?style=flat-square) ![build time: 15 min](https://img.shields.io/badge/build_time-15_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) [![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -23,7 +23,8 @@
 
 - **Remove Duplicates → Remove items seen in previous executions**
 - History size and what happens when it fills
-- **Limit** node to avoid flooding a channel on the first run
+- Why **filter before dedupe, never limit after it**: anything dropped after dedupe is marked seen and lost
+- Sorting so the channel reads in publish order
 - Telegram HTML formatting
 
 ## 🏗️ Architecture
@@ -33,10 +34,10 @@
 ```mermaid
 flowchart LR
   s0(["⏰ Schedule"]):::time
-  core{{"⚙️ n8n workflow<br/><small>5 nodes</small>"}}:::n8n
+  core{{"⚙️ n8n workflow<br/><small>7 nodes</small>"}}:::n8n
   state[("🗄️ memory<br/>between runs")]:::store
   core -.- state
-  s1["🌐 blog.n8n.io"]:::ext
+  s1["🌐 URLs from data"]:::ext
   s2["✈️ Telegram 🔑"]:::saas
   s0 -->|"fires"| core
   core <-->|"reads feed"| s1
@@ -53,16 +54,20 @@ flowchart LR
 <details><summary><b>Node-level flow</b> (every node and branch)</summary>
 
 ```mermaid
-flowchart LR
+flowchart TB
   n0(["Every 30 Minutes"]):::trigger
-  n1["Read Feed"]:::http
-  n2["Only New Links"]:::logic
-  n3["Max 5 per Run"]:::logic
-  n4["Post to Channel"]:::msg
+  n1["⚙️ Config"]:::code
+  n2["Read Feed"]:::http
+  n3{"Recent Only"}:::logic
+  n4["Oldest First"]:::msg
+  n5["Only New Links"]:::logic
+  n6["Post to Channel"]:::msg
   n0 --> n1
   n1 --> n2
   n2 --> n3
   n3 --> n4
+  n4 --> n5
+  n5 --> n6
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
   classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937
@@ -78,7 +83,7 @@ flowchart LR
 <details><summary>Plain-text flow</summary>
 
 ```
-Schedule (30 min) → RSS → Remove Duplicates (by link, across runs) → Limit 5 → Telegram channel
+Schedule (30 min) → Config → RSS → keep last 3 days → oldest first → Remove Duplicates (by link, across runs) → Telegram channel
 ```
 
 </details>
@@ -99,9 +104,10 @@ No placeholder values. It runs as-is once the credentials are connected.
 > In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
 
 1. Create a channel and add your bot as admin with *Post messages*.
-2. RSS Read → your feed URL.
-3. **Remove Duplicates** → operation *Remove items processed in previous executions*, value `{{ $json.link }}`.
-4. **Limit** 5, then Telegram *Send message* to `@your_channel_name`, parse mode HTML.
+2. Set the feed URL, channel and `max_age_days` in **⚙️ Config**.
+3. **Filter** `isoDate` is after `{{ $now.minus({ days: 3 }) }}`, then **Sort** by `isoDate` (ascending). This stops the first run flooding the channel with the whole feed.
+4. **Remove Duplicates** → operation *Remove items processed in previous executions*, value `{{ $json.link }}`.
+5. Telegram *Send message* to `{{ $('⚙️ Config').first().json.channel }}`, parse mode HTML.
 
 ## 🔍 Node-by-node reference
 
@@ -118,18 +124,50 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>2. Read Feed</b> · <code>RSS Read</code> v1.1</summary>
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `feed_url` | https://blog.n8n.io/rss/ |
+| `channel` | @your_channel_name |
+| `max_age_days` | 3 |
+
+</details>
+
+<details><summary><b>3. Read Feed</b> · <code>RSS Read</code> v1.1</summary>
 
 > Reads an RSS/Atom feed; outputs one item per article.
 
 | Property | Value |
 |---|---|
-| `url` | https://blog.n8n.io/rss/ |
+| `url` | `{{ $json.feed_url }}` |
 | `⚙️ On error` | Continue (regular output) |
 
 </details>
 
-<details><summary><b>3. Only New Links</b> · <code>removeDuplicates</code> v2</summary>
+<details><summary><b>4. Recent Only</b> · <code>Filter</code> v2.2</summary>
+
+> Keeps only items that match; drops the rest.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ $json.isoDate }} after {{ $now.minus({ days: $('⚙️ Config').first().json.max_age_day…` |
+
+</details>
+
+<details><summary><b>5. Oldest First</b> · <code>sort</code> v1</summary>
+
+
+
+| Property | Value |
+|---|---|
+| `sortFieldsUi.sortField.fieldName` | isoDate |
+
+</details>
+
+<details><summary><b>6. Only New Links</b> · <code>removeDuplicates</code> v2</summary>
 
 
 
@@ -141,26 +179,19 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>4. Max 5 per Run</b> · <code>limit</code> v1</summary>
+<details><summary><b>7. Post to Channel</b> · <code>telegram</code> v1.2</summary>
 
 
 
 | Property | Value |
 |---|---|
-| `maxItems` | 5 |
-
-</details>
-
-<details><summary><b>5. Post to Channel</b> · <code>telegram</code> v1.2</summary>
-
-
-
-| Property | Value |
-|---|---|
-| `chatId` | @your_channel_name |
+| `chatId` | `{{ $('⚙️ Config').first().json.channel }}` |
 | `text` | `📰 <b>{{ $json.title }}</b> {{ ($json.contentSnippet \|\| '').slice(0, 200) }}… {{ $json.link }}` |
 | `additionalFields.parse_mode` | HTML |
 | `additionalFields.appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -170,10 +201,11 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (2 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Run twice. The second run should post nothing.
-- [ ] The first run posts only 5 thanks to Limit, and the rest come next time.
+- [ ] The first run posts only articles from the last 3 days, oldest first.
+- [ ] **Activate** it. Like static data, dedupe history only builds up in real (active) runs you keep.
 
 ## 🧯 Troubleshooting
 
@@ -188,6 +220,12 @@ Use `@channelusername` for public channels, or the numeric `-100…` ID for priv
 <details><summary><b>Posts everything again after editing</b></summary>
 
 Dedupe history is per node. Deleting or recreating the node resets it.
+
+</details>
+
+<details><summary><b>A post failed and never came back</b></summary>
+
+The link was already marked seen. *Post to Channel* retries 3 times; if Telegram is down longer, repost by hand.
 
 </details>
 

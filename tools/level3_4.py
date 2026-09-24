@@ -223,6 +223,7 @@ def L15(root):
         "formFields": {"values": [form_field("Sprint", required=True, placeholder="Sprint 24"), form_field("What went well?", "textarea"),
             form_field("What didn't go well?", "textarea"), form_field("Suggestions", "textarea"),
             form_field("Team morale", "dropdown", True, ["1 - Very low", "2 - Low", "3 - Neutral", "4 - Good", "5 - Excellent"])]}, "options": {}}, (0, 0))
+    w.add("⚙️ Config", "set", 3.4, {**assign(scrum_master_email=EMAIL), "includeOtherFields": True, "include": "all"}, (120, -170))
     w.lc("Analyze Retro", "chainLlm", 1.5, {"promptType": "define", "hasOutputParser": True,
         "text": "=Sprint: {{ $json.Sprint }}\nMorale: {{ $json['Team morale'] }}\n\nWent well:\n{{ $json['What went well?'] }}\n\nDidn't go well:\n{{ $json[\"What didn't go well?\"] }}\n\nSuggestions:\n{{ $json.Suggestions }}",
         "messages": {"messageValues": [{"message": "You are an experienced agile coach. Summarise the feedback, rate sentiment, and propose at most 3 SMART action items (specific, owner role, measurable). Only include items the team can act on next sprint."}]}}, (240, 0))
@@ -235,7 +236,7 @@ def L15(root):
         "const li = (o.action_items || []).map((a, i) => `<li><b>${i + 1}. ${a.title}</b> (${a.priority}, ${a.owner_role})<br>${a.description}</li>`).join('');\n"
         "return [{ json: { ...o, sprint: $('Retrospective Form').first().json.Sprint,\n"
         "  html: `<p><b>Sentiment:</b> ${o.sentiment}</p><p>${o.summary}</p><p>Proposed Jira tasks:</p><ol>${li}</ol><p>Approve to create them in Jira.</p>` } }];"}, (560, 0))
-    w.add("Ask Scrum Master", "gmail", 2.1, {"operation": "sendAndWait", "sendTo": EMAIL,
+    w.add("Ask Scrum Master", "gmail", 2.1, {"operation": "sendAndWait", "sendTo": "={{ $('⚙️ Config').first().json.scrum_master_email }}",
         "subject": "=Approve retro action items for {{ $json.sprint }}?", "message": "={{ $json.html }}",
         "approvalOptions": {"values": {"approvalType": "double"}}, "options": {"limitWaitTime": {"values": {"limitType": "afterTimeInterval", "resumeAmount": 2, "resumeUnit": "days"}}}}, (780, 0))
     w.add("Approved?", "if", 2.2, {"conditions": conditions(cond("={{ $json.data.approved }}", "boolean", "true")), "options": {}}, (1000, 0))
@@ -244,7 +245,7 @@ def L15(root):
         "issueType": {"__rl": True, "mode": "id", "value": "REPLACE_TASK_ISSUE_TYPE_ID"}, "summary": "=[Retro {{ $json.sprint }}] {{ $json.title }}",
         "additionalFields": {"description": "={{ $json.description }}\n\nOwner role: {{ $json.owner_role }}\nPriority suggested by AI: {{ $json.priority }}\n\nApproved by Scrum Master via n8n.", "labels": ["retro-action"]}}, (1440, -100))
     w.add("Declined — stop", "noOp", 1, {}, (1220, 120))
-    w.chain("Retrospective Form", "Analyze Retro", "Build Approval Message", "Ask Scrum Master", "Approved?")
+    w.chain("Retrospective Form", "⚙️ Config", "Analyze Retro", "Build Approval Message", "Ask Scrum Master", "Approved?")
     w.link("Approved?", "Restore Items", 0); w.link("Approved?", "Declined — stop", 1)
     w.link("Restore Items", "Create Jira Task")
     w.ai("Gemini", "Analyze Retro", "ai_languageModel"); w.ai("Retro Schema", "Analyze Retro", "ai_outputParser")
@@ -452,7 +453,8 @@ def L21(root):
     w.note("## 📡 L21 · Ops monitoring\nEvery 5 min: check each URL, measure status + response time.\nAlerts only when a site **changes** state (UP→DOWN, DOWN→UP) — state kept with `$getWorkflowStaticData`.\n⚠️ Static data persists only for **active** (production) runs.", (-60, -400), 500, 240, 3)
     w.add("Every 5 Minutes", "scheduleTrigger", 1.2, {"rule": {"interval": [{"field": "minutes", "minutesInterval": 5}]}}, (0, 0))
     w.add("Sites to Watch", "code", 2, {"jsCode":
-        "return [\n  { url: 'https://n8n.io', name: 'n8n website' },\n  { url: 'https://api.github.com', name: 'GitHub API' },\n  { url: 'https://httpstat.us/503', name: 'Demo: always down' },\n].map(s => ({ json: { ...s, started: Date.now() } }));"}, (220, 0))
+        "const ALERT_TO = 'you@example.com';   // who gets UP/DOWN emails\n"
+        "return [\n  { url: 'https://n8n.io', name: 'n8n website' },\n  { url: 'https://api.github.com', name: 'GitHub API' },\n  { url: 'https://httpstat.us/503', name: 'Demo: always down' },\n].map(s => ({ json: { ...s, alert_to: ALERT_TO, started: Date.now() } }));"}, (220, 0))
     w.add("Check Site", "httpRequest", 4.2, {"url": "={{ $json.url }}", "options": {"timeout": 10000, "redirect": {"redirect": {}},
         "response": {"response": {"fullResponse": True, "neverError": True}}}}, (440, 0), onError="continueRegularOutput")
     w.add("Compare with Last State", "code", 2, {"jsCode":
@@ -473,7 +475,7 @@ def L21(root):
     w.add("Log Every Check", "googleSheets", 4.5, sheet_append("Uptime"), (880, -120), onError="continueRegularOutput")
     w.note("⚠️ **No alert?** That's usually correct.\nThis only passes when `changed = true` — the site's status flipped since the last check (set in *Compare with Last State*). A site that's UP on every run never alerts.\nTo test: the `httpstat.us/503` demo should flip DOWN on the second automatic run.", (860, 260), 300, 170, 4)
     w.add("State Changed?", "filter", 2.2, {"conditions": conditions(cond("={{ $json.changed }}", "boolean", "true")), "options": {}}, (880, 80))
-    w.add("Alert", "gmail", 2.1, gmail_send(EMAIL, "={{ $json.status === 'DOWN' ? '🔴' : '🟢' }} {{ $json.name }} is {{ $json.status }}",
+    w.add("Alert", "gmail", 2.1, gmail_send("={{ $('Sites to Watch').first().json.alert_to }}", "={{ $json.status === 'DOWN' ? '🔴' : '🟢' }} {{ $json.name }} is {{ $json.status }}",
         "=<p><b>{{ $json.name }}</b> ({{ $json.url }}) is now <b>{{ $json.status }}</b>.</p><p>HTTP {{ $json.code }} · {{ $json.ms }} ms · since {{ $json.since }}</p><p>{{ $json.error }}</p>"), (1100, 80))
     w.chain("Every 5 Minutes", "Sites to Watch", "Check Site", "Compare with Last State")
     w.link("Compare with Last State", "Log Every Check"); w.link("Compare with Last State", "State Changed?"); w.link("State Changed?", "Alert")

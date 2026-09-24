@@ -2,7 +2,7 @@
 
 # L15 · Retrospective → AI action items → human approval → Jira
 
-![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Agile / Scrum](https://img.shields.io/badge/domain-Agile_/_Scrum-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 10](https://img.shields.io/badge/nodes-10-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Agile / Scrum](https://img.shields.io/badge/domain-Agile_/_Scrum-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -34,7 +34,7 @@
 ```mermaid
 flowchart LR
   s0(["👤 Person filling the form"]):::person
-  core{{"⚙️ n8n workflow<br/><small>10 nodes</small>"}}:::n8n
+  core{{"⚙️ n8n workflow<br/><small>11 nodes</small>"}}:::n8n
   s1["✦ Google Gemini 🔑"]:::ai
   s2(["🧑 Approver"]):::person
   s3["📧 Gmail 🔑"]:::saas
@@ -58,24 +58,26 @@ flowchart LR
 ```mermaid
 flowchart TB
   n0(["Retrospective Form"]):::trigger
-  n1[["Analyze Retro"]]:::ai
-  n2("Gemini"):::sub
-  n3("Retro Schema"):::sub
-  n4["Build Approval Message"]:::code
-  n5["Ask Scrum Master"]:::msg
-  n6{"Approved?"}:::logic
-  n7["Restore Items"]:::code
-  n8["Create Jira Task"]:::data
-  n9["Declined — stop"]:::logic
+  n1["⚙️ Config"]:::code
+  n2[["Analyze Retro"]]:::ai
+  n3("Gemini"):::sub
+  n4("Retro Schema"):::sub
+  n5["Build Approval Message"]:::code
+  n6["Ask Scrum Master"]:::msg
+  n7{"Approved?"}:::logic
+  n8["Restore Items"]:::code
+  n9["Create Jira Task"]:::data
+  n10["Declined — stop"]:::logic
   n0 --> n1
-  n1 --> n4
-  n4 --> n5
+  n1 --> n2
+  n2 --> n5
   n5 --> n6
-  n6 -->|"true"| n7
-  n6 -->|"false"| n9
-  n7 --> n8
-  n2 -.->|languageModel| n1
-  n3 -.->|outputParser| n1
+  n6 --> n7
+  n7 -->|"true"| n8
+  n7 -->|"false"| n10
+  n8 --> n9
+  n3 -.->|languageModel| n2
+  n4 -.->|outputParser| n2
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
   classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937
@@ -112,7 +114,7 @@ Replace these placeholder values with your own:
 
 | Node | Field | Placeholder |
 |---|---|---|
-| Ask Scrum Master | `sendTo` | `you@example.com` |
+| ⚙️ Config | `scrum_master_email` | `you@example.com` |
 | Create Jira Task | `project` | `REPLACE_PROJECT_ID` |
 | Create Jira Task | `issueType` | `REPLACE_TASK_ISSUE_TYPE_ID` |
 
@@ -146,7 +148,19 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>2. Analyze Retro</b> · <code>Basic LLM Chain</code> v1.5</summary>
+<details><summary><b>2. ⚙️ Config</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+
+> Creates, renames or overwrites fields without code.
+
+| Property | Value |
+|---|---|
+| `scrum_master_email` | you@example.com |
+| `includeOtherFields` | ✅ on |
+| `include` | all |
+
+</details>
+
+<details><summary><b>3. Analyze Retro</b> · <code>Basic LLM Chain</code> v1.5</summary>
 
 > Sends one prompt to a model and returns the answer. Simplest AI node.
 
@@ -159,7 +173,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>3. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
+<details><summary><b>4. Gemini</b> · <code>Google Gemini Chat Model</code> v1</summary>
 
 > The language model plugged into a chain or agent.
 
@@ -170,7 +184,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>4. Retro Schema</b> · <code>Structured Output Parser</code> v1.2</summary>
+<details><summary><b>5. Retro Schema</b> · <code>Structured Output Parser</code> v1.2</summary>
 
 > Forces the model's answer into JSON matching your schema.
 
@@ -197,7 +211,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>5. Build Approval Message</b> · <code>Code</code> v2</summary>
+<details><summary><b>6. Build Approval Message</b> · <code>Code</code> v2</summary>
 
 > Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
 
@@ -216,14 +230,14 @@ return [{ json: { ...o, sprint: $('Retrospective Form').first().json.Sprint,
 
 </details>
 
-<details><summary><b>6. Ask Scrum Master</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>7. Ask Scrum Master</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
 | Property | Value |
 |---|---|
 | `operation` | sendAndWait |
-| `sendTo` | you@example.com |
+| `sendTo` | `{{ $('⚙️ Config').first().json.scrum_master_email }}` |
 | `subject` | `Approve retro action items for {{ $json.sprint }}?` |
 | `message` | `{{ $json.html }}` |
 | `approvalOptions.approvalType` | double |
@@ -233,7 +247,7 @@ return [{ json: { ...o, sprint: $('Retrospective Form').first().json.Sprint,
 
 </details>
 
-<details><summary><b>7. Approved?</b> · <code>If</code> v2.2</summary>
+<details><summary><b>8. Approved?</b> · <code>If</code> v2.2</summary>
 
 > Splits items into a **true** and a **false** branch.
 
@@ -243,7 +257,7 @@ return [{ json: { ...o, sprint: $('Retrospective Form').first().json.Sprint,
 
 </details>
 
-<details><summary><b>8. Restore Items</b> · <code>Code</code> v2</summary>
+<details><summary><b>9. Restore Items</b> · <code>Code</code> v2</summary>
 
 > Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
 
@@ -259,7 +273,7 @@ return $('Build Approval Message').first().json.action_items.map(a => ({ json: {
 
 </details>
 
-<details><summary><b>9. Create Jira Task</b> · <code>Jira Software</code> v1</summary>
+<details><summary><b>10. Create Jira Task</b> · <code>Jira Software</code> v1</summary>
 
 > Creates, searches or updates Jira issues.
 
@@ -270,10 +284,13 @@ return $('Build Approval Message').first().json.action_items.map(a => ({ json: {
 | `summary` | `[Retro {{ $json.sprint }}] {{ $json.title }}` |
 | `additionalFields.description` | `{{ $json.description }}  Owner role: {{ $json.owner_role }} Priority suggested by AI: {…` |
 | `additionalFields.labels` | retro-action |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
-<details><summary><b>10. Declined — stop</b> · <code>No Operation</code> v1</summary>
+<details><summary><b>11. Declined — stop</b> · <code>No Operation</code> v1</summary>
 
 > Does nothing. Marks a branch that intentionally ends.
 
@@ -287,7 +304,7 @@ return $('Build Approval Message').first().json.action_items.map(a => ({ json: {
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 7/8 nodes executed in real n8n (4 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 8/9 nodes executed in real n8n (4 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Submit a retro from [docs/sample-data.md](../../docs/sample-data.md#retro-feedback). You should get an approval email and see the execution *Waiting*.
 - [ ] Click **Approve**: 1–3 Jira tasks should appear. Try again and click **Decline**: no tasks.

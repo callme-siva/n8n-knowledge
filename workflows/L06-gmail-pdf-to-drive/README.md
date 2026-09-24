@@ -2,7 +2,7 @@
 
 # L06 · Gmail PDF attachments → Google Drive
 
-![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Admin / finance](https://img.shields.io/badge/domain-Admin_/_finance-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: Integrations](https://img.shields.io/badge/level-Integrations-D4A106?style=flat-square) ![domain: Admin / finance](https://img.shields.io/badge/domain-Admin_/_finance-334155?style=flat-square) ![build time: 20 min](https://img.shields.io/badge/build_time-20_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -182,6 +182,9 @@ return out;
 |---|---|
 | `operation` | markAsRead |
 | `messageId` | `{{ $('Split PDF Attachments').item.json.messageId }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -191,7 +194,7 @@ return out;
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (3 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Email yourself 2 PDFs and 1 image. Exactly 2 files should appear in Drive.
 - [ ] Check that the email is now read and that the next poll doesn't re-upload it.

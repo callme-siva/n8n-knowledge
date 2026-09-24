@@ -2,7 +2,7 @@
 
 # L12 · Meeting transcript → RAID log
 
-![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Project management](https://img.shields.io/badge/domain-Project_management-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
+![level: AI](https://img.shields.io/badge/level-AI-F97316?style=flat-square) ![domain: Project management](https://img.shields.io/badge/domain-Project_management-334155?style=flat-square) ![build time: 30 min](https://img.shields.io/badge/build_time-30_min-0EA5E9?style=flat-square) ![nodes: 7](https://img.shields.io/badge/nodes-7-7C3AED?style=flat-square) [![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -255,7 +255,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `columns.schema.3.canBeUsedToMatch` | off |
 | `columns.schema.4.displayName` | category |
 | `columns.schema.4.required` | off |
-| … | 34 more in workflow.json |
+| … | 37 more in workflow.json |
 
 </details>
 
@@ -265,7 +265,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (3 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 5/5 nodes executed in real n8n (3 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Paste a sample transcript from [docs/sample-data.md](../../docs/sample-data.md#meeting-transcript).
 - [ ] Check that every row has a category from Risk/Assumption/Issue/Dependency and nothing else.

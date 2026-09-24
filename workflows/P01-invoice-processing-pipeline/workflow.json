@@ -86,14 +86,42 @@
     },
     {
       "parameters": {
-        "jsCode": "const out = [];\nfor (const item of $input.all()) for (const [k, b] of Object.entries(item.binary || {}))\n  if (b.mimeType === 'application/pdf' || (b.fileName || '').toLowerCase().endsWith('.pdf'))\n    out.push({ json: { file: b.fileName, from: item.json.from?.text, messageId: item.json.id }, binary: { data: b } });\nreturn out;"
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "PASTE_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Ledger"
+        },
+        "options": {}
+      },
+      "id": "1219463b-09c8-5b18-ac2e-056b8c62b8a1",
+      "name": "Read Ledger",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        400,
+        0
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\nfor (const item of $('Invoice Email').all()) for (const [k, b] of Object.entries(item.binary || {}))\n  if (b.mimeType === 'application/pdf' || (b.fileName || '').toLowerCase().endsWith('.pdf'))\n    out.push({ json: { file: b.fileName, from: item.json.from?.text, messageId: item.json.id }, binary: { data: b }, pairedItem: 0 });\nreturn out;"
       },
       "id": "6d0e80d6-fda3-5cd6-b0ab-f50f722ed20e",
       "name": "One Item per PDF",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        400,
+        600,
         0
       ]
     },
@@ -108,7 +136,7 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        600,
+        800,
         0
       ]
     },
@@ -201,14 +229,14 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const x = $json.output || {};\nconst src = $('One Item per PDF').item.json;\nconst errors = [];\nconst num = v => Number(String(v ?? '').replace(/[^0-9.-]/g, ''));\nconst sub = num(x.subtotal), tax = num(x.tax_total), total = num(x.grand_total);\nif (!x.invoice_number) errors.push('missing invoice number');\nif (!Number.isFinite(total) || total <= 0) errors.push('missing/invalid total');\nif (Number.isFinite(sub) && Number.isFinite(tax) && sub > 0 && Math.abs(sub + tax - total) > 1) errors.push(`subtotal + tax (${sub + tax}) ≠ total (${total})`);\nif (x.vendor_gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(x.vendor_gstin)) errors.push(`GSTIN format invalid: ${x.vendor_gstin}`);\nreturn { json: { ...x, subtotal: sub || null, tax_total: tax || null, grand_total: total, file: src.file, from: src.from,\n  dedupe_key: `${(x.vendor_name || '').toLowerCase().replace(/\\W/g, '')}|${x.invoice_number}`, valid: errors.length === 0, errors: errors.join('; ') } };"
+        "jsCode": "const x = $json.output || {};\nconst src = $('One Item per PDF').item.json;\nconst errors = [];\n// Idempotency: the Ledger sheet is the record of what was already processed.\nconst logged = new Set($('Read Ledger').all().map(i => i.json.dedupe_key).filter(Boolean));\nconst num = v => Number(String(v ?? '').replace(/[^0-9.-]/g, ''));\nconst sub = num(x.subtotal), tax = num(x.tax_total), total = num(x.grand_total);\nif (!x.invoice_number) errors.push('missing invoice number');\nif (!Number.isFinite(total) || total <= 0) errors.push('missing/invalid total');\nif (Number.isFinite(sub) && Number.isFinite(tax) && sub > 0 && Math.abs(sub + tax - total) > 1) errors.push(`subtotal + tax (${sub + tax}) ≠ total (${total})`);\nif (x.vendor_gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(x.vendor_gstin)) errors.push(`GSTIN format invalid: ${x.vendor_gstin}`);\nconst dedupe_key = `${(x.vendor_name || '').toLowerCase().replace(/\\W/g, '')}|${x.invoice_number}`;\nreturn { json: { ...x, subtotal: sub || null, tax_total: tax || null, grand_total: total, file: src.file, from: src.from,\n  dedupe_key, already_logged: logged.has(dedupe_key), valid: errors.length === 0, errors: errors.join('; ') } };"
       },
       "id": "5fac388b-013d-5901-a09a-bd0cd7a40116",
       "name": "Validate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1040,
+        1240,
         0
       ]
     },
@@ -241,15 +269,15 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1240,
+        1440,
         0
       ]
     },
     {
       "parameters": {
-        "content": "⚠️ A repeat invoice is dropped **silently** here — no exception row, no email.\nThat's by design (see the AP-team overload it prevents), but it's why running the same test PDF twice looks like nothing happened the 2nd time.",
+        "content": "⚠️ **Same invoice twice?** It's skipped here if its `dedupe_key` (vendor + invoice no.) is already in the **Ledger** sheet.\nThe ledger is the memory, so an invoice that failed to append or was rejected is picked up again next time.\nTo re-test: delete its Ledger row.",
         "width": 300,
-        "height": 150,
+        "height": 190,
         "color": 4
       },
       "id": "9a20a9fc-f8f0-58ff-92c9-6768a7648217",
@@ -257,24 +285,40 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1440,
-        320
+        1620,
+        30
       ]
     },
     {
       "parameters": {
-        "operation": "removeItemsSeenInPreviousExecutions",
-        "dedupeValue": "={{ $json.dedupe_key }}",
-        "options": {
-          "historySize": 100000
-        }
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.already_logged }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "e3563c68-a89f-5e7a-a998-9f717f918184",
-      "name": "Block Duplicates",
-      "type": "n8n-nodes-base.removeDuplicates",
-      "typeVersion": 2,
+      "id": "a963e90b-beed-5365-b759-c90d6fa9a475",
+      "name": "New Invoice?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
-        1440,
+        1640,
         -120
       ]
     },
@@ -307,7 +351,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1640,
+        1840,
         -120
       ]
     },
@@ -337,7 +381,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1840,
+        2040,
         -220
       ]
     },
@@ -370,21 +414,21 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2040,
+        2240,
         -220
       ]
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const inv = $('Validate').item.json;\nreturn { json: { logged_at: new Date().toISOString(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,\n  invoice_date: inv.invoice_date, due_date: inv.due_date || '', subtotal: inv.subtotal, tax: inv.tax_total, total: inv.grand_total,\n  currency: inv.currency || 'INR', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file } };"
+        "jsCode": "const inv = $('Validate').item.json;\nreturn { json: { logged_at: $now.toISO(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,\n  invoice_date: inv.invoice_date, due_date: inv.due_date || '', subtotal: inv.subtotal, tax: inv.tax_total, total: inv.grand_total,\n  currency: inv.currency || 'INR', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };"
       },
       "id": "a1362c60-d0f2-5442-9485-40c1c5257156",
       "name": "Ledger Row",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2240,
+        2440,
         -120
       ]
     },
@@ -414,22 +458,25 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        2440,
+        2640,
         -120
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const inv = $('Validate').item.json;\nconst reason = $json.data && !$json.data.approved ? 'rejected by approver' : inv.errors;\nreturn { json: { logged_at: new Date().toISOString(), vendor: inv.vendor_name || '', invoice_no: inv.invoice_number || '', total: inv.grand_total || '', file: inv.file, reason } };"
+        "jsCode": "const inv = $('Validate').item.json;\nconst reason = $json.data && !$json.data.approved ? 'rejected by approver' : inv.errors;\nreturn { json: { logged_at: $now.toISO(), vendor: inv.vendor_name || '', invoice_no: inv.invoice_number || '', total: inv.grand_total || '', file: inv.file, reason } };"
       },
       "id": "3059109c-e64b-5d5c-b984-548e5607c503",
       "name": "Log Exception",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1440,
-        160
+        1640,
+        320
       ]
     },
     {
@@ -458,9 +505,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        1640,
-        160
-      ]
+        1840,
+        320
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {
@@ -477,9 +527,12 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1840,
-        160
-      ]
+        2040,
+        320
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     }
   ],
   "connections": {
@@ -495,6 +548,17 @@
       ]
     },
     "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Read Ledger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Ledger": {
       "main": [
         [
           {
@@ -553,7 +617,7 @@
       "main": [
         [
           {
-            "node": "Block Duplicates",
+            "node": "New Invoice?",
             "type": "main",
             "index": 0
           }
@@ -567,7 +631,7 @@
         ]
       ]
     },
-    "Block Duplicates": {
+    "New Invoice?": {
       "main": [
         [
           {

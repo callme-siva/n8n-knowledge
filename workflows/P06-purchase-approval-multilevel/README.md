@@ -2,7 +2,7 @@
 
 # P06 · Purchase request with multi-level approval
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / operations / HR](https://img.shields.io/badge/domain-Finance_/_operations_/_HR-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 15](https://img.shields.io/badge/nodes-15-7C3AED?style=flat-square) ![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / operations / HR](https://img.shields.io/badge/domain-Finance_/_operations_/_HR-334155?style=flat-square) ![build time: 50 min](https://img.shields.io/badge/build_time-50_min-0EA5E9?style=flat-square) ![nodes: 18](https://img.shields.io/badge/nodes-18-7C3AED?style=flat-square) [![e2e test: passed · 4 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_4_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -24,7 +24,8 @@
 - Chained **Send and Wait** approvals with time limits
 - A 3-way **Switch** on approved / rejected / **timed out** (missing response)
 - Routing by business rule (amount > threshold → second approver)
-- Generating human-friendly request IDs
+- **Approver lookup** from a Team sheet, so requesters can't pick (or be) their own approver
+- Collision-free request IDs from `$execution.id`
 - An **audit trail**: upsert the same row as the status changes
 
 ## 🏗️ Architecture
@@ -34,14 +35,14 @@
 ```mermaid
 flowchart LR
   s0(["👤 Person filling the form"]):::person
-  core{{"⚙️ n8n workflow<br/><small>15 nodes</small>"}}:::n8n
+  core{{"⚙️ n8n workflow<br/><small>18 nodes</small>"}}:::n8n
   s1["📊 Google Sheets 🔑"]:::saas
-  s2(["🧑 Approver"]):::person
-  s3["📧 Gmail 🔑"]:::saas
+  s2["📧 Gmail 🔑"]:::saas
+  s3(["🧑 Approver"]):::person
   s0 -->|"form submission"| core
-  core -->|"writes rows"| s1
-  core <-->|"approve / decline"| s2
-  core -->|"approval email · sends email"| s3
+  core <-->|"reads rows · writes rows"| s1
+  core -->|"approval email · sends email"| s2
+  core <-->|"approve / decline"| s3
   classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
   classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
   classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
@@ -57,37 +58,43 @@ flowchart LR
 flowchart TB
   n0(["Purchase Request Form"]):::trigger
   n1["⚙️ Config"]:::code
-  n2["Create Request"]:::code
-  n3["Audit: Created"]:::data
-  n4["Manager Approval"]:::msg
-  n5{"Manager Decision"}:::logic
-  n6{"Needs Finance?"}:::logic
-  n7["Finance Approval"]:::msg
-  n8{"Finance Approved?"}:::logic
-  n9["Final: Approved"]:::code
-  n10["Final: Rejected"]:::code
-  n11["Final: Escalated (timeout)"]:::code
-  n12["Audit: Decision"]:::data
-  n13["Notify Requester"]:::msg
-  n14["Escalate to Finance"]:::msg
-  n9 --> n12
-  n10 --> n12
-  n11 --> n12
-  n11 --> n14
+  n2["Lookup Manager"]:::data
+  n3{"Manager OK?"}:::logic
+  n4["Refuse: No Manager"]:::msg
+  n5["Create Request"]:::code
+  n6["Audit: Created"]:::data
+  n7["Manager Approval"]:::msg
+  n8{"Manager Decision"}:::logic
+  n9{"Needs Finance?"}:::logic
+  n10["Finance Approval"]:::msg
+  n11{"Finance Approved?"}:::logic
+  n12["Final: Approved"]:::code
+  n13["Final: Rejected"]:::code
+  n14["Final: Escalated (timeout)"]:::code
+  n15["Audit: Decision"]:::data
+  n16["Notify Requester"]:::msg
+  n17["Escalate to Finance"]:::msg
+  n12 --> n15
+  n13 --> n15
+  n14 --> n15
+  n14 --> n17
   n0 --> n1
   n1 --> n2
   n2 --> n3
-  n3 --> n4
-  n4 --> n5
-  n5 -->|"Approved"| n6
-  n5 -->|"Rejected"| n10
-  n5 -->|"Timed out"| n11
-  n6 -->|"true"| n7
-  n6 -->|"false"| n9
+  n3 -->|"true"| n5
+  n3 -->|"false"| n4
+  n5 --> n6
+  n6 --> n7
   n7 --> n8
-  n8 -->|"true"| n9
-  n8 -->|"false"| n10
-  n12 --> n13
+  n8 -->|"Approved"| n9
+  n8 -->|"Rejected"| n13
+  n8 -->|"Timed out"| n14
+  n9 -->|"true"| n10
+  n9 -->|"false"| n12
+  n10 --> n11
+  n11 -->|"true"| n12
+  n11 -->|"false"| n13
+  n15 --> n16
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
   classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937
@@ -103,7 +110,7 @@ flowchart TB
 <details><summary>Plain-text flow</summary>
 
 ```
-Form → Config → Create ID → Audit row → Manager approval ⏸3d → Switch
+Form → Config → look up manager in Team sheet (missing or self? → refuse) → Create ID → Audit row → Manager approval ⏸3d → Switch
   ├ Approved → amount > ₹1L? ─ yes → Finance approval ⏸3d → approved? ─ yes/no ┐
   │                          └ no ─────────────────────────────────────────────┤
   ├ Rejected ─────────────────────────────────────────────────────────────────────┤→ Set final status → Audit upsert → Notify requester
@@ -128,7 +135,7 @@ Why it's built this way, and what it costs.
 | You need | Where to get it |
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (tab `Requests` | request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided) |
+| Google Sheets OAuth2 (tab `Team` | email, manager_email; tab `Requests`: request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided) |
 
 ## 📝 Before you run it
 
@@ -137,6 +144,7 @@ Replace these placeholder values with your own:
 | Node | Field | Placeholder |
 |---|---|---|
 | ⚙️ Config | `finance_email` | `you@example.com` |
+| Lookup Manager | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
 | Audit: Created | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
 | Audit: Decision | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
 
@@ -149,6 +157,7 @@ Create each tab from its template, so column names match exactly: **Google Sheet
 | Tab | Template | Columns |
 |---|---|---|
 | `Requests` | [Requests.csv](../../templates/P06-purchase-approval-multilevel/Requests.csv) | `request_id`, `amount`, `cost_centre`, `created`, `item`, `justification`, `manager`, `requester`, `status`, `decided` |
+| `Team` | [Team.csv](../../templates/P06-purchase-approval-multilevel/Team.csv) | `email`, `manager_email` |
 
 <sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
 
@@ -157,7 +166,7 @@ Create each tab from its template, so column names match exactly: **Google Sheet
 > [!TIP]
 > In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.
 
-1. Create the `Requests` tab.
+1. Create the `Team` tab (one row per employee: `email`, `manager_email`) and the `Requests` tab.
 2. Import it, set the finance email and threshold in Config.
 3. For testing, set both approval time limits to a few minutes (Options → *Limit wait time*).
 4. Submit 3 requests: ₹20,000 (manager only), ₹2,00,000 (manager + finance), one you ignore (timeout).
@@ -173,7 +182,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `formTitle` | Purchase request |
-| `formFields.values` | Your email *, Manager email *, Item / service *, Amount (INR) *, Cost centre *, Justifi… |
+| `formFields.values` | Your email *, Item / service *, Amount (INR) *, Cost centre *, Justification * |
 
 </details>
 
@@ -188,27 +197,72 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 </details>
 
-<details><summary><b>3. Create Request</b> · <code>Code</code> v2</summary>
+<details><summary><b>3. Lookup Manager</b> · <code>Google Sheets</code> v4.5</summary>
+
+> Reads, appends or updates rows in a spreadsheet.
+
+| Property | Value |
+|---|---|
+| `documentId` | PASTE_YOUR_GOOGLE_SHEET_URL |
+| `sheetName` | Team |
+| `filtersUI.lookupColumn` | email |
+| `filtersUI.lookupValue` | `{{ $('Purchase Request Form').item.json['Your email'].trim().toLowerCase() }}` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
+| `⚙️ Always output data` | ✅ on |
+
+</details>
+
+<details><summary><b>4. Manager OK?</b> · <code>If</code> v2.2</summary>
+
+> Splits items into a **true** and a **false** branch.
+
+| Property | Value |
+|---|---|
+| `condition` | `{{ ($json.manager_email \|\| '').trim() }} is not empty AND {{ ($json.manager_email \|\…` |
+
+</details>
+
+<details><summary><b>5. Refuse: No Manager</b> · <code>Gmail</code> v2.1</summary>
+
+> Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
+
+| Property | Value |
+|---|---|
+| `sendTo` | `{{ $('Purchase Request Form').item.json['Your email'] }}` |
+| `subject` | Purchase request not submitted |
+| `emailType` | html |
+| `message` | `<p>We couldn't find a manager for <b>{{ $('Purchase Request Form').item.json['Your email'] }}</b> in the Team sheet, so this request for {{ $('Purchase Request Form').item.json['Item / service'] }} was not sent for approval.</p><p>Please contact finance.</p>` |
+| `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
+
+</details>
+
+<details><summary><b>6. Create Request</b> · <code>Code</code> v2</summary>
 
 > Runs JavaScript. *Run once for all items* sees every item; *for each item* sees one at a time.
 
 | Property | Value |
 |---|---|
 | `mode` | runOnceForEachItem |
-| `jsCode` | (JavaScript, 4 lines, shown below) |
+| `jsCode` | (JavaScript, 5 lines, shown below) |
 
 **Code:**
 
 ```javascript
 const f = $('Purchase Request Form').item.json;
-const id = 'PR-' + $today.toFormat('yyMMdd') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
-return { json: { request_id: id, requester: f['Your email'], manager: f['Manager email'], item: f['Item / service'], amount: Number(f['Amount (INR)']),
-  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: new Date().toISOString() } };
+// $execution.id is unique and increasing, so IDs never collide and sort in order.
+const id = 'PR-' + $now.toFormat('yyMMdd') + '-' + $execution.id;
+return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (INR)']),
+  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: $now.toISO() } };
 ```
 
 </details>
 
-<details><summary><b>4. Audit: Created</b> · <code>Google Sheets</code> v4.5</summary>
+<details><summary><b>7. Audit: Created</b> · <code>Google Sheets</code> v4.5</summary>
 
 > Reads, appends or updates rows in a spreadsheet.
 
@@ -219,10 +273,13 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 | `sheetName` | Requests |
 | `columns.mappingMode` | autoMapInputData |
 | `columns.matchingColumns` | request_id |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
-<details><summary><b>5. Manager Approval</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>8. Manager Approval</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
@@ -239,7 +296,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>6. Manager Decision</b> · <code>Switch</code> v3.2</summary>
+<details><summary><b>9. Manager Decision</b> · <code>Switch</code> v3.2</summary>
 
 > Routes items to one of many named outputs.
 
@@ -256,7 +313,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>7. Needs Finance?</b> · <code>If</code> v2.2</summary>
+<details><summary><b>10. Needs Finance?</b> · <code>If</code> v2.2</summary>
 
 > Splits items into a **true** and a **false** branch.
 
@@ -266,7 +323,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>8. Finance Approval</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>11. Finance Approval</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
@@ -283,7 +340,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>9. Finance Approved?</b> · <code>If</code> v2.2</summary>
+<details><summary><b>12. Finance Approved?</b> · <code>If</code> v2.2</summary>
 
 > Splits items into a **true** and a **false** branch.
 
@@ -293,7 +350,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>10. Final: Approved</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+<details><summary><b>13. Final: Approved</b> · <code>Edit Fields (Set)</code> v3.4</summary>
 
 > Creates, renames or overwrites fields without code.
 
@@ -306,7 +363,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>11. Final: Rejected</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+<details><summary><b>14. Final: Rejected</b> · <code>Edit Fields (Set)</code> v3.4</summary>
 
 > Creates, renames or overwrites fields without code.
 
@@ -319,7 +376,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>12. Final: Escalated (timeout)</b> · <code>Edit Fields (Set)</code> v3.4</summary>
+<details><summary><b>15. Final: Escalated (timeout)</b> · <code>Edit Fields (Set)</code> v3.4</summary>
 
 > Creates, renames or overwrites fields without code.
 
@@ -332,7 +389,7 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 
 </details>
 
-<details><summary><b>13. Audit: Decision</b> · <code>Google Sheets</code> v4.5</summary>
+<details><summary><b>16. Audit: Decision</b> · <code>Google Sheets</code> v4.5</summary>
 
 > Reads, appends or updates rows in a spreadsheet.
 
@@ -343,10 +400,13 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 | `sheetName` | Requests |
 | `columns.mappingMode` | autoMapInputData |
 | `columns.matchingColumns` | request_id |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
-<details><summary><b>14. Notify Requester</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>17. Notify Requester</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
@@ -357,10 +417,13 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 | `emailType` | html |
 | `message` | `<p>Your purchase request <b>{{ $('Create Request').item.json.request_id }}</b> for {{ $('Create Request').item.json.item }} is now <b>{{ $json.status.replace('_', ' ') }}</b>.</p>{{ $json.status === 'timed_out' ? '<p>Your manager did not respond in 3 days, so this has been escalated to finance.</p>' : '' }}` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
-<details><summary><b>15. Escalate to Finance</b> · <code>Gmail</code> v2.1</summary>
+<details><summary><b>18. Escalate to Finance</b> · <code>Gmail</code> v2.1</summary>
 
 > Sends, reads or labels email. `sendAndWait` pauses the workflow for a human reply.
 
@@ -371,6 +434,9 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 | `emailType` | html |
 | `message` | `<p>Manager {{ $('Create Request').item.json.manager }} didn't respond in 3 days.</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -380,8 +446,9 @@ return { json: { request_id: id, requester: f['Your email'], manager: f['Manager
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 12/15 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 2 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 14/18 nodes executed in real n8n (9 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 4 behaviour checks. See [tests/](../../tests/README.md).
 
+- [ ] Submit from an email that isn't in `Team`, or whose manager_email is itself: the request is refused, no approval is sent.
 - [ ] Each request's row goes from `pending_manager` to its final status.
 - [ ] The requester gets exactly one final email.
 

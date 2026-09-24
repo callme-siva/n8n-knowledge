@@ -2,7 +2,7 @@
 
 # P04 · Multi-touch sales follow-up sequence
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square) ![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Sales](https://img.shields.io/badge/domain-Sales-334155?style=flat-square) ![build time: 45 min](https://img.shields.io/badge/build_time-45_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square) [![e2e test: passed · 3 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_3_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -204,6 +204,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `sheetName` | Leads |
 | `columns.mappingMode` | autoMapInputData |
 | `columns.matchingColumns` | email |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -218,6 +221,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | html |
 | `message` | `<p>Hi {{ $('Lead Record').item.json.name }},</p><p>Thanks for reaching out about <i>{{ $('Lead Record').item.json.need }}</i>. Would a 20-minute call this week help? Here's my calendar: https://cal.com/your-link</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -243,6 +249,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `limit` | 5 |
 | `simple` | ✅ on |
 | `filters.q` | `from:{{ $('Lead Record').item.json.email }} after:{{ DateTime.fromISO($('Lead Record').…` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 | `⚙️ Always output data` | ✅ on |
 
 </details>
@@ -287,7 +296,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `columns.schema.2.removed` | off |
 | `columns.schema.3.displayName` | updated |
 | `columns.schema.3.type` | string |
-| … | 5 more in workflow.json |
+| … | 8 more in workflow.json |
 
 </details>
 
@@ -300,6 +309,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `select` | channel |
 | `channelId` | #sales |
 | `text` | `:tada: {{ $('Lead Record').item.json.name }} ({{ $('Lead Record').item.json.email }}) replied after email 1. Take it from here.` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -314,6 +326,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | html |
 | `message` | `<p>Hi {{ $('Lead Record').item.json.name }},</p><p>Teams like yours usually save 5–10 hours a week by automating the first step of <i>{{ $('Lead Record').item.json.need }}</i>. Happy to show you how. Just reply 'yes'.</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -339,6 +354,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `limit` | 5 |
 | `simple` | ✅ on |
 | `filters.q` | `from:{{ $('Lead Record').item.json.email }} after:{{ DateTime.fromISO($('Lead Record').…` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 | `⚙️ Always output data` | ✅ on |
 
 </details>
@@ -383,7 +401,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `columns.schema.2.removed` | off |
 | `columns.schema.3.displayName` | updated |
 | `columns.schema.3.type` | string |
-| … | 5 more in workflow.json |
+| … | 8 more in workflow.json |
 
 </details>
 
@@ -396,6 +414,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `select` | channel |
 | `channelId` | #sales |
 | `text` | `:tada: {{ $('Lead Record').item.json.name }} ({{ $('Lead Record').item.json.email }}) replied after email 2. Take it from here.` |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -410,6 +431,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `emailType` | html |
 | `message` | `<p>Hi {{ $('Lead Record').item.json.name }}, I haven't heard back, so I'll assume the timing isn't right. If that changes, just reply to this email. All the best!</p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -443,7 +467,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `columns.schema.2.removed` | off |
 | `columns.schema.3.displayName` | updated |
 | `columns.schema.3.type` | string |
-| … | 5 more in workflow.json |
+| … | 8 more in workflow.json |
 
 </details>
 
@@ -453,7 +477,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 13/17 nodes executed in real n8n (12 credentialed nodes replaced by realistic mocks), 3 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 13/17 nodes executed in real n8n (12 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 3 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Reply → no Email 2, the row shows `replied_after_email_1`, and there's a Slack alert.
 - [ ] Don't reply → you get Email 2, then Email 3, and the row shows `no_reply_closed`.

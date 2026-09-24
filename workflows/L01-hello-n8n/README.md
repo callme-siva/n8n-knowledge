@@ -2,7 +2,7 @@
 
 # L01 · Hello n8n — your first workflow
 
-![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: General](https://img.shields.io/badge/domain-General-334155?style=flat-square) ![build time: 10 min](https://img.shields.io/badge/build_time-10_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Beginner](https://img.shields.io/badge/level-Beginner-2EA44F?style=flat-square) ![domain: General](https://img.shields.io/badge/domain-General-334155?style=flat-square) ![build time: 10 min](https://img.shields.io/badge/build_time-10_min-0EA5E9?style=flat-square) ![nodes: 4](https://img.shields.io/badge/nodes-4-7C3AED?style=flat-square) [![e2e test: passed · 2 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_2_checks-2EA44F?style=flat-square)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -17,7 +17,7 @@
 
 **🧠 Mental model:** An assembly line: each station (node) takes the trays (items) coming in, does one job, and passes trays on.
 
-**🚫 When *not* to use it:** Don't reach for the Code node for things a Set or IF node can do. Visual nodes are easier for the next person to read.
+**🚫 When *not* to use it:** This lesson uses a Code node so you can see items directly. In real workflows, prefer Set, IF and Filter when they can do the job: visual nodes are easier for the next person to read.
 
 ## 🎯 What you'll learn
 
@@ -102,9 +102,9 @@ Nodes that need a credential selected after import: **Gmail**.
 1. Create a new workflow and name it `L01 · Hello n8n`.
 2. Add a **Manual Trigger** node.
 3. Add an **Edit Fields (Set)** node with three fields: `name` (string), `city` (string), `tasks_done` (number).
-4. Add a **Code** node and paste the code from `workflow.json`. Look at how it spreads `...item.json` to keep the old fields.
-5. Add a **Gmail → Send message** node. In *To*, put your own email. In *Message*, drag `greeting` from the INPUT panel.
-6. Click **Execute workflow**.
+4. Add a **Code** node and type the code shown in the *Node-by-node reference* below. `...item.json` keeps the old fields, and `greeting` is the new one. (A Set node could build this string too; Code is here so you see what a node does with items.)
+5. Click **Execute workflow** and open *Build Greeting* → **OUTPUT**. If you see your greeting, you've finished the lesson.
+6. *Optional, needs Gmail:* add a **Gmail → Send message** node ([set up Gmail first](../../docs/credentials.md#gmail), about 10 minutes the first time). In *To*, put your own email. In *Message*, drag `greeting` from the INPUT panel. Run it again.
 
 ## 🔍 Node-by-node reference
 
@@ -146,7 +146,7 @@ return $input.all().map(item => ({
   json: {
     ...item.json,
     greeting: `Hello ${item.json.name} from ${item.json.city}! You finished ${item.json.tasks_done} tasks today.`,
-    generated_at: new Date().toISOString(),
+    generated_at: $now.toISO(),   // $now uses your n8n timezone; new Date() is always UTC
   }
 }));
 ```
@@ -164,6 +164,9 @@ return $input.all().map(item => ({
 | `emailType` | html |
 | `message` | `<p>{{ $json.greeting }}</p><p><small>Sent at {{ $json.generated_at }}</small></p>` |
 | `appendAttribution` | off |
+| `⚙️ Retry on fail` | ✅ on |
+| `⚙️ Max tries` | 3 |
+| `⚙️ Wait between tries (ms)` | 3000 |
 
 </details>
 
@@ -173,7 +176,7 @@ return $input.all().map(item => ({
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (1 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 4/4 nodes executed in real n8n (1 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 2 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Click each node and open the **OUTPUT** tab: Table, JSON and Schema views show the same data in different shapes.
 - [ ] Change `tasks_done` to 10 and run again.
@@ -231,7 +234,7 @@ Add an **Aggregate** node after Build Greeting: *Individual fields* → field `g
 
 ## 🚀 Ideas to extend it
 
-- Add a second item in the Set node (turn on *Include Other Input Fields*) or return two items from Code — watch Gmail send two emails.
+- Return two items from the Code node and watch Gmail send two emails (see practice challenge ⭐ below).
 - Replace Gmail with Telegram or Slack.
 
 ---

@@ -79,6 +79,31 @@
     },
     {
       "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "scrum_master_email",
+              "value": "you@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {},
+        "includeOtherFields": true,
+        "include": "all"
+      },
+      "id": "ce402471-8674-5211-a02f-c6ab8bc793d0",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        120,
+        -170
+      ]
+    },
+    {
+      "parameters": {
         "promptType": "define",
         "hasOutputParser": true,
         "text": "=Sprint: {{ $json.Sprint }}\nMorale: {{ $json['Team morale'] }}\n\nWent well:\n{{ $json['What went well?'] }}\n\nDidn't go well:\n{{ $json[\"What didn't go well?\"] }}\n\nSuggestions:\n{{ $json.Suggestions }}",
@@ -144,7 +169,7 @@
     {
       "parameters": {
         "operation": "sendAndWait",
-        "sendTo": "you@example.com",
+        "sendTo": "={{ $('⚙️ Config').first().json.scrum_master_email }}",
         "subject": "=Approve retro action items for {{ $json.sprint }}?",
         "message": "={{ $json.html }}",
         "approvalOptions": {
@@ -244,7 +269,10 @@
       "position": [
         1440,
         -100
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {},
@@ -260,6 +288,17 @@
   ],
   "connections": {
     "Retrospective Form": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
       "main": [
         [
           {

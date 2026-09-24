@@ -12,13 +12,14 @@ def P01(root):
         "filters": {"q": "has:attachment filename:pdf label:invoices", "readStatus": "unread"},
         "options": {"downloadAttachments": True, "dataPropertyAttachmentsPrefixName": "attachment_"}}, (0, 0))
     w.add("⚙️ Config", "set", 3.4, {**assign(approval_limit=50000, approver_email=EMAIL, ap_team_email=EMAIL), "includeOtherFields": True, "include": "all"}, (200, 0))
+    w.add("Read Ledger", "googleSheets", 4.5, sheet_read("Ledger"), (400, 0), executeOnce=True, alwaysOutputData=True)
     w.add("One Item per PDF", "code", 2, {"jsCode":
         "const out = [];\n"
-        "for (const item of $input.all()) for (const [k, b] of Object.entries(item.binary || {}))\n"
+        "for (const item of $('Invoice Email').all()) for (const [k, b] of Object.entries(item.binary || {}))\n"
         "  if (b.mimeType === 'application/pdf' || (b.fileName || '').toLowerCase().endsWith('.pdf'))\n"
-        "    out.push({ json: { file: b.fileName, from: item.json.from?.text, messageId: item.json.id }, binary: { data: b } });\n"
-        "return out;"}, (400, 0))
-    w.add("PDF → Text", "extractFromFile", 1, {"operation": "pdf", "binaryPropertyName": "data", "options": {}}, (600, 0))
+        "    out.push({ json: { file: b.fileName, from: item.json.from?.text, messageId: item.json.id }, binary: { data: b }, pairedItem: 0 });\n"
+        "return out;"}, (600, 0))
+    w.add("PDF → Text", "extractFromFile", 1, {"operation": "pdf", "binaryPropertyName": "data", "options": {}}, (800, 0))
     w.lc("Extract Invoice Fields", "informationExtractor", 1.2, {"text": "={{ $json.text }}", "schemaType": "fromAttributes", "attributes": {"attributes": [
         {"name": "vendor_name", "type": "string", "description": "Seller / supplier legal name", "required": True},
         {"name": "vendor_gstin", "type": "string", "description": "Seller GSTIN, 15 characters, if present"},
@@ -35,37 +36,40 @@ def P01(root):
         "const x = $json.output || {};\n"
         "const src = $('One Item per PDF').item.json;\n"
         "const errors = [];\n"
+        "// Idempotency: the Ledger sheet is the record of what was already processed.\n"
+        "const logged = new Set($('Read Ledger').all().map(i => i.json.dedupe_key).filter(Boolean));\n"
         "const num = v => Number(String(v ?? '').replace(/[^0-9.-]/g, ''));\n"
         "const sub = num(x.subtotal), tax = num(x.tax_total), total = num(x.grand_total);\n"
         "if (!x.invoice_number) errors.push('missing invoice number');\n"
         "if (!Number.isFinite(total) || total <= 0) errors.push('missing/invalid total');\n"
         "if (Number.isFinite(sub) && Number.isFinite(tax) && sub > 0 && Math.abs(sub + tax - total) > 1) errors.push(`subtotal + tax (${sub + tax}) ≠ total (${total})`);\n"
         "if (x.vendor_gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(x.vendor_gstin)) errors.push(`GSTIN format invalid: ${x.vendor_gstin}`);\n"
+        "const dedupe_key = `${(x.vendor_name || '').toLowerCase().replace(/\\W/g, '')}|${x.invoice_number}`;\n"
         "return { json: { ...x, subtotal: sub || null, tax_total: tax || null, grand_total: total, file: src.file, from: src.from,\n"
-        "  dedupe_key: `${(x.vendor_name || '').toLowerCase().replace(/\\W/g, '')}|${x.invoice_number}`, valid: errors.length === 0, errors: errors.join('; ') } };"}, (1040, 0))
-    w.add("Valid?", "if", 2.2, {"conditions": conditions(cond("={{ $json.valid }}", "boolean", "true")), "options": {}}, (1240, 0))
-    w.note("⚠️ A repeat invoice is dropped **silently** here — no exception row, no email.\nThat's by design (see the AP-team overload it prevents), but it's why running the same test PDF twice looks like nothing happened the 2nd time.", (1440, 320), 300, 150, 4)
-    w.add("Block Duplicates", "removeDuplicates", 2, {"operation": "removeItemsSeenInPreviousExecutions", "dedupeValue": "={{ $json.dedupe_key }}", "options": {"historySize": 100000}}, (1440, -120))
-    w.add("Needs Approval?", "if", 2.2, {"conditions": conditions(cond("={{ $json.grand_total }}", "number", "gt", f"={{{{ {CFG}.approval_limit }}}}")), "options": {}}, (1640, -120))
+        "  dedupe_key, already_logged: logged.has(dedupe_key), valid: errors.length === 0, errors: errors.join('; ') } };"}, (1240, 0))
+    w.add("Valid?", "if", 2.2, {"conditions": conditions(cond("={{ $json.valid }}", "boolean", "true")), "options": {}}, (1440, 0))
+    w.note("⚠️ **Same invoice twice?** It's skipped here if its `dedupe_key` (vendor + invoice no.) is already in the **Ledger** sheet.\nThe ledger is the memory, so an invoice that failed to append or was rejected is picked up again next time.\nTo re-test: delete its Ledger row.", (1620, 30), 300, 190, 4)
+    w.add("New Invoice?", "if", 2.2, {"conditions": conditions(cond("={{ $json.already_logged }}", "boolean", "false")), "options": {}}, (1640, -120))
+    w.add("Needs Approval?", "if", 2.2, {"conditions": conditions(cond("={{ $json.grand_total }}", "number", "gt", f"={{{{ {CFG}.approval_limit }}}}")), "options": {}}, (1840, -120))
     w.add("Ask Approver", "gmail", 2.1, approval(f"={{{{ {CFG}.approver_email }}}}", "=Approve ₹{{ $json.grand_total }} invoice from {{ $json.vendor_name }}?",
-        "=<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>₹{{ $json.grand_total }}</b> (tax ₹{{ $json.tax_total }}), due {{ $json.due_date }}</p>", 3), (1840, -220))
-    w.add("Approved?", "if", 2.2, {"conditions": conditions(cond("={{ $json.data.approved }}", "boolean", "true")), "options": {}}, (2040, -220))
+        "=<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>₹{{ $json.grand_total }}</b> (tax ₹{{ $json.tax_total }}), due {{ $json.due_date }}</p>", 3), (2040, -220))
+    w.add("Approved?", "if", 2.2, {"conditions": conditions(cond("={{ $json.data.approved }}", "boolean", "true")), "options": {}}, (2240, -220))
     w.add("Ledger Row", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "const inv = $('Validate').item.json;\n"
-        "return { json: { logged_at: new Date().toISOString(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,\n"
+        "return { json: { logged_at: $now.toISO(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,\n"
         "  invoice_date: inv.invoice_date, due_date: inv.due_date || '', subtotal: inv.subtotal, tax: inv.tax_total, total: inv.grand_total,\n"
-        "  currency: inv.currency || 'INR', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file } };"}, (2240, -120))
-    w.add("Append to Ledger", "googleSheets", 4.5, sheet_append("Ledger"), (2440, -120))
+        "  currency: inv.currency || 'INR', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };"}, (2440, -120))
+    w.add("Append to Ledger", "googleSheets", 4.5, sheet_append("Ledger"), (2640, -120))
     w.add("Log Exception", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "const inv = $('Validate').item.json;\n"
         "const reason = $json.data && !$json.data.approved ? 'rejected by approver' : inv.errors;\n"
-        "return { json: { logged_at: new Date().toISOString(), vendor: inv.vendor_name || '', invoice_no: inv.invoice_number || '', total: inv.grand_total || '', file: inv.file, reason } };"}, (1440, 160))
-    w.add("Append to Exceptions", "googleSheets", 4.5, sheet_append("Exceptions"), (1640, 160))
+        "return { json: { logged_at: $now.toISO(), vendor: inv.vendor_name || '', invoice_no: inv.invoice_number || '', total: inv.grand_total || '', file: inv.file, reason } };"}, (1640, 320))
+    w.add("Append to Exceptions", "googleSheets", 4.5, sheet_append("Exceptions"), (1840, 320))
     w.add("Tell AP Team", "gmail", 2.1, gmail_send(f"={{{{ {CFG}.ap_team_email }}}}", "=⚠️ Invoice needs attention: {{ $json.vendor }} {{ $json.invoice_no }}",
-        "=<p>{{ $json.file }}: {{ $json.reason }}</p>"), (1840, 160))
-    w.chain("Invoice Email", "⚙️ Config", "One Item per PDF", "PDF → Text", "Extract Invoice Fields", "Validate", "Valid?")
-    w.link("Valid?", "Block Duplicates", 0); w.link("Valid?", "Log Exception", 1)
-    w.link("Block Duplicates", "Needs Approval?")
+        "=<p>{{ $json.file }}: {{ $json.reason }}</p>"), (2040, 320))
+    w.chain("Invoice Email", "⚙️ Config", "Read Ledger", "One Item per PDF", "PDF → Text", "Extract Invoice Fields", "Validate", "Valid?")
+    w.link("Valid?", "New Invoice?", 0); w.link("Valid?", "Log Exception", 1)
+    w.link("New Invoice?", "Needs Approval?", 0)
     w.link("Needs Approval?", "Ask Approver", 0); w.link("Needs Approval?", "Ledger Row", 1)
     w.link("Ask Approver", "Approved?"); w.link("Approved?", "Ledger Row", 0); w.link("Approved?", "Log Exception", 1)
     w.chain("Ledger Row", "Append to Ledger"); w.chain("Log Exception", "Append to Exceptions", "Tell AP Team")
@@ -73,17 +77,17 @@ def P01(root):
     write(root, w, readme("P01", "Accounts-payable invoice pipeline", P, "Finance / accounts payable", "60 min",
         "Accounts payable teams retype invoice data by hand, pay duplicates without noticing, and push large invoices through without anyone checking them. This is the most commonly automated back-office process in the world. The design principle that makes it safe: **the AI extracts, code validates, and a human approves above a threshold**.",
         ["**Information Extractor**: typed fields from messy text", "**Never trust AI numbers**: re-check subtotal + tax = total in code",
-         "Regex validation of Indian **GSTIN**", "**Duplicate protection** across runs (vendor + invoice number)",
+         "Regex validation of Indian **GSTIN**", "**Idempotency**: the ledger itself decides what was already processed (vendor + invoice number)",
          "Threshold-based **human approval** with a timeout", "An **exceptions queue** so bad inputs are never silently dropped"],
         "Gmail (label:invoices, PDF) → Config → split PDFs → PDF text → Information Extractor ⇐ Gemini → Validate (maths, GSTIN)\n"
-        "  ├ valid → Remove duplicates → amount > limit?\n  │     ├ yes → approval email ⏸ → approved? → Ledger | Exceptions\n  │     └ no  → Ledger\n  └ invalid → Exceptions sheet → email AP team",
-        ["Gmail OAuth2", "Google Gemini API key", "Google Sheets OAuth2 (tabs `Ledger`, `Exceptions`)"],
+        "  ├ valid → key already in Ledger? skip : amount > limit?\n  │     ├ yes → approval email ⏸ → approved? → Ledger | Exceptions\n  │     └ no  → Ledger\n  └ invalid → Exceptions sheet → email AP team",
+        ["Gmail OAuth2", "Google Gemini API key (paid tier for real invoices: free-tier prompts may be used by Google to improve its products)", "Google Sheets OAuth2 (tabs `Ledger` with a `dedupe_key` column, `Exceptions`)"],
         ["Create a Gmail filter that labels supplier emails `invoices`.",
          "Create `Ledger` and `Exceptions` tabs with headers matching the *Ledger Row* and *Log Exception* fields.",
          "Import it, connect the credentials, and set approval_limit and emails in **⚙️ Config**.",
          "Run it on 3 sample invoices: one normal, one above the limit, one with wrong totals (edit a PDF, or use an invoice generator)."],
         ["Normal invoice → one ledger row, no approval.", "Large invoice → approval email; *Approve* → ledger, *Decline* → exception.",
-         "Same invoice again → silently blocked as a duplicate.", "Wrong totals → exception row + AP email with the reason."],
+         "Same invoice again → skipped, because its `dedupe_key` is already in the Ledger. Delete that row to process it again.", "Wrong totals → exception row + AP email with the reason."],
         [("Fields empty for scanned PDFs", "Scans have no text layer. Add an OCR step (e.g. Google Vision or Mistral OCR via HTTP) before extraction."),
          ("Dates in odd formats", "The extractor returns dates as strings. Normalise them with Luxon in *Validate* if your ledger needs `YYYY-MM-DD`.")],
         ["Add a 3-way match against purchase orders (P06).", "Post approved invoices to Tally, Zoho Books or QuickBooks by API.", "Weekly AP ageing report (Q05 style)."]))
@@ -140,7 +144,8 @@ def P03(root):
     w = WF("P03-incident-response-orchestrator", "P03 · Incident response orchestrator (alerts → dedupe → Jira + Slack → AI postmortem)")
     w.note("## 🚨 P03 · From alert storm to one incident\nReceives Alertmanager/Grafana-style webhooks. Groups repeats by **fingerprint** (state kept between runs), opens **one** Jira incident per problem, pages on critical, suppresses repeats, and on *resolved* closes the loop with an **AI postmortem draft**.", (0, 0), 580)
     w.add("POST /alerts", "webhook", 2, {"httpMethod": "POST", "path": "alerts", "authentication": "headerAuth", "responseMode": "onReceived", "options": {}}, (0, 0))
-    w.add("One Item per Alert", "splitOut", 1, {"fieldToSplitOut": "body.alerts", "options": {}}, (200, 0))
+    w.add("⚙️ Config", "set", 3.4, {**assign(oncall_email=EMAIL, slack_channel_id="REPLACE_SLACK_CHANNEL_ID"), "includeOtherFields": True, "include": "all"}, (200, 0))
+    w.add("One Item per Alert", "splitOut", 1, {"fieldToSplitOut": "body.alerts", "options": {}}, (400, 0))
     w.add("Decide Action", "code", 2, {"jsCode":
         "// Alertmanager payload: alerts[] { status, fingerprint, labels{alertname,severity,service}, annotations{summary,description}, startsAt, endsAt }\n"
         "const state = $getWorkflowStaticData('global'); state.open ??= {};\n"
@@ -150,6 +155,7 @@ def P03(root):
         "  const sev = (a.labels?.severity || 'warning').toLowerCase();\n"
         "  let action;\n"
         "  if (a.status === 'resolved') action = known ? 'resolve' : 'ignore';\n"
+        "  else if (known && !known.jira_key && known.sev === 'critical') { known.count++; action = 'page'; }  // last Jira create failed: try again\n"
         "  else if (known) { known.count++; action = 'repeat'; }\n"
         "  else { state.open[fp] = { since: a.startsAt || new Date().toISOString(), count: 1, sev }; action = sev === 'critical' ? 'page' : 'notify'; }\n"
         "  const rec = state.open[fp] || {};\n"
@@ -157,29 +163,29 @@ def P03(root):
         "    since: rec.since, repeats: rec.count, jira_key: rec.jira_key || null, duration_min: a.endsAt && rec.since ? Math.round((Date.parse(a.endsAt) - Date.parse(rec.since)) / 60000) : null };\n"
         "  if (action === 'resolve') delete state.open[fp];\n"
         "  return { json: out };\n"
-        "});"}, (400, 0))
+        "});"}, (600, 0))
     w.add("Route", "switch", 3.2, {"rules": {"values": [
         {"conditions": conditions(cond("={{ $json.action }}", "string", "equals", "page")), "renameOutput": True, "outputKey": "Page (critical)"},
         {"conditions": conditions(cond("={{ $json.action }}", "string", "equals", "notify")), "renameOutput": True, "outputKey": "Notify (warning)"},
         {"conditions": conditions(cond("={{ $json.action }}", "string", "equals", "resolve")), "renameOutput": True, "outputKey": "Resolved"}]},
-        "options": {"fallbackOutput": "extra", "renameFallbackOutput": "Suppress (repeat)"}}, (600, 0))
+        "options": {"fallbackOutput": "extra", "renameFallbackOutput": "Suppress (repeat)"}}, (800, 0))
     w.add("Open Jira Incident", "jira", 1, {"project": {"__rl": True, "mode": "id", "value": "REPLACE_PROJECT_ID"}, "issueType": {"__rl": True, "mode": "id", "value": "REPLACE_INCIDENT_ISSUE_TYPE_ID"},
-        "summary": "=[P1] {{ $json.service }}: {{ $json.name }}", "additionalFields": {"description": "={{ $json.summary }}\n\n{{ $json.description }}\n\nFingerprint: {{ $json.fp }}\nStarted: {{ $json.since }}", "labels": ["incident", "auto"]}}, (840, -260))
+        "summary": "=[P1] {{ $json.service }}: {{ $json.name }}", "additionalFields": {"description": "={{ $json.summary }}\n\n{{ $json.description }}\n\nFingerprint: {{ $json.fp }}\nStarted: {{ $json.since }}", "labels": ["incident", "auto"]}}, (1040, -260))
     w.add("Remember Jira Key", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "// Store the new Jira key against the alert fingerprint so repeats and the resolve event can find it.\n"
         "const state = $getWorkflowStaticData('global');\n"
         "const a = $('Route').item.json;\n"
         "if (state.open[a.fp]) state.open[a.fp].jira_key = $json.key;\n"
-        "return { json: { ...a, jira_key: $json.key } };"}, (1040, -260))
-    w.add("Page On-call", "gmail", 2.1, gmail_send(EMAIL, "=🔴 P1 {{ $json.service }}: {{ $json.name }} ({{ $json.jira_key }})", "=<p>{{ $json.summary }}</p><p>Jira: {{ $json.jira_key }}</p>"), (1240, -320))
-    w.add("Slack #incidents", "slack", 2.3, slack_post("#incidents", "=:red_circle: *{{ $json.sev.toUpperCase() }}* {{ $json.service }}: {{ $json.name }}\n{{ $json.summary }}{{ $json.jira_key ? '\\nJira: ' + $json.jira_key : '' }}"), (1240, -140))
-    w.add("Suppress", "noOp", 1, {}, (840, 260))
+        "return { json: { ...a, jira_key: $json.key } };"}, (1240, -260))
+    w.add("Page On-call", "gmail", 2.1, gmail_send("={{ $('⚙️ Config').first().json.oncall_email }}", "=🔴 P1 {{ $json.service }}: {{ $json.name }} ({{ $json.jira_key }})", "=<p>{{ $json.summary }}</p><p>Jira: {{ $json.jira_key }}</p>"), (1440, -320))
+    w.add("Slack #incidents", "slack", 2.3, slack_post_id("=:red_circle: *{{ $json.sev.toUpperCase() }}* {{ $json.service }}: {{ $json.name }}\n{{ $json.summary }}{{ $json.jira_key ? '\\nJira: ' + $json.jira_key : '' }}"), (1440, -140))
+    w.add("Suppress", "noOp", 1, {}, (1040, 260))
     w.lc("Draft Postmortem", "chainLlm", 1.5, {"promptType": "define",
         "text": "=Incident resolved.\nService: {{ $json.service }}\nAlert: {{ $json.name }}\nSeverity: {{ $json.sev }}\nStarted: {{ $json.since }}\nDuration: {{ $json.duration_min }} minutes\nRepeated alerts: {{ $json.repeats }}\nSummary: {{ $json.summary }}\nDetails: {{ $json.description }}",
-        "messages": {"messageValues": [{"message": "Write a blameless postmortem DRAFT in Markdown with sections: Summary, Impact, Timeline (only known facts), Probable cause (clearly marked as hypothesis), Follow-up actions (3 max), Open questions. Never invent facts; write 'unknown' where data is missing."}]}}, (840, 80))
-    w.gemini("Gemini", (840, 280), 0.2)
-    w.add("Post Postmortem Draft", "slack", 2.3, slack_post("#incidents", "=:large_green_circle: *Resolved* {{ $('Route').item.json.service }}: {{ $('Route').item.json.name }} after {{ $('Route').item.json.duration_min }} min\n\n*Postmortem draft:*\n{{ $json.text }}"), (1100, 80))
-    w.chain("POST /alerts", "One Item per Alert", "Decide Action", "Route")
+        "messages": {"messageValues": [{"message": "Write a blameless postmortem DRAFT in Markdown with sections: Summary, Impact, Timeline (only known facts), Probable cause (clearly marked as hypothesis), Follow-up actions (3 max), Open questions. Never invent facts; write 'unknown' where data is missing."}]}}, (1040, 80))
+    w.gemini("Gemini", (1040, 280), 0.2)
+    w.add("Post Postmortem Draft", "slack", 2.3, slack_post_id("=:large_green_circle: *Resolved* {{ $('Route').item.json.service }}: {{ $('Route').item.json.name }} after {{ $('Route').item.json.duration_min }} min\n\n*Postmortem draft:*\n{{ $json.text }}"), (1300, 80))
+    w.chain("POST /alerts", "⚙️ Config", "One Item per Alert", "Decide Action", "Route")
     w.link("Route", "Open Jira Incident", 0); w.link("Route", "Slack #incidents", 1); w.link("Route", "Draft Postmortem", 2); w.link("Route", "Suppress", 3)
     w.chain("Open Jira Incident", "Remember Jira Key"); w.link("Remember Jira Key", "Page On-call"); w.link("Remember Jira Key", "Slack #incidents")
     w.chain("Draft Postmortem", "Post Postmortem Draft"); w.ai("Gemini", "Draft Postmortem", "ai_languageModel")
@@ -190,7 +196,7 @@ def P03(root):
          "Storing the Jira key so the resolve event can refer back to it", "AI **postmortem draft** with strict \"no invented facts\" rules"],
         "Webhook /alerts → Split Out alerts → Code (state by fingerprint → action) → Switch\n  ├ page     → Jira incident → remember key → email on-call + Slack\n  ├ notify   → Slack\n  ├ resolved → LLM postmortem draft ⇐ Gemini → Slack\n  └ repeat   → suppress",
         ["Header Auth credential (e.g. `Authorization: Bearer <long random>`)", "Jira Software Cloud API token", "Slack API", "Gmail OAuth2", "Google Gemini API key"],
-        ["Import it and set the Jira project and issue-type IDs (an *Incident* or *Bug* type).",
+        ["Import it and set the Jira project and issue-type IDs (an *Incident* or *Bug* type). Put the on-call email and the Slack **channel ID** (not its name, which breaks on rename) in **⚙️ Config**.",
          "Create a **Header Auth** credential on the webhook. Alertmanager: `http_config.authorization.credentials`; Grafana contact point: *Authorization header*.",
          "**Activate** it (static data and production webhooks need an active workflow).",
          "Point Alertmanager (`webhook_configs.url`) or a Grafana contact point at `https://<n8n>/webhook/alerts`, or simulate one with curl (below)."],
@@ -198,7 +204,9 @@ def P03(root):
          "Send the same payload 3 times: only **one** Jira issue and one page.",
          "Send it again with `\"status\":\"resolved\"` and `\"endsAt\"`: you should get a postmortem draft in Slack."],
         [("Every alert creates a new incident", "The workflow isn't active (static data isn't saved in manual runs), or the fingerprint changes between sends."),
-         ("State lost after a restart", "Static data survives restarts but not re-imports. For production, keep state in a DB table instead.")],
+         ("State lost after a restart", "Static data survives restarts but not re-imports. For production, keep state in a DB table instead."),
+         ("Two incidents for one alert storm", "Static data is saved when an execution ends, so two webhook calls running at the same moment (burst alerts, queue mode) can both see the fingerprint as new. For high volume, keep state in Postgres/Redis with a unique key on the fingerprint."),
+         ("Jira was down during a critical alert", "*Open Jira Incident* retries 3 times. If it still fails, the fingerprint has no Jira key, so the next repeat of that critical alert tries to open the incident again instead of being suppressed.")],
         ["Add an escalation Wait: if not acknowledged in 10 min, page the secondary on-call.", "Update a public status page via API.", "Attach recent logs to the postmortem prompt."]))
 
 
@@ -316,35 +324,45 @@ def P06(root):
     w = WF("P06-purchase-approval-multilevel", "P06 · Purchase request with multi-level approval, timeouts and audit trail")
     w.note("## ✅ P06 · Approvals without chasing people\nForm → request ID → **manager** approves (3-day timeout) → above ₹1,00,000 also **finance** approves → requester notified at every step → every decision logged in an audit sheet.", (0, 0), 560)
     w.add("Purchase Request Form", "formTrigger", 2.2, {"formTitle": "Purchase request", "formFields": {"values": [
-        form_field("Your email", "email", True), form_field("Manager email", "email", True), form_field("Item / service", required=True),
+        form_field("Your email", "email", True), form_field("Item / service", required=True),
         form_field("Amount (INR)", "number", True), form_field("Cost centre", "dropdown", True, ["Engineering", "Sales", "Marketing", "Operations", "HR"]),
         form_field("Justification", "textarea", True)]}, "options": {}}, (0, 0))
     w.add("⚙️ Config", "set", 3.4, assign(finance_email=EMAIL, finance_threshold=100000), (200, 0))
+    w.note("🔒 **Who approves is looked up, never typed.** The requester's manager comes from the `Team` sheet (`email` → `manager_email`), so nobody can route a request to themselves.\nNot in the sheet, or listed as their own manager? The request is refused.", (400, 200), 320, 170, 4)
+    w.add("Lookup Manager", "googleSheets", 4.5, sheet_read("Team", "email", "={{ $('Purchase Request Form').item.json['Your email'].trim().toLowerCase() }}"), (400, 0), alwaysOutputData=True)
+    w.add("Manager OK?", "if", 2.2, {"conditions": conditions(
+        cond("={{ ($json.manager_email || '').trim() }}", "string", "notEmpty", cid="c1"),
+        cond("={{ ($json.manager_email || '').trim().toLowerCase() }}", "string", "notEquals", "={{ $('Purchase Request Form').item.json['Your email'].trim().toLowerCase() }}", cid="c2")), "options": {}}, (600, 0))
+    w.add("Refuse: No Manager", "gmail", 2.1, gmail_send("={{ $('Purchase Request Form').item.json['Your email'] }}", "Purchase request not submitted",
+        "=<p>We couldn't find a manager for <b>{{ $('Purchase Request Form').item.json['Your email'] }}</b> in the Team sheet, so this request for {{ $('Purchase Request Form').item.json['Item / service'] }} was not sent for approval.</p><p>Please contact finance.</p>"), (800, 200))
     w.add("Create Request", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "const f = $('Purchase Request Form').item.json;\n"
-        "const id = 'PR-' + $today.toFormat('yyMMdd') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();\n"
-        "return { json: { request_id: id, requester: f['Your email'], manager: f['Manager email'], item: f['Item / service'], amount: Number(f['Amount (INR)']),\n"
-        "  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: new Date().toISOString() } };"}, (400, 0))
-    w.add("Audit: Created", "googleSheets", 4.5, sheet_upsert("Requests", "request_id"), (600, 0))
+        "// $execution.id is unique and increasing, so IDs never collide and sort in order.\n"
+        "const id = 'PR-' + $now.toFormat('yyMMdd') + '-' + $execution.id;\n"
+        "return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (INR)']),\n"
+        "  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: $now.toISO() } };"}, (800, 0))
+    w.add("Audit: Created", "googleSheets", 4.5, sheet_upsert("Requests", "request_id"), (1000, 0))
     card = "=<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>"
-    w.add("Manager Approval", "gmail", 2.1, approval("={{ $('Create Request').item.json.manager }}", "=Approve {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})?", card, 3), (800, 0))
+    w.add("Manager Approval", "gmail", 2.1, approval("={{ $('Create Request').item.json.manager }}", "=Approve {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})?", card, 3), (1200, 0))
     w.add("Manager Decision", "switch", 3.2, {"rules": {"values": [
         {"conditions": conditions(cond("={{ $json.data?.approved }}", "boolean", "true")), "renameOutput": True, "outputKey": "Approved"},
         {"conditions": conditions(cond("={{ $json.data?.approved }}", "boolean", "false")), "renameOutput": True, "outputKey": "Rejected"}]},
-        "options": {"fallbackOutput": "extra", "renameFallbackOutput": "Timed out"}}, (1000, 0))
-    w.add("Needs Finance?", "if", 2.2, {"conditions": conditions(cond("={{ $('Create Request').item.json.amount }}", "number", "gt", f"={{{{ {CFG}.finance_threshold }}}}")), "options": {}}, (1240, -160))
-    w.add("Finance Approval", "gmail", 2.1, approval(f"={{{{ {CFG}.finance_email }}}}", "=Finance approval: {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})", card + "<p>✅ Manager approved.</p>", 3), (1460, -260))
-    w.add("Finance Approved?", "if", 2.2, {"conditions": conditions(cond("={{ $json.data?.approved }}", "boolean", "true")), "options": {}}, (1680, -260))
+        "options": {"fallbackOutput": "extra", "renameFallbackOutput": "Timed out"}}, (1400, 0))
+    w.add("Needs Finance?", "if", 2.2, {"conditions": conditions(cond("={{ $('Create Request').item.json.amount }}", "number", "gt", f"={{{{ {CFG}.finance_threshold }}}}")), "options": {}}, (1640, -160))
+    w.add("Finance Approval", "gmail", 2.1, approval(f"={{{{ {CFG}.finance_email }}}}", "=Finance approval: {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})", card + "<p>✅ Manager approved.</p>", 3), (1860, -260))
+    w.add("Finance Approved?", "if", 2.2, {"conditions": conditions(cond("={{ $json.data?.approved }}", "boolean", "true")), "options": {}}, (2080, -260))
     for i, (name, status, y) in enumerate([("Final: Approved", "approved", -160), ("Final: Rejected", "rejected", 80), ("Final: Escalated (timeout)", "timed_out", 260)]):
         w.add(name, "set", 3.4, assign(request_id="={{ $('Create Request').item.json.request_id }}", requester="={{ $('Create Request').item.json.requester }}",
-            status=status, decided="={{ $now.toISO() }}"), (1900, y))
+            status=status, decided="={{ $now.toISO() }}"), (2300, y))
         w.link(name, "Audit: Decision")
-    w.add("Audit: Decision", "googleSheets", 4.5, sheet_upsert("Requests", "request_id"), (2120, 0))
+    w.add("Audit: Decision", "googleSheets", 4.5, sheet_upsert("Requests", "request_id"), (2520, 0))
     w.add("Notify Requester", "gmail", 2.1, gmail_send("={{ $('Create Request').item.json.requester }}", "={{ $('Create Request').item.json.request_id }}: {{ $json.status.replace('_', ' ') }}",
-        "=<p>Your purchase request <b>{{ $('Create Request').item.json.request_id }}</b> for {{ $('Create Request').item.json.item }} is now <b>{{ $json.status.replace('_', ' ') }}</b>.</p>{{ $json.status === 'timed_out' ? '<p>Your manager did not respond in 3 days, so this has been escalated to finance.</p>' : '' }}"), (2340, 0))
+        "=<p>Your purchase request <b>{{ $('Create Request').item.json.request_id }}</b> for {{ $('Create Request').item.json.item }} is now <b>{{ $json.status.replace('_', ' ') }}</b>.</p>{{ $json.status === 'timed_out' ? '<p>Your manager did not respond in 3 days, so this has been escalated to finance.</p>' : '' }}"), (2740, 0))
     w.add("Escalate to Finance", "gmail", 2.1, gmail_send(f"={{{{ {CFG}.finance_email }}}}", "=⏰ No manager response on {{ $('Create Request').item.json.request_id }}",
-        "=<p>Manager {{ $('Create Request').item.json.manager }} didn't respond in 3 days.</p>" ), (2120, 300))
-    w.chain("Purchase Request Form", "⚙️ Config", "Create Request", "Audit: Created", "Manager Approval", "Manager Decision")
+        "=<p>Manager {{ $('Create Request').item.json.manager }} didn't respond in 3 days.</p>" ), (2520, 300))
+    w.chain("Purchase Request Form", "⚙️ Config", "Lookup Manager", "Manager OK?")
+    w.link("Manager OK?", "Create Request", 0); w.link("Manager OK?", "Refuse: No Manager", 1)
+    w.chain("Create Request", "Audit: Created", "Manager Approval", "Manager Decision")
     w.link("Manager Decision", "Needs Finance?", 0); w.link("Manager Decision", "Final: Rejected", 1); w.link("Manager Decision", "Final: Escalated (timeout)", 2)
     w.link("Needs Finance?", "Finance Approval", 0); w.link("Needs Finance?", "Final: Approved", 1)
     w.chain("Finance Approval", "Finance Approved?"); w.link("Finance Approved?", "Final: Approved", 0); w.link("Finance Approved?", "Final: Rejected", 1)
@@ -352,14 +370,14 @@ def P06(root):
     write(root, w, readme("P06", "Purchase request with multi-level approval", P, "Finance / operations / HR", "50 min",
         "Every company has approval flows: purchases, leave, discounts, travel, contract exceptions. They usually run on email threads that get lost, and nobody can later say who approved what. This workflow gives you **routing by amount, timeouts with escalation, notifications and a full audit trail** without buying an approvals tool.",
         ["Chained **Send and Wait** approvals with time limits", "A 3-way **Switch** on approved / rejected / **timed out** (missing response)",
-         "Routing by business rule (amount > threshold → second approver)", "Generating human-friendly request IDs",
+         "Routing by business rule (amount > threshold → second approver)", "**Approver lookup** from a Team sheet, so requesters can't pick (or be) their own approver", "Collision-free request IDs from `$execution.id`",
          "An **audit trail**: upsert the same row as the status changes"],
-        "Form → Config → Create ID → Audit row → Manager approval ⏸3d → Switch\n  ├ Approved → amount > ₹1L? ─ yes → Finance approval ⏸3d → approved? ─ yes/no ┐\n  │                          └ no ─────────────────────────────────────────────┤\n  ├ Rejected ─────────────────────────────────────────────────────────────────────┤→ Set final status → Audit upsert → Notify requester\n  └ Timed out → escalate to finance ──────────────────────────────────────────────┘",
-        ["Gmail OAuth2", "Google Sheets OAuth2 (tab `Requests`: request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided)"],
-        ["Create the `Requests` tab.", "Import it, set the finance email and threshold in Config.",
+        "Form → Config → look up manager in Team sheet (missing or self? → refuse) → Create ID → Audit row → Manager approval ⏸3d → Switch\n  ├ Approved → amount > ₹1L? ─ yes → Finance approval ⏸3d → approved? ─ yes/no ┐\n  │                          └ no ─────────────────────────────────────────────┤\n  ├ Rejected ─────────────────────────────────────────────────────────────────────┤→ Set final status → Audit upsert → Notify requester\n  └ Timed out → escalate to finance ──────────────────────────────────────────────┘",
+        ["Gmail OAuth2", "Google Sheets OAuth2 (tab `Team`: email, manager_email; tab `Requests`: request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided)"],
+        ["Create the `Team` tab (one row per employee: `email`, `manager_email`) and the `Requests` tab.", "Import it, set the finance email and threshold in Config.",
          "For testing, set both approval time limits to a few minutes (Options → *Limit wait time*).",
          "Submit 3 requests: ₹20,000 (manager only), ₹2,00,000 (manager + finance), one you ignore (timeout)."],
-        ["Each request's row goes from `pending_manager` to its final status.", "The requester gets exactly one final email."],
+        ["Submit from an email that isn't in `Team`, or whose manager_email is itself: the request is refused, no approval is sent.", "Each request's row goes from `pending_manager` to its final status.", "The requester gets exactly one final email."],
         [("Buttons in the email show an error page", "Approval links call your n8n. It must be reachable (set `WEBHOOK_URL`)."),
          ("Timeout path never runs", "It only runs after the wait limit. Check *Limit wait time* is on for both approvals.")],
         ["Use Slack *Send and wait* instead of email for faster approvals.", "Create the PO in your ERP on approval.", "A weekly report of pending requests older than 5 days."]))
@@ -593,7 +611,7 @@ def P11(root):
          "Indian identifiers: Aadhaar, PAN, IFSC, +91 mobile", "A basic **prompt-injection screen**, and why it's only a first layer",
          "Webhook **header auth**, custom status codes (200 / 403)", "Audit logging that stays compliant: redacted text plus counts only"],
         "POST /ai/ask (header auth) → Redact PII → Injection screen → blocked?\n  ├ yes → audit (blocked) → 403\n  └ no  → LLM ⇐ Gemini → restore tokens → audit (answered) → 200 {answer, pii_redacted}",
-        ["Header Auth credential (e.g. `X-API-Key: <long random>`)", "Google Gemini API key", "Google Sheets OAuth2 (tab `AI_Audit`: time, user, outcome, pii_counts, prompt_redacted)"],
+        ["Header Auth credential (e.g. `X-API-Key: <long random>`)", "Google Gemini API key: use a **paid-tier** key for real data. On the free tier, Google may use prompts to improve its products, which defeats the point of a PII gateway (see ai.google.dev/gemini-api/terms)", "Google Sheets OAuth2 (tab `AI_Audit`: time, user, outcome, pii_counts, prompt_redacted)"],
         ["Create a **Header Auth** credential and select it on the webhook.", "Create the `AI_Audit` tab.", "Activate it, then call it with curl (see Test)."],
         ["```bash\ncurl -X POST https://<n8n>/webhook/ai/ask -H 'X-API-Key: <key>' -H 'Content-Type: application/json' -d '{\"user\":\"asha\",\"text\":\"Draft a polite reply to Rahul (rahul@example.com, 9876543210) about refund to card 4111 1111 1111 1111\"}'\n```",
          "The response contains the real email/phone, but the **audit sheet and the LLM prompt contain only tokens**.",
