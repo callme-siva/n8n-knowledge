@@ -28,12 +28,7 @@ flowchart LR
   core{{"⚙️ n8n workflow<br/><small>8 nodes</small>"}}:::n8n
   s0 -->|"starts"| core
   classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
-  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
-  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
-  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
-  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
   classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937
-  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937
 ```
 
 <details><summary><b>Node-level flow</b> (every node and branch)</summary>
@@ -57,21 +52,9 @@ flowchart TB
   n6 --> n5
   n5 --> n7
   classDef trigger fill:#E8F7EE,stroke:#2EA44F,stroke-width:2px,color:#1F2937
-  classDef ai fill:#F1EBFF,stroke:#7C3AED,stroke-width:2px,color:#1F2937
-  classDef sub fill:#F7F3FF,stroke:#A78BFA,stroke-width:2px,color:#1F2937
   classDef logic fill:#FFF4E5,stroke:#F59E0B,stroke-width:2px,color:#1F2937
   classDef code fill:#EEF2F7,stroke:#64748B,stroke-width:2px,color:#1F2937
-  classDef data fill:#EAF3FF,stroke:#2563EB,stroke-width:2px,color:#1F2937
-  classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
-```
-
-</details>
-
-<details><summary>Plain-text flow</summary>
-
-```
-Manual → Leads + Companies → Merge (match on company) → Size (Set) → Top 2 (Limit) → Biggest First (Sort) → ✅ Check
 ```
 
 </details>

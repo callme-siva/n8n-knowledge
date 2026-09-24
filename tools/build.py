@@ -46,14 +46,20 @@ for key, head in [("🟢", "🟢 Level 1 · Basics"), ("🟡", "🟡 Level 2 · 
         extra = {"L20": " <sub>+ [L20a](workflows/L20a-subworkflow-send-branded-email/README.md)</sub>", "P10": " <sub>+ [P10a](workflows/P10a-tool-lookup-customer/README.md)</sub>"}.get(r["num"], "")
         blocks.append(f"| **{r['num']}** | [{r['title']}](workflows/{r['slug']}/README.md){extra} | {r['domain']} | {concepts} | {r['time']} |")
     blocks.append("")
-gal = ["<table>"]
+def gallery(rows, prefix=""):
+    g = ["<table>"]
+    for i in range(0, len(rows), 2):
+        g.append("<tr>")
+        for r in rows[i:i + 2]:
+            g.append(f'<td width="50%" align="center" valign="top"><a href="{prefix}workflows/{r["slug"]}/README.md"><img src="{prefix}workflows/{r["slug"]}/canvas.svg" alt="{r["num"]} canvas"></a><br/><b>{r["num"]}</b> · {r["title"]}</td>')
+        g.append("</tr>")
+    return g + ["</table>"]
 rs = [r for r in REGISTRY if not r["num"].endswith("a")]
-for i in range(0, len(rs), 2):
-    gal.append("<tr>")
-    for r in rs[i:i + 2]:
-        gal.append(f'<td width="50%" align="center" valign="top"><a href="workflows/{r["slug"]}/README.md"><img src="workflows/{r["slug"]}/canvas.svg" alt="{r["num"]} canvas"></a><br/><b>{r["num"]}</b> · {r["title"]}</td>')
-    gal.append("</tr>")
-gal.append("</table>")
+HIGHLIGHTS = ("L01", "L15", "Q02", "P01", "P06", "X01")
+gal = gallery([r for r in rs if r["num"] in HIGHLIGHTS]) + ["", f"**[See all {len(rs)} canvases →](GALLERY.md)**"]
+open(os.path.join(ROOT, "GALLERY.md"), "w").write("\n".join(['<div align="center">', "", "# 🖼️ Gallery", "",
+    f"**Every workflow's canvas, {len(rs)} in total.** Click one to open its lesson.", "", "</div>", "", *gallery(rs), "",
+    '<p align="center"><a href="README.md">← Back to the learning path</a></p>']) + "\n")
 p = os.path.join(ROOT, "README.md"); s = open(p).read()
 s = re.sub(r"<!-- LESSONS:START -->.*<!-- LESSONS:END -->", lambda m: "<!-- LESSONS:START -->\n" + "\n".join(blocks) + "\n<!-- LESSONS:END -->", s, flags=re.S)
 s = re.sub(r"<!-- GALLERY:START -->.*<!-- GALLERY:END -->", lambda m: "<!-- GALLERY:START -->\n" + "\n".join(gal) + "\n<!-- GALLERY:END -->", s, flags=re.S)

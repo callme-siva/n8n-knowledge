@@ -47,8 +47,6 @@ flowchart LR
   core -->|"sends email"| s2
   core -->|"posts messages"| s3
   core <-->|"prompt + data → answer"| s4
-  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
-  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
   classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
   classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937
@@ -92,20 +90,7 @@ flowchart TB
   classDef logic fill:#FFF4E5,stroke:#F59E0B,stroke-width:2px,color:#1F2937
   classDef code fill:#EEF2F7,stroke:#64748B,stroke-width:2px,color:#1F2937
   classDef data fill:#EAF3FF,stroke:#2563EB,stroke-width:2px,color:#1F2937
-  classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
-```
-
-</details>
-
-<details><summary>Plain-text flow</summary>
-
-```
-Webhook /alerts → Split Out alerts → Code (state by fingerprint → action) → Switch
-  ├ page     → Jira incident → remember key → email on-call + Slack
-  ├ notify   → Slack
-  ├ resolved → LLM postmortem draft ⇐ Gemini → Slack
-  └ repeat   → suppress
 ```
 
 </details>

@@ -256,8 +256,10 @@ def mermaid(wf):
             L.append(f'  {ids[src]} -->|"{lab(labs[oi])}"| {ids[dst]}' if len(labs) > oi and len(wf["connections"][src]["main"]) > 1 else f"  {ids[src]} --> {ids[dst]}")
         else:
             L.append(f'  {ids[src]} -.->|{kind.replace("ai_", "")}| {ids[dst]}')
+    used = {cat(n) for n in nodes}
     for c, (fill, stroke, _) in CATS.items():
-        L.append(f"  classDef {c} fill:{fill},stroke:{stroke},stroke-width:2px,color:#1F2937")
+        if c in used:
+            L.append(f"  classDef {c} fill:{fill},stroke:{stroke},stroke-width:2px,color:#1F2937")
     L.append("```")
     return "\n".join(L)
 
@@ -358,11 +360,9 @@ def context_mermaid(wf):
     for lab, (cls, verbs, cred) in right.items():
         arrow = "<-->" if any(v.startswith(("reads", "searches", "JQL", "agent", "HTTPS", "prompt", "text", "approve")) for v in verbs) else "-->"
         L.append(f'  core {arrow}|"{" · ".join(sorted(verbs))}"| {nid(lab)}')
-    L += ["  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937",
-          "  classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937",
-          "  classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937",
-          "  classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937",
-          "  classDef ext fill:#E6FAF8,stroke:#0D9488,color:#1F2937",
-          "  classDef n8n fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px,color:#1F2937",
-          "  classDef store fill:#F8FAFC,stroke:#64748B,color:#1F2937", "```"]
+    defs = {"person": "fill:#FFF4E5,stroke:#F59E0B", "time": "fill:#E8F7EE,stroke:#2EA44F", "saas": "fill:#EAF3FF,stroke:#2563EB",
+            "ai": "fill:#F1EBFF,stroke:#7C3AED", "ext": "fill:#E6FAF8,stroke:#0D9488", "n8n": "fill:#FFF1F4,stroke:#EA4B71,stroke-width:3px",
+            "store": "fill:#F8FAFC,stroke:#64748B"}
+    body = "\n".join(L)
+    L += [f"  classDef {c} {d},color:#1F2937" for c, d in defs.items() if f":::{c}" in body] + ["```"]
     return "\n".join(L)

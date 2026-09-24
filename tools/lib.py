@@ -216,8 +216,7 @@ def render_readme(r, data, diagram):
           "## 🏗️ Architecture", "",
           "**System context:** who and what this workflow talks to, and what crosses each boundary. 🔑 = needs a credential · 🧑 = a human decides.", "",
           context_mermaid(data), "",
-          "<details><summary><b>Node-level flow</b> (every node and branch)</summary>", "", diagram, "", "</details>", "",
-          "<details><summary>Plain-text flow</summary>", "", "```", r["flow"].strip("\n"), "```", "", "</details>", ""]
+          "<details><summary><b>Node-level flow</b> (every node and branch)</summary>", "", diagram, "", "</details>", ""]
     d = DECISIONS.get(r["num"])
     if d:
         L += ["## ⚖️ Design decisions & trade-offs", "", "Why it's built this way, and what it costs.", "",

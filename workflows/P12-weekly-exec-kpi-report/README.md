@@ -51,7 +51,6 @@ flowchart LR
   core -->|"data → chart PNG"| s4
   core <-->|"prompt + data → answer"| s5
   core -->|"sends email"| s6
-  classDef person fill:#FFF4E5,stroke:#F59E0B,color:#1F2937
   classDef time fill:#E8F7EE,stroke:#2EA44F,color:#1F2937
   classDef saas fill:#EAF3FF,stroke:#2563EB,color:#1F2937
   classDef ai fill:#F1EBFF,stroke:#7C3AED,color:#1F2937
@@ -102,16 +101,6 @@ flowchart TB
   classDef data fill:#EAF3FF,stroke:#2563EB,stroke-width:2px,color:#1F2937
   classDef http fill:#E6FAF8,stroke:#0D9488,stroke-width:2px,color:#1F2937
   classDef msg fill:#FFEDEF,stroke:#E11D48,stroke-width:2px,color:#1F2937
-```
-
-</details>
-
-<details><summary>Plain-text flow</summary>
-
-```
-Schedule → Config ─┬→ Jira done 7d → aggregate ─┐
-                   ├→ GitHub merged PRs ────────┼→ Merge(3) → KPIs + WoW ─┬→ QuickChart ─┐
-                   └→ Sheets revenue → sum ─────┘                        └→ LLM narrative ┴→ Merge → Gmail
 ```
 
 </details>
