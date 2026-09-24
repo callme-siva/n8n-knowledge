@@ -73,7 +73,8 @@ def stub_code(mode, data):
 
 def build_test_copy(wf, slug):
     wf = copy.deepcopy(wf)
-    fx = FIXTURES.get(slug, {})
+    base = slug.split("--")[0]            # "X01-…--solution" uses X01's fixtures
+    fx = FIXTURES.get(base, {})
     nodes = {n["name"]: n for n in wf["nodes"]}
     ai_children = {src for src, kinds in wf["connections"].items() for k in kinds if k != "main"}
     mocked, runnable = [], True
@@ -97,7 +98,7 @@ def build_test_copy(wf, slug):
         if s == "wait" and n["parameters"].get("resume") == "timeInterval":
             n["parameters"].update({"amount": 1, "unit": "seconds"})
         if s in EVENT_TRIGGERS:
-            sample = copy.deepcopy(TRIGGERS.get(slug) or TRIGGERS.get(s) or [{}])
+            sample = copy.deepcopy(TRIGGERS.get(base) or TRIGGERS.get(s) or [{}])
             for item in sample:  # "_binary": {"key": {"file": "x.pdf"}} → embed the real sample file
                 for b in (item.get("_binary") or {}).values():
                     if "file" in b:
@@ -156,8 +157,10 @@ def run(slugs):
     env = dict(os.environ, N8N_USER_FOLDER=os.path.join(tmp, "home"), N8N_DIAGNOSTICS_ENABLED="false",
                N8N_LOG_LEVEL="info", N8N_RUNNERS_ENABLED="true", GENERIC_TIMEZONE="Asia/Kolkata")
     plans = []
-    for path in sorted(glob.glob(os.path.join(ROOT, "workflows", "*", "workflow.json"))):
-        slug = os.path.basename(os.path.dirname(path))
+    # debug challenges ship a broken workflow.json plus a fixed solution.json: both are run
+    paths = sorted(glob.glob(os.path.join(ROOT, "workflows", "*", "workflow.json")) + glob.glob(os.path.join(ROOT, "workflows", "*", "solution.json")))
+    for path in paths:
+        slug = os.path.basename(os.path.dirname(path)) + ("--solution" if path.endswith("solution.json") else "")
         if slugs and not any(slug.startswith(p) for p in slugs):
             continue
         wf, mocked, runnable = build_test_copy(json.load(open(path)), slug)
@@ -189,14 +192,25 @@ def run(slugs):
             except ValueError:
                 pass
         err = ""
+        if not ok and os.environ.get("HARNESS_DEBUG"):
+            print(out[-3000:])
         if not ok:
-            em = re.search(r"Execution error:\s*\n?(.*)", out)
+            em = re.search(r"Execution error:\s*\n(?:=+\s*\n)?(.*)", out)
             err = (em.group(1) if em else out.strip().splitlines()[-1] if out.strip() else "unknown")[:300]
         results[slug] = {"status": "passed" if ok else "failed", "real_nodes": len(real), "mocked_nodes": len(mocked),
                          "nodes_ran": len([r for r in ran if not r.startswith("__test_start")]),
                          "ran": sorted(r for r in ran if not r.startswith("__test_start")), "error": err}
+        base = slug.split("--")[0]
+        broken = not slug.endswith("--solution") and os.path.exists(os.path.join(ROOT, "workflows", slug, "solution.json"))
+        checks = [] if broken else EXPECT.get(base, [])
+        if broken:   # must fail, and with the ✅ Check node's bug list (not some unrelated error)
+            if ok:
+                ok, err = False, "debug challenge ran clean: its bugs are missing"
+            elif "bug(s) left" in out:
+                ok, err = True, re.search(r"🐞 [^\n]*", out).group(0)[:300]
+            results[slug].update(status="passed" if ok else "failed", error=err, expected_failure=True)
         failures = []
-        for chk in EXPECT.get(slug, []) if ok else []:
+        for chk in checks if ok and not broken else []:
             kind, node = chk[0], chk[1]
             runs = run_data.get(node, [])
             outs = [r.get("data", {}).get("main", []) for r in runs]
@@ -208,7 +222,7 @@ def run(slugs):
                 blob = json.dumps(outs, ensure_ascii=False, separators=(",", ":"))
                 if (kind == "contains") != (chk[2] in blob):
                     failures.append(f"{node} {'should' if kind == 'contains' else 'must not'} contain {chk[2]!r}")
-        results[slug]["checks"] = len(EXPECT.get(slug, []))
+        results[slug]["checks"] = len(checks)
         # record the exact rows each Google Sheets node read or wrote (used to generate templates/)
         sheet_io = {}
         for node, meta in wf.get("_sheets", {}).items():
@@ -223,7 +237,7 @@ def run(slugs):
         n_ran = results[slug]["nodes_ran"]
         if ok and n_ran == 0:
             results[slug]["status"] = "failed"; results[slug]["error"] = "no nodes executed"; ok = False
-        print(f"{'✓' if ok else '✗'} {slug}: ran {n_ran}/{len(real) + len(mocked)} nodes ({len(mocked)} mocked), {len(EXPECT.get(slug, []))} behaviour checks" + ("" if ok else f"\n    → {results[slug]['error']}"))
+        print(f"{'✓' if ok else '✗'} {slug}: ran {n_ran}/{len(real) + len(mocked)} nodes ({len(mocked)} mocked), " + ("fails with its bug list, as intended" if broken else f"{len(checks)} behaviour checks") + ("" if ok else f"\n    → {results[slug]['error']}"))
     return results
 
 

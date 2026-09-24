@@ -1,0 +1,236 @@
+{
+  "name": "X02 · Debug me: the top-2 leads list",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🐞 X02 · This workflow has 3 bugs\nIt should join leads with company data and return the **2 leads from the biggest companies**, biggest first.\nRun it, read **✅ Check**, fix, repeat. Don't edit Leads, Companies or ✅ Check.",
+        "width": 460,
+        "height": 200,
+        "color": 5
+      },
+      "id": "f5404901-5827-5f1b-99c5-4a6d5fb2d30b",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "25ad2a7e-aac2-527b-a5c4-4b2c5c71adbb",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// From your form. Don't change this node.\nreturn [\n  { name: 'Asha', company: 'Finlytics' },\n  { name: 'Ravi', company: 'Kiranmart' },\n  { name: 'Meera', company: 'Pixel Studio' },\n  { name: 'Karan', company: 'Zenlogix' },\n].map(j => ({ json: j }));"
+      },
+      "id": "b73dc4b8-d0e6-54d2-b08c-d4977393baab",
+      "name": "Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// From your CRM export. Don't change this node.\nreturn [\n  { Company: 'Finlytics', employees: 120 },\n  { Company: 'Kiranmart', employees: 1200 },\n  { Company: 'Pixel Studio', employees: 9 },\n  { Company: 'Zenlogix', employees: 450 },\n].map(j => ({ json: j }));"
+      },
+      "id": "d7ac33f0-6b16-591c-aedb-f376151c8791",
+      "name": "Companies",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "company",
+        "options": {}
+      },
+      "id": "13ec6e00-97af-501d-9ef8-eea1add4b164",
+      "name": "Join on Company",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        440,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "size",
+              "value": "={{ $json.employees }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "all",
+        "options": {}
+      },
+      "id": "4ddffaa0-9367-5961-b856-26ceab1df820",
+      "name": "Size",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "size",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "32bdc97c-c49e-5a04-b7a5-c5d846c1864a",
+      "name": "Biggest First",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 2
+      },
+      "id": "e9aeedae-0779-546a-afc5-252240a2ad2c",
+      "name": "Top 2",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Don't edit this node: it tells you which bugs are left.\nconst items = $input.all().map(i => i.json).filter(j => j.name);\nconst bugs = [];\nif (!items.length) bugs.push('Join on Company matched nothing. Look at the field names in Leads and Companies: are they spelled the same, including capitals?');\nelse {\n  if (items.some(j => typeof j.size !== 'number')) bugs.push('Size: size is text, so \"9\" sorts above \"1200\". Check the type of the field in the Set node.');\n  const names = items.map(j => j.name).join(', ');\n  if (names !== 'Ravi, Karan') bugs.push(`Got [${names}], expected [Ravi, Karan]. If the sorting is right, check the ORDER of the nodes: what does Top 2 receive?`);\n}\nif (bugs.length) throw new Error(`🐞 ${bugs.length} bug(s) left: ` + bugs.map((b, i) => `(${i + 1}) ${b}`).join('  '));\nreturn [{ json: { result: '🎉 All fixed! Top 2 leads: Ravi (1200), Karan (450).', leads: items } }];"
+      },
+      "id": "78f8538c-7418-5b57-8c32-7d9b15d482d6",
+      "name": "✅ Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Leads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Companies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leads": {
+      "main": [
+        [
+          {
+            "node": "Join on Company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Companies": {
+      "main": [
+        [
+          {
+            "node": "Join on Company",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Join on Company": {
+      "main": [
+        [
+          {
+            "node": "Size",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Size": {
+      "main": [
+        [
+          {
+            "node": "Top 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 2": {
+      "main": [
+        [
+          {
+            "node": "Biggest First",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Biggest First": {
+      "main": [
+        [
+          {
+            "node": "✅ Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

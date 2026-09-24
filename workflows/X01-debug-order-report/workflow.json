@@ -1,0 +1,195 @@
+{
+  "name": "X01 · Debug me: the paid-orders report",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🐞 X01 · This workflow has 3 bugs\nIt should list the **3 paid orders**, each with 18% tax added and its own label.\n1. Click **Execute workflow**.\n2. Read the error from **✅ Check**: it names what's still wrong.\n3. Fix one bug, run again, repeat until it says *All fixed*.\nDon't edit ✅ Check or Orders.",
+        "width": 460,
+        "height": 250,
+        "color": 5
+      },
+      "id": "30e71dec-1028-58ff-bee7-3c9f2639604b",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "41271eb9-e45a-5192-b4fb-3214c0a43f7b",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Test data. Don't change this node.\nreturn [\n  { order_id: 101, customer: 'Asha', amount: 1000, status: 'Paid' },\n  { order_id: 102, customer: 'Ravi', amount: 250, status: 'Unpaid' },\n  { order_id: 103, customer: 'Meera', amount: 499.5, status: 'Paid' },\n  { order_id: 104, customer: 'Karan', amount: 80, status: 'Unpaid' },\n  { order_id: 105, customer: 'Priya', amount: 3200, status: 'Paid' },\n].map(o => ({ json: o }));"
+      },
+      "id": "f2cebc85-c994-55a1-a9f4-7d0ba2882c89",
+      "name": "Orders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "total",
+              "value": "={{ Math.round($json.ammount * 118) / 100 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "all",
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "id": "71e5670a-2f20-595d-8a22-ef32c16b280f",
+      "name": "Add Tax",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Runs ONCE for all items.\nreturn $input.all().map(i => ({ json: { ...i.json, label: `#${$json.order_id} · ${$json.customer}` } }));"
+      },
+      "id": "a3d2a488-5da8-542b-a85e-d2f4490a1906",
+      "name": "Add Label",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.status }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "paid"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "87af7af6-f084-57c2-946d-f57cd2383bec",
+      "name": "Paid Only",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Don't edit this node: it tells you which bugs are left.\nconst items = $input.all().map(i => i.json).filter(j => j.order_id);\nconst bugs = [];\nif (items.length !== 3) bugs.push(`Paid Only let ${items.length} order(s) through, expected 3. Compare the status values in Orders with the filter value, letter by letter.`);\nconst taxed = $('Add Tax').all().map(i => i.json);\nif (taxed.some(j => typeof j.total !== 'number' || Number.isNaN(j.total))) bugs.push('Add Tax: total is empty. Open the node and check the field name inside the expression (the INPUT panel shows the real names).');\nelse if (taxed.some(j => j.total !== Math.round(j.amount * 118) / 100)) bugs.push('Add Tax: total is not amount + 18%.');\nconst labels = $('Add Label').all().map(i => i.json.label);\nif (new Set(labels).size !== labels.length) bugs.push(`Add Label: every order got the label \"${labels[0]}\". In \"run once for all items\" mode, $json is only the FIRST item. Use the loop variable.`);\nif (bugs.length) throw new Error(`🐞 ${bugs.length} bug(s) left: ` + bugs.map((b, i) => `(${i + 1}) ${b}`).join('  '));\nreturn [{ json: { result: '🎉 All fixed! 3 paid orders, tax added, labels correct.', orders: items } }];"
+      },
+      "id": "148c326c-15c9-5d41-b48a-2eb9f20236d2",
+      "name": "✅ Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orders": {
+      "main": [
+        [
+          {
+            "node": "Add Tax",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Tax": {
+      "main": [
+        [
+          {
+            "node": "Add Label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Label": {
+      "main": [
+        [
+          {
+            "node": "Paid Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paid Only": {
+      "main": [
+        [
+          {
+            "node": "✅ Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}

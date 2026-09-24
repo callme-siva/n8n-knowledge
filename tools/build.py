@@ -1,14 +1,14 @@
 """Regenerate every workflow, canvas snapshot and README:  python3 tools/build.py"""
 import os, sys, glob, json
 sys.path.insert(0, os.path.dirname(__file__))
-import level1_2, level3_4, quickwins, projects
+import level1_2, level3_4, quickwins, projects, debug
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 import lib, templates
 lib.SHEET_TEMPLATES = templates.sheet_templates(ROOT)   # columns come from the last e2e run (tests/results.json)
 templates.sample_files(ROOT)
-for fn in level1_2.ALL + level3_4.ALL + quickwins.ALL + projects.ALL:
+for fn in level1_2.ALL + level3_4.ALL + quickwins.ALL + projects.ALL + debug.ALL:
     fn(ROOT)
     print("built", fn.__name__)
 
@@ -16,7 +16,7 @@ for fn in level1_2.ALL + level3_4.ALL + quickwins.ALL + projects.ALL:
 HELPERS = ("L20a", "P10a")
 all_dirs = sorted(d for d in os.listdir(os.path.join(ROOT, "workflows")) if not d.startswith(HELPERS))
 title = lambda d: json.load(open(os.path.join(ROOT, "workflows", d, "workflow.json")))["name"].split(" (")[0]
-TRACK = {"L": "the core path", "Q": "Quick wins", "P": "Real-world projects"}
+TRACK = {"L": "the core path", "Q": "Quick wins", "P": "Real-world projects", "X": "the debug challenges"}
 for d in all_dirs:
     dirs = [x for x in all_dirs if x[0] == d[0]]
     i = dirs.index(d)
@@ -38,7 +38,7 @@ from lib import REGISTRY, LEVELS
 strip = lambda t: re.sub(r"\*\*|`|\*", "", t)
 blocks = []
 for key, head in [("🟢", "🟢 Level 1 · Basics"), ("🟡", "🟡 Level 2 · Integrations"), ("🟠", "🟠 Level 3 · AI"), ("🔴", "🔴 Level 4 · Multi-agent & production"),
-                  ("⚡", "⚡ Quick wins: useful in 15 minutes"), ("🏭", "🏭 Projects: real business processes")]:
+                  ("⚡", "⚡ Quick wins: useful in 15 minutes"), ("🏭", "🏭 Projects: real business processes"), ("🐞", "🐞 Debug challenges: fix a broken workflow")]:
     rows = [r for r in REGISTRY if r["level"].startswith(key) and not r["num"].endswith("a")]
     blocks += [f"### {head}", "", "| # | Lesson | Domain | Key concepts | Time |", "|:-:|---|---|---|:-:|"]
     for r in rows:
@@ -64,9 +64,15 @@ print("README tables + gallery updated")
 sys.path.insert(0, os.path.join(ROOT, "tests"))
 from fixtures import EXPECT
 n_checks = sum(map(len, EXPECT.values()))
+n_wf = len(os.listdir(os.path.join(ROOT, "workflows")))
+n_run = n_wf - 1   # P10 (MCP server) is structure-checked only
 for f in ("README.md", "tests/README.md", "docs/testing.md"):
     p = os.path.join(ROOT, f); t = open(p).read()
     t = re.sub(r"\d+ behaviour checks", f"{n_checks} behaviour checks", t)
+    t = re.sub(r"imports all \d+ workflows", f"imports all {n_wf} workflows", t)
+    t = re.sub(r"runs \d+ of them", f"runs {n_run} of them", t)
+    t = re.sub(r"runs \d+ of the \d+ workflows", f"runs {n_run} of the {n_wf} workflows", t)
+    t = re.sub(r"✅ \d+ run ·", f"✅ {n_run} run ·", t)
     open(p, "w").write(t)
 print(n_checks, "behaviour checks")
 

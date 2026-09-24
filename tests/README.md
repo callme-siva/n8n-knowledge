@@ -2,7 +2,7 @@
 
 # 🧪 End-to-end tests
 
-**Every push imports all 44 workflows into a real n8n and runs 43 of them, with 90 behaviour checks.** Credentialed and AI nodes are replaced with fixtures, so these tests prove logic, wiring and routing, not the quality of AI output.
+**Every push imports all 46 workflows into a real n8n and runs 45 of them, with 95 behaviour checks.** Credentialed and AI nodes are replaced with fixtures, so these tests prove logic, wiring and routing, not the quality of AI output.
 
 </div>
 
@@ -16,6 +16,8 @@
 | **Live** public APIs: Open-Meteo, open.er-api.com, RSS feeds, books.toscrape.com, quickchart.io | Event triggers (form, webhook, Gmail, chat, error, sub-workflow) become a manual start + a sample event |
 
 Sheets writes with inline column mappings are evaluated for real (their expressions are part of the test).
+
+**Debug challenges (X01, X02)** ship a broken `workflow.json` and a fixed `solution.json`. The harness runs both: the broken one must fail with its ✅ Check bug list, and the solution must pass its behaviour checks. The `HARNESS_DEBUG=1` environment variable prints n8n's full output for any failing run.
 
 ## Behaviour checks
 

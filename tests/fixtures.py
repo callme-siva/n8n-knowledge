@@ -139,6 +139,9 @@ return { json: { output: { vendor_name: str(/TAX INVOICE\s+(.+?)\s+\d+ MG Road/)
 # Each check: ("count", node, output_index, expected_items)  or  ("contains", node, text)  or  ("absent", node, text)
 # count = total items that node emitted on that output (summed over loop iterations).
 EXPECT = {
+    # debug challenges: checked against solution.json (the broken workflow.json must fail with its bug list)
+    "X01-debug-order-report": [("count", "Paid Only", 0, 3), ("contains", "✅ Check", "All fixed"), ("contains", "Add Tax", "\"total\":589.41")],
+    "X02-debug-top-leads": [("count", "Join on Company", 0, 4), ("contains", "✅ Check", "All fixed")],
     "L01-hello-n8n": [("contains", "Build Greeting", "Hello "), ("count", "Send to Yourself", 0, 1)],
     "L02-daily-weather-email": [("contains", "Fetch Weather", "temperature_2m"), ("count", "Email Summary", 0, 1)],
     "L03-job-search-api": [("count", "Format Email", 0, 1), ("contains", "Format Email", "<tr>")],

@@ -61,7 +61,7 @@ Runs on self-hosted n8n with the Gemini free tier, free public APIs and free tie
 <td valign="top">
 
 ### ✅ Executed in CI
-Every push imports all 44 workflows into n8n 2.40.5 and **runs 43 of them** (P10 is an MCP server, so it's structure-checked). Logic, code, branching, loops and public APIs run for real; credentialed and AI nodes are replaced with fixtures. 90 behaviour checks across 43 workflows.
+Every push imports all 46 workflows into n8n 2.40.5 and **runs 45 of them** (P10 is an MCP server, so it's structure-checked). Logic, code, branching, loops and public APIs run for real; credentialed and AI nodes are replaced with fixtures. 95 behaviour checks across 43 workflows.
 
 </td>
 </tr>
@@ -87,7 +87,7 @@ Every push imports all 44 workflows into n8n 2.40.5 and **runs 43 of them** (P10
 <p align="center"><img src="assets/learning-path.svg" alt="Learning roadmap: core path L01–L22, quick wins Q01–Q08, real-world projects P01–P12" width="100%"></p>
 
 > [!TIP]
-> **New to n8n?** Follow the core path in order. **Know the basics?** Pick any ⚡ quick win. **Building for a company?** Go to the 🏭 real-world projects. Each one models a real business process: approvals, checkpoints, dedupe and audit logs. Read its credentials and troubleshooting sections before running it for real.
+> **New to n8n?** Follow the core path in order. **Know the basics?** Pick any ⚡ quick win. **Building for a company?** Go to the 🏭 real-world projects. Each one models a real business process: approvals, checkpoints, dedupe and audit logs. Read its credentials and troubleshooting sections before running it for real. **After L05 and L07**, try the 🐞 debug challenges: broken workflows you fix until their ✅ Check node passes.
 
 <!-- LESSONS:START -->
 ### 🟢 Level 1 · Basics
@@ -161,6 +161,13 @@ Every push imports all 44 workflows into n8n 2.40.5 and **runs 43 of them** (P10
 | **P10** | [MCP server for company tools](workflows/P10-mcp-server-business-tools/README.md) <sub>+ [P10a](workflows/P10a-tool-lookup-customer/README.md)</sub> | AI platform / internal tools | MCP Server Trigger with bearer authentication · Sub-workflows as tools | 30 min |
 | **P11** | [PII-safe AI gateway](workflows/P11-pii-safe-ai-gateway/README.md) | Security / compliance / platform | Redaction with reversible tokens · Validating matches | 45 min |
 | **P12** | [Weekly executive KPI report](workflows/P12-weekly-exec-kpi-report/README.md) | Leadership / PMO / chief of staff | Parallel fan-out to three sources, joined with a 3-input Merge · Aggregating counts in n8n vs in code | 60 min |
+
+### 🐞 Debug challenges: fix a broken workflow
+
+| # | Lesson | Domain | Key concepts | Time |
+|:-:|---|---|---|:-:|
+| **X01** | [Debug me: the paid-orders report](workflows/X01-debug-order-report/README.md) | Any | Reading the INPUT / OUTPUT panels to find where data first goes wrong · Expression typos that silently give undefined | 20 min |
+| **X02** | [Debug me: the top-2 leads list](workflows/X02-debug-top-leads/README.md) | Sales / any | Merge → Combine by matching fields, and what happens when keys differ · Why types matter | 25 min |
 
 <!-- LESSONS:END -->
 
@@ -254,6 +261,10 @@ Every push imports all 44 workflows into n8n 2.40.5 and **runs 43 of them** (P10
 <td width="50%" align="center" valign="top"><a href="workflows/P11-pii-safe-ai-gateway/README.md"><img src="workflows/P11-pii-safe-ai-gateway/canvas.svg" alt="P11 canvas"></a><br/><b>P11</b> · PII-safe AI gateway</td>
 <td width="50%" align="center" valign="top"><a href="workflows/P12-weekly-exec-kpi-report/README.md"><img src="workflows/P12-weekly-exec-kpi-report/canvas.svg" alt="P12 canvas"></a><br/><b>P12</b> · Weekly executive KPI report</td>
 </tr>
+<tr>
+<td width="50%" align="center" valign="top"><a href="workflows/X01-debug-order-report/README.md"><img src="workflows/X01-debug-order-report/canvas.svg" alt="X01 canvas"></a><br/><b>X01</b> · Debug me: the paid-orders report</td>
+<td width="50%" align="center" valign="top"><a href="workflows/X02-debug-top-leads/README.md"><img src="workflows/X02-debug-top-leads/canvas.svg" alt="X02 canvas"></a><br/><b>X02</b> · Debug me: the top-2 leads list</td>
+</tr>
 </table>
 <!-- GALLERY:END -->
 
@@ -273,7 +284,7 @@ Every push imports all 44 workflows into n8n 2.40.5 and **runs 43 of them** (P10
 | Practice challenges with solutions | ❌ | sometimes | ✅ 84 + 30-question quiz |
 | Troubleshooting per workflow | ❌ | ❌ | ✅ |
 | Production practices | rarely | rarely | ✅ |
-| Every workflow executed in CI | ❌ | n/a | ✅ 43 run · 90 behaviour checks · AI and credentialed nodes mocked |
+| Every workflow executed in CI | ❌ | n/a | ✅ 45 run · 95 behaviour checks · AI and credentialed nodes mocked |
 
 If you want *any* template for a niche app, the big collections are great. This repo is for **learning to design workflows yourself**.
 

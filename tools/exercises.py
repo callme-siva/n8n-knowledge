@@ -1,6 +1,28 @@
 """Practice challenges per lesson: (stars, challenge, hint, solution-markdown)."""
 
 EX = {
+    "X01": [
+        (1, "**Bug 1:** only some orders (or none) get through *Paid Only*.",
+         "Open *Orders* and *Paid Only* side by side. Compare the status value in the data with the value in the condition, character by character.",
+         "The data says `Paid`, the filter compares with `paid`, and Filter is case-sensitive by default. Either type `Paid`, or open the Filter's **Options → Ignore Case**. Ignoring case is safer when data comes from people."),
+        (1, "**Bug 2:** `total` is empty.",
+         "Open *Add Tax* and look at the expression preview under the field. Then look at the INPUT panel: which field names actually exist?",
+         "The expression says `$json.ammount` (two m's). A missing field is `undefined`, and `undefined * 118` is `NaN`, so n8n leaves it empty without an error. Fix it to `{{ Math.round($json.amount * 118) / 100 }}`. Drag fields from the INPUT panel instead of typing them to avoid this."),
+        (2, "**Bug 3:** every order has the same label.",
+         "Check the Code node's mode. In *Run once for all items*, what does `$json` point to?",
+         "In *Run once for all items* mode, `$json` is the **first** item only. Inside the `map`, use the loop variable:\n```javascript\nreturn $input.all().map(i => ({ json: { ...i.json, label: `#${i.json.order_id} · ${i.json.customer}` } }));\n```\nOr switch the node to *Run once for each item*, where `$json` is the current item."),
+    ],
+    "X02": [
+        (1, "**Bug 1:** *Join on Company* outputs nothing.",
+         "Open the Merge node's two INPUT tabs. The field you match on must exist, spelled the same, in both.",
+         "Leads use `company`, Companies use `Company`. Keys are case-sensitive, so nothing matches. In the Merge node, turn on **Fields to match have different names** and set Input 1 field `company`, Input 2 field `Company`. (Or rename the field with a Set node before the merge.)"),
+        (2, "**Bug 2:** Pixel Studio (9 employees) ranks above Kiranmart (1,200).",
+         "Look at `size` in the OUTPUT panel of *Size*. Is it shown as a number or as text?",
+         "The Set field's type is **String**, so Sort compares text, and `\"9\"` comes after `\"1200\"`. Change the field type to **Number**."),
+        (2, "**Bug 3:** sorting is right, but the top 2 are still wrong.",
+         "What does *Top 2* receive, and what does *Biggest First* receive? Follow the connections, not the node names.",
+         "*Top 2* runs **before** *Biggest First*, so it keeps the first 2 items in the original order and only then sorts them. Rewire it as `Size → Biggest First → Top 2 → ✅ Check`."),
+    ],
     "L01": [
         (1, "Send the greeting for **three people** instead of one.",
          "The Set node emits one item. What if the Code node returned three?",

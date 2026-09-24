@@ -42,7 +42,7 @@ N8N_USER_FOLDER=/tmp/n8n-test npx n8n import:workflow --separate --input=/tmp/im
 **Last full run:** n8n 2.40.5 → 44/44 imported; 0 issues across node types, versions, parameter names, option names and dropdown values.
 
 ## Level 4: automated end-to-end (CI)
-Every push runs 43 of the 44 workflows in real n8n (P10 is structure-checked), with credentialed and AI nodes replaced by fixtures and 90 behaviour checks. See [tests/README.md](../tests/README.md).
+Every push runs 45 of the 46 workflows in real n8n (P10 is structure-checked), with credentialed and AI nodes replaced by fixtures and 95 behaviour checks. See [tests/README.md](../tests/README.md).
 
 ## Level 5: live run with your accounts
 Run each workflow once with real credentials and the inputs from [sample-data.md](sample-data.md). Record the result in your PR description.

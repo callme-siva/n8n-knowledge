@@ -1263,5 +1263,75 @@
     ],
     "real_nodes": 5,
     "status": "passed"
+  },
+  "X01-debug-order-report": {
+    "checks": 0,
+    "error": "\ud83d\udc1e 3 bug(s) left: (1) Paid Only let 0 order(s) through, expected 3. Compare the status values in Orders with the filter value, letter by letter.  (2) Add Tax: total is empty. Open the node and check the field name inside the expression (the INPUT panel shows the real names).  (3) Add Label: every ord",
+    "expected_failure": true,
+    "mocked_nodes": 0,
+    "nodes_ran": 6,
+    "ran": [
+      "Add Label",
+      "Add Tax",
+      "Orders",
+      "Paid Only",
+      "When clicking 'Execute workflow'",
+      "\u2705 Check"
+    ],
+    "real_nodes": 6,
+    "status": "passed"
+  },
+  "X01-debug-order-report--solution": {
+    "checks": 3,
+    "error": "",
+    "mocked_nodes": 0,
+    "nodes_ran": 6,
+    "ran": [
+      "Add Label",
+      "Add Tax",
+      "Orders",
+      "Paid Only",
+      "When clicking 'Execute workflow'",
+      "\u2705 Check"
+    ],
+    "real_nodes": 6,
+    "status": "passed"
+  },
+  "X02-debug-top-leads": {
+    "checks": 0,
+    "error": "\ud83d\udc1e 1 bug(s) left: (1) Join on Company matched nothing. Look at the field names in Leads and Companies: are they spelled the same, including capitals? [line 10]",
+    "expected_failure": true,
+    "mocked_nodes": 0,
+    "nodes_ran": 8,
+    "ran": [
+      "Biggest First",
+      "Companies",
+      "Join on Company",
+      "Leads",
+      "Size",
+      "Top 2",
+      "When clicking 'Execute workflow'",
+      "\u2705 Check"
+    ],
+    "real_nodes": 8,
+    "status": "passed"
+  },
+  "X02-debug-top-leads--solution": {
+    "checks": 2,
+    "error": "",
+    "mocked_nodes": 0,
+    "nodes_ran": 8,
+    "ran": [
+      "Biggest First",
+      "Companies",
+      "Join on Company",
+      "Leads",
+      "Size",
+      "Top 2",
+      "When clicking 'Execute workflow'",
+      "\u2705 Check"
+    ],
+    "real_nodes": 8,
+    "status": "passed"
   }
 }

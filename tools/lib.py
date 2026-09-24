@@ -130,7 +130,7 @@ def write(root, wf, doc):
 
 
 LEVELS = {"🟢": ("Beginner", "2EA44F"), "🟡": ("Integrations", "D4A106"), "🟠": ("AI", "F97316"), "🔴": ("Multi-agent & production", "DC2626"),
-          "⚡": ("Quick win", "0EA5E9"), "🏭": ("Real-world project", "7C3AED")}
+          "⚡": ("Quick win", "0EA5E9"), "🏭": ("Real-world project", "7C3AED"), "🐞": ("Debug challenge", "DC2626")}
 
 
 def badge(label, value, color):
@@ -191,7 +191,9 @@ def render_readme(r, data, diagram):
     lvl_name, color = LEVELS[r["level"][0]]
     nodes = [n for n in data["nodes"] if "stickyNote" not in n["type"]]
     t = _test_result(r.get("slug", ""))
-    if t and t.get("status") == "passed":
+    if t and t.get("expected_failure") and t.get("status") == "passed":
+        tbadge = badge("e2e test", "fails until fixed · solution verified", "2EA44F")
+    elif t and t.get("status") == "passed":
         tbadge = badge("e2e test", f"passed · {t.get('checks', 0)} checks", "2EA44F") if t.get("checks") else badge("e2e test", "smoke run only", "D4A106")
     elif t and t.get("status") == "structure-only":
         tbadge = badge("e2e test", "structure only", "64748B")
@@ -231,7 +233,9 @@ def render_readme(r, data, diagram):
           "> [!TIP]", "> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.", ""]
     L += [f"{i}. {s}" for i, s in enumerate(r["steps"], 1)]
     L += ["", node_reference(data), "## ✅ Test it", ""]
-    if t and t.get("status") == "passed":
+    if t and t.get("expected_failure"):
+        L += ["> [!TIP]", "> **Automated test:** CI runs this broken workflow and checks that ✅ Check reports the bugs, then runs [`solution.json`](solution.json) and checks it passes.", ""]
+    elif t and t.get("status") == "passed":
         L += ["> [!TIP]", f"> **Automated end-to-end test: passed.** {t.get('nodes_ran')}/{t.get('real_nodes', 0) + t.get('mocked_nodes', 0)} nodes executed in real n8n "
               f"({t.get('mocked_nodes')} credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), {t.get('checks', 0)} behaviour checks. See [tests/](../../tests/README.md).", ""]
     L += [*[f"- [ ] {x}" for x in r["test"]], "",
