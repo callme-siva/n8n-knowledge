@@ -122,6 +122,22 @@
     },
     {
       "parameters": {
+        "content": "⚠️ **No alert?** That's usually correct.\nThis only passes when `changed = true` — the site's status flipped since the last check (set in *Compare with Last State*). A site that's UP on every run never alerts.\nTo test: the `httpstat.us/503` demo should flip DOWN on the second automatic run.",
+        "width": 300,
+        "height": 170,
+        "color": 4
+      },
+      "id": "d6359ddc-90a6-58b8-b242-debb0a226c58",
+      "name": "Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        860,
+        260
+      ]
+    },
+    {
+      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,

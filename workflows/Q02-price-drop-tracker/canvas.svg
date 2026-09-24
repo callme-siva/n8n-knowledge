@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -217 920 669" width="920" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -217 920 900" width="920" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-80" y="-217" width="920" height="669" rx="14" fill="#F8FAFC"/>
-<rect x="-80" y="-217" width="920" height="669" rx="14" fill="url(#dots)"/>
+<rect x="-80" y="-217" width="920" height="900" rx="14" fill="#F8FAFC"/>
+<rect x="-80" y="-217" width="920" height="900" rx="14" fill="url(#dots)"/>
 <rect x="-80" y="-217" width="920" height="36" rx="14" fill="#1F2937"/><rect x="-80" y="-197" width="920" height="16" fill="#1F2937"/>
 <circle cx="-60" cy="-199" r="5" fill="#FF5F57"/><circle cx="-42" cy="-199" r="5" fill="#FEBC2E"/><circle cx="-24" cy="-199" r="5" fill="#28C840"/>
 <text x="-4" y="-194" font-size="13" fill="#E5E7EB" font-weight="600">Q02 · Price drop tracker (web scraping + state)</text>
@@ -10,6 +10,14 @@
 <text x="-26" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Scrapes a product page every 6 h, remembers the last price, alerts</text>
 <text x="-26" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">when it drops below your target or drops by 5%.</text>
 <text x="-26" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">Demo site: books.toscrape.com (built for scraping practice).</text>
+<rect x="440" y="486" width="300" height="157" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="454" y="514" font-size="15" fill="#5B4B12" font-weight="700">⚠️ No email? Check alert in this</text>
+<text x="454" y="536" font-size="15" fill="#5B4B12" font-weight="700">node&#x27;s output.</text>
+<text x="454" y="558" font-size="12.5" fill="#5B4B12" font-weight="400">Fires only if price ≤ target or it dropped</text>
+<text x="454" y="575" font-size="12.5" fill="#5B4B12" font-weight="400">≥5% since the last check (set in Compare</text>
+<text x="454" y="592" font-size="12.5" fill="#5B4B12" font-weight="400">with Last Price).</text>
+<text x="454" y="609" font-size="12.5" fill="#5B4B12" font-weight="400">To test: set target above the current</text>
+<text x="454" y="626" font-size="12.5" fill="#5B4B12" font-weight="400">price, then run it.</text>
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,50.0 C380.0,50.0 380.0,50.0 436,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M540,50.0 H564 Q574,50.0 574,60.0 V191 Q574,201 564,201 H-34 Q-44,201 -44,211 V306.0 Q-44,316.0 -34,316.0 H-4" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>

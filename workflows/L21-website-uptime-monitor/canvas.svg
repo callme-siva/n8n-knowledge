@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -354 1380 620" width="1380" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -354 1380 828" width="1380" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
 <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D5D9E0"/></pattern><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity=".10"/></filter><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker></defs>
-<rect x="-100" y="-354" width="1380" height="620" rx="14" fill="#F8FAFC"/>
-<rect x="-100" y="-354" width="1380" height="620" rx="14" fill="url(#dots)"/>
+<rect x="-100" y="-354" width="1380" height="828" rx="14" fill="#F8FAFC"/>
+<rect x="-100" y="-354" width="1380" height="828" rx="14" fill="url(#dots)"/>
 <rect x="-100" y="-354" width="1380" height="36" rx="14" fill="#1F2937"/><rect x="-100" y="-334" width="1380" height="16" fill="#1F2937"/>
 <circle cx="-80" cy="-336" r="5" fill="#FF5F57"/><circle cx="-62" cy="-336" r="5" fill="#FEBC2E"/><circle cx="-44" cy="-336" r="5" fill="#28C840"/>
 <text x="-24" y="-331" font-size="13" fill="#E5E7EB" font-weight="600">L21 · Website &amp; API uptime monitor (state + alerts on change)</text>
@@ -11,6 +11,15 @@
 <text x="-46" y="-211" font-size="12.5" fill="#5B4B12" font-weight="400">Alerts only when a site changes state (UP→DOWN, DOWN→UP) — state kept</text>
 <text x="-46" y="-194" font-size="12.5" fill="#5B4B12" font-weight="400">with $getWorkflowStaticData.</text>
 <text x="-46" y="-177" font-size="12.5" fill="#5B4B12" font-weight="400">⚠️ Static data persists only for active (production) runs.</text>
+<rect x="860" y="260" width="300" height="174" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
+<text x="874" y="288" font-size="15" fill="#5B4B12" font-weight="700">⚠️ No alert? That&#x27;s usually</text>
+<text x="874" y="310" font-size="15" fill="#5B4B12" font-weight="700">correct.</text>
+<text x="874" y="332" font-size="12.5" fill="#5B4B12" font-weight="400">This only passes when changed = true — the</text>
+<text x="874" y="349" font-size="12.5" fill="#5B4B12" font-weight="400">site&#x27;s status flipped since the last check</text>
+<text x="874" y="366" font-size="12.5" fill="#5B4B12" font-weight="400">(set in Compare with Last State). A site</text>
+<text x="874" y="383" font-size="12.5" fill="#5B4B12" font-weight="400">that&#x27;s UP on every run never alerts.</text>
+<text x="874" y="400" font-size="12.5" fill="#5B4B12" font-weight="400">To test: the httpstat.us/503 demo should</text>
+<text x="874" y="417" font-size="12.5" fill="#5B4B12" font-weight="400">flip DOWN on the second automatic run.</text>
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,50.0 C380.0,50.0 380.0,50.0 436,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M540,50.0 C600.0,50.0 600.0,50.0 656,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>

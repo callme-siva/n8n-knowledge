@@ -9,6 +9,7 @@ Thanks for helping others learn! A good lesson solves **one real problem** and t
 - [ ] A sample event / fixtures and at least one **behaviour check** in `tests/fixtures.py`; `tests/harness.py` passes.
 - [ ] Folder `workflows/Lxx-short-name/` with `workflow.json` + `README.md` (copy an existing README's sections: problem, what you'll learn, flow, credentials, build steps, test, common errors, level up).
 - [ ] A sticky note on the canvas saying what to configure.
+- [ ] If a node's output is gated by a **computed, non-obvious condition** (a threshold, a diff against remembered state, a dedupe check) and nothing else on the canvas explains it, add a second sticky note right at that node: what it takes for the gate to pass, and how to force a pass while testing. Use `w.note(content, (x, y), width, height, color=4)` positioned at the *node's own x/y* — `tools/render.py`'s `canvas_svg` folds it into the right spot automatically, even on a wide, two-row canvas. See Q02 and L21 for the pattern.
 - [ ] Settings live in a `⚙️ Config` Set node, not scattered across nodes.
 - [ ] No credentials, no pinned data, no real emails or sheet IDs (`you@example.com`, `PASTE_YOUR_…`, `REPLACE_…`).
 - [ ] Gemini as the default model unless the lesson is about another provider.

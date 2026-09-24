@@ -471,6 +471,7 @@ def L21(root):
         "  return { json: { time: new Date().toISOString(), name: site.name, url: site.url, status: up ? 'UP' : 'DOWN', code, ms, changed, since, error: r.json.error?.message || '' } };\n"
         "});"}, (660, 0))
     w.add("Log Every Check", "googleSheets", 4.5, sheet_append("Uptime"), (880, -120), onError="continueRegularOutput")
+    w.note("⚠️ **No alert?** That's usually correct.\nThis only passes when `changed = true` — the site's status flipped since the last check (set in *Compare with Last State*). A site that's UP on every run never alerts.\nTo test: the `httpstat.us/503` demo should flip DOWN on the second automatic run.", (860, 260), 300, 170, 4)
     w.add("State Changed?", "filter", 2.2, {"conditions": conditions(cond("={{ $json.changed }}", "boolean", "true")), "options": {}}, (880, 80))
     w.add("Alert", "gmail", 2.1, gmail_send(EMAIL, "={{ $json.status === 'DOWN' ? '🔴' : '🟢' }} {{ $json.name }} is {{ $json.status }}",
         "=<p><b>{{ $json.name }}</b> ({{ $json.url }}) is now <b>{{ $json.status }}</b>.</p><p>HTTP {{ $json.code }} · {{ $json.ms }} ms · since {{ $json.since }}</p><p>{{ $json.error }}</p>"), (1100, 80))

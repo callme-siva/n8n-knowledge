@@ -112,6 +112,22 @@
     },
     {
       "parameters": {
+        "content": "⚠️ **No email?** Check `alert` in this node's output.\nFires only if `price ≤ target` **or** it dropped `≥5%` since the last check (set in *Compare with Last Price*).\nTo test: set `target` above the current price, then run it.",
+        "width": 300,
+        "height": 160,
+        "color": 4
+      },
+      "id": "7bcf8ee7-ef62-5783-b6a6-8a3202f06824",
+      "name": "Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        220
+      ]
+    },
+    {
+      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,

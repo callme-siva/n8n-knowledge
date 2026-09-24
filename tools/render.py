@@ -103,12 +103,14 @@ FOLD_WIDTH = 1250  # canvases wider than this (in n8n units) are folded into two
 
 
 def _fold(wf, nodes):
-    """Fold a very wide workflow into rows. Returns (nodes, row_of, gutters) where gutters[r] is the y of the lane above row r."""
+    """Fold a very wide workflow into rows. Returns (nodes, row_of, gutters, fold_xy) where gutters[r] is the y of
+    the lane above row r, and fold_xy(x, y) maps an arbitrary canvas point (e.g. an annotation note anchored to a
+    node) through the same row transform, so it lands next to that node instead of at its original, un-folded spot."""
     import math
     main = [n for n in nodes if cat(n) != "sub"]
     xs = sorted({n["position"][0] for n in main})
     if not xs or xs[-1] - xs[0] <= FOLD_WIDTH:
-        return nodes, {n["name"]: 0 for n in nodes}, {}
+        return nodes, {n["name"]: 0 for n in nodes}, {}, (lambda x, y: (x, y))
     k = math.ceil((xs[-1] - xs[0]) / FOLD_WIDTH)
     width = (xs[-1] - xs[0]) / k
     # row boundaries snap to real node columns so no column is cut in half
@@ -121,7 +123,7 @@ def _fold(wf, nodes):
             name = parent.get(name, name)
         return pos.get(name, n["position"][0])
     row = {n["name"]: max(i for i, st in enumerate(starts) if home_x(n) >= st) for n in nodes}
-    out, gutters, y_offset, prev_bottom = [], {}, 0, None
+    out, gutters, shift, y_offset, prev_bottom = [], {}, {}, 0, None
     for r in range(k):
         members = [n for n in nodes if row[n["name"]] == r]
         if not members:
@@ -130,20 +132,28 @@ def _fold(wf, nodes):
         if prev_bottom is not None:
             y_offset = prev_bottom + 120 - top
             gutters[r] = prev_bottom + 55
-        moved = [dict(n, position=[n["position"][0] - (starts[r] - xs[0]), n["position"][1] + y_offset]) for n in members]
+        shift[r] = (starts[r] - xs[0], y_offset)
+        moved = [dict(n, position=[n["position"][0] - shift[r][0], n["position"][1] + y_offset]) for n in members]
         out += moved
         prev_bottom = max(n["position"][1] + (98 if cat(n) == "sub" else 146) for n in moved)
-    return out, row, gutters
+    def fold_xy(x, y):
+        r = max(i for i, st in enumerate(starts) if x >= st)
+        dx, dy = shift.get(r, (0, 0))
+        return x - dx, y + dy
+    return out, row, gutters, fold_xy
 
 
 def canvas_svg(wf):
     _mark(wf)
     nodes = [n for n in wf["nodes"] if "stickyNote" not in n["type"]]
     notes = [n for n in wf["nodes"] if "stickyNote" in n["type"]]
-    nodes, row, gutter = _fold(wf, nodes)
+    nodes, row, gutter, fold_xy = _fold(wf, nodes)
     by = {n["name"]: n for n in nodes}
     top = min(n["position"][1] for n in nodes)
-    notes = [dict(n, position=[n["position"][0], top - 40 - _note_h(n["parameters"])]) for n in notes]
+    # the first (main, context) note always anchors to the top strip; any extra notes are annotations
+    # pinned to a node, so they're folded the same way as nodes and keep their own x/y instead.
+    notes = ([dict(notes[0], position=[notes[0]["position"][0], top - 40 - _note_h(notes[0]["parameters"])])] if notes else []) + \
+            [dict(n, position=list(fold_xy(*n["position"]))) for n in notes[1:]]
     S = 100  # main node size
     size = lambda n: 64 if cat(n) == "sub" else S
     xs, ys = [], []

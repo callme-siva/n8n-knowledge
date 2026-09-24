@@ -72,6 +72,7 @@ def Q02(root):
         "  if (Number.isFinite(price)) state.prices[p.url] = price;\n"
         "  return { json: { ...p, price, last: last ?? null, dropPct, alert, ok: Number.isFinite(price) } };\n"
         "});"}, (880, 0))
+    w.note("⚠️ **No email?** Check `alert` in this node's output.\nFires only if `price ≤ target` **or** it dropped `≥5%` since the last check (set in *Compare with Last Price*).\nTo test: set `target` above the current price, then run it.", (1100, 220), 300, 160, 4)
     w.add("Worth Alerting?", "filter", 2.2, {"conditions": conditions(cond("={{ $json.alert }}", "boolean", "true")), "options": {}}, (1100, 0))
     w.add("Price Alert", "gmail", 2.1, gmail_send(EMAIL, "=🏷️ {{ $json.name }} now {{ $json.price }} ({{ $json.dropPct }}% drop)",
         "=<p><b>{{ $json.name }}</b> is now <b>{{ $json.price }}</b> (was {{ $json.last ?? 'unknown' }}, target {{ $json.target }}).</p><p><a href=\"{{ $json.url }}\">Open product</a></p>"), (1320, 0))
