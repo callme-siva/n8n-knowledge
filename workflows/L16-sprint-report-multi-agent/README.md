@@ -372,7 +372,37 @@ Lower the temperature, and tell agents to quote the numbers from the JSON.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Run the three specialist agents **in parallel** instead of in sequence.
+
+<details><summary>💡 Hint</summary>
+
+Fan out from *Compute Sprint Metrics*, fan in with Merge.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Connect Compute Sprint Metrics to all three agents. Add a **Merge** (3 inputs, combine by position) before the Coordinator, and change the Coordinator prompt to read the three outputs from the merged item. Total time ≈ the slowest agent, not the sum.
+
+</details>
+
+**⭐⭐ Challenge 2:** Swap GitHub Projects for **Jira** as the data source.
+
+<details><summary>💡 Hint</summary>
+
+Only the fetch + metrics steps change; agents stay the same.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Replace the GraphQL request with **Jira → Get many** (`sprint in openSprints()`), and adapt *Compute Sprint Metrics* to read `fields.status.statusCategory.key` and your story-points custom field. Keeping the metrics JSON shape the same means no prompt changes.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Swap GitHub for Jira (Jira node, sprint JQL).
 - Run the three specialist agents in **parallel** and merge them, which is faster.

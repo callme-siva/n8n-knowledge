@@ -308,7 +308,37 @@ Check the output of the Gmail node. The decision lives in `data.approved`.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Let the Scrum Master **edit** the action items, not just approve them.
+
+<details><summary>💡 Hint</summary>
+
+Send and Wait has a *Free text* and a *Custom form* response type.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Change the approval to **Response type: Custom form** with a textarea prefilled with the items. Parse the edited text into items before creating Jira tasks.
+
+</details>
+
+**⭐⭐ Challenge 2:** Collect retros from the **whole team for a week**, then analyse them together.
+
+<details><summary>💡 Hint</summary>
+
+Store submissions, then run the analysis on a schedule.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Form → Sheets append (one row per person). A second workflow: Schedule (Friday) → Sheets read this sprint's rows → Aggregate → the same LLM + approval flow. Themes across 8 people are much stronger than 1.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Collect retros from the whole team for a week, then analyse all of them together (Aggregate node).
 - Post the approval to Slack instead (the Slack node also has *Send and Wait*).

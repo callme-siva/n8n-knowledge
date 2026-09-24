@@ -223,7 +223,46 @@ Turn on *Always Output Data* on the Jira node.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Only include **High/Highest** priority stale stories.
+
+<details><summary>💡 Hint</summary>
+
+Fix it in JQL, not in code, so Jira does the filtering.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Append to the JQL: `AND priority in (High, Highest)`. Filtering at the source means less data, faster runs and an easier workflow.
+
+</details>
+
+**⭐⭐ Challenge 2:** DM each assignee their own list instead of one team email.
+
+<details><summary>💡 Hint</summary>
+
+Group by assignee, then one item per person → Slack/email node runs per item.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Replace the report Code with:
+```javascript
+const by = {};
+for (const i of $input.all().map(x => x.json).filter(j => j.key)) {
+  const who = i.fields.assignee?.emailAddress || 'unassigned@example.com';
+  (by[who] ??= []).push(`${i.key} ${i.fields.summary}`);
+}
+return Object.entries(by).map(([email, list]) => ({ json: { email, text: list.join('\n') } }));
+```
+Send to `{{ $json.email }}`.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Post it to the team Slack/Teams channel instead of email.
 - Also comment on each stale issue: "Any blockers? 🙂".

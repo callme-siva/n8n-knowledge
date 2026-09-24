@@ -244,7 +244,37 @@ Lower `maxLength` in read_page (e.g. 4000) or limit it to 4 pages.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Force **at least 4 distinct sources** before writing.
+
+<details><summary>💡 Hint</summary>
+
+Make it a rule in the system prompt and check it in code.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Prompt: *"Do not write the report until you've read at least 4 pages from different domains."* After the agent, add a Code node that counts unique domains in the Sources list; if fewer than 4, prepend a warning to the email.
+
+</details>
+
+**⭐⭐ Challenge 2:** Add a **critic** agent that reviews the report before it's sent.
+
+<details><summary>💡 Hint</summary>
+
+A second LLM that only checks claims against the cited sources.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After the Research Agent, add a Basic LLM Chain: *"List any sentence whose claim isn't supported by the cited URL text. Output JSON {issues: [...]}"*. Append the issues to the email as "⚠️ Reviewer notes".
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Save reports to Google Docs or Notion.
 - Schedule a weekly competitor scan with a fixed question list.

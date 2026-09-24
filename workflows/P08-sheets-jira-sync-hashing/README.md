@@ -129,6 +129,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Sheets**, **Jira Software**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Backlog` | [Backlog.csv](../../templates/P08-sheets-jira-sync-hashing/Backlog.csv) | `row_id`, `description`, `jira_key`, `priority`, `summary`, `sync_hash`, `synced_at` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -318,7 +328,37 @@ The hash inputs include a changing value (like a timestamp). Hash only the busin
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Sync the **priority** field to Jira too.
+
+<details><summary>💡 Hint</summary>
+
+Jira priorities are objects; map names to IDs.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add to Jira create/update: *Priority* = a lookup `{"High": "2", "Medium": "3", "Low": "4"}[$json.priority]` (check your Jira's priority IDs via *Get priorities*). The hash already includes priority, so changes trigger updates.
+
+</details>
+
+**⭐⭐ Challenge 2:** Pull the **Jira status** back into a read-only sheet column.
+
+<details><summary>💡 Hint</summary>
+
+One-way sync in the other direction, for one field.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add a second schedule: Sheets read rows with `jira_key` → Jira *Get issue* per row → Set `{row_id, jira_status}` → Sheets upsert by `row_id`. Don't include `jira_status` in the hash, or you'll create an update loop.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Pull Jira status back into the sheet (read-only column).
 - Make it two-way with *last-writer-wins* on `updated` timestamps. Understand the conflict cases first.

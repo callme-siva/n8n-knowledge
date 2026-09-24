@@ -325,7 +325,37 @@ Set the workflow timezone; the Code builds times in the server's timezone.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a **Designer** checklist item: *"Invite to design critique"*.
+
+<details><summary>💡 Hint</summary>
+
+The checklist is data inside *Build Checklist*.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add `['Manager', 'Invite to design critique']` to `byRole.Designer`. No wiring changes: the Jira and aggregation steps adapt to any count.
+
+</details>
+
+**⭐⭐ Challenge 2:** Send a **day-30 check-in survey** to the new joiner.
+
+<details><summary>💡 Hint</summary>
+
+Long wait → form link.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After *Summary to HR*, add **Wait → At specified time**: `{{ DateTime.fromISO($('New Joiner Form (HR)').first().json['Start date']).plus({ days: 30 }).set({ hour: 10 }) }}` → Gmail with a link to an n8n Form (*"How's it going?"*) that writes to a sheet.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Offboarding mirror workflow (revoke access, collect laptop).
 - Day-30 check-in survey with a Wait node.

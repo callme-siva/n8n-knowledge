@@ -182,7 +182,7 @@ Input names must match exactly on both sides.
 
 </details>
 
-## 🚀 Level up
+## 🚀 Ideas to extend it
 
 - Add a `reply_to` input.
 - Switch Gmail for SMTP or SendGrid. Callers don't change.

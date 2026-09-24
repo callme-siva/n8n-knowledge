@@ -191,7 +191,37 @@ Dedupe history is per node. Deleting or recreating the node resets it.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Post only articles matching **keywords** (e.g. "AI", "automation").
+
+<details><summary>💡 Hint</summary>
+
+Filter before dedupe, so skipped items aren't remembered.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add a **Filter**: `{{ /\b(ai|automation|n8n)\b/i.test($json.title) }}` is true, placed before *Only New Links*.
+
+</details>
+
+**⭐⭐ Challenge 2:** Add an AI-written one-line hook per article.
+
+<details><summary>💡 Hint</summary>
+
+LLM chain per item, after the Limit (so you pay for max 5).
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After *Max 5 per Run*, add a Basic LLM Chain + Gemini: *"Write one catchy line (max 15 words) about: {{ $json.title }}"*. Use `{{ $json.text }}` in the Telegram message.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add AI to write a one-line hook per article.
 - Merge several feeds (see L05).

@@ -477,7 +477,37 @@ Put your own email in *Send Response Email* until you're ready.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Stop auto-sending: require approval for **escalated** complaints.
+
+<details><summary>💡 Hint</summary>
+
+Use the escalation agent's `escalate` flag.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Before *Send Response Email*, add an IF on `{{ $('Check Escalation').item.json.output.escalate }}`. On true, send a Gmail **Send and Wait** to the team lead with the draft (L15 pattern); on false, send directly.
+
+</details>
+
+**⭐⭐ Challenge 2:** Log every complaint with category, urgency and resolution to a sheet for weekly analysis.
+
+<details><summary>💡 Hint</summary>
+
+All the fields exist in earlier agents' outputs.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add a Set node pulling `$('Understand Complaint').item.json.output.category`, `.urgency`, `$('Determine Resolution').item.json.output.resolution_workflow`, and the escalation flag, then Sheets append. After a month you'll know your top 3 complaint causes.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add a real order lookup tool (Google Sheets or your DB) to the Investigate agent.
 - Route escalations to a Slack channel and a Jira Service Management ticket.

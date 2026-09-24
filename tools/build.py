@@ -4,6 +4,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 import level1_2, level3_4, quickwins, projects
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+import lib, templates
+lib.SHEET_TEMPLATES = templates.sheet_templates(ROOT)   # columns come from the last e2e run (tests/results.json)
+templates.sample_files(ROOT)
 for fn in level1_2.ALL + level3_4.ALL + quickwins.ALL + projects.ALL:
     fn(ROOT)
     print("built", fn.__name__)

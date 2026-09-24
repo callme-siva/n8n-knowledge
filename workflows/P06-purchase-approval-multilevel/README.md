@@ -142,6 +142,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Requests` | [Requests.csv](../../templates/P06-purchase-approval-multilevel/Requests.csv) | `request_id`, `amount`, `cost_centre`, `created`, `item`, `justification`, `manager`, `requester`, `status`, `decided` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -391,7 +401,37 @@ It only runs after the wait limit. Check *Limit wait time* is on for both approv
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Make the finance threshold depend on the **cost centre**.
+
+<details><summary>💡 Hint</summary>
+
+Replace the single number with a lookup.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In ⚙️ Config, store `thresholds = {"Engineering": 200000, "Sales": 50000, "default": 100000}` (type Object). IF: `{{ amount > ($('⚙️ Config').item.json.thresholds[cost_centre] ?? $('⚙️ Config').item.json.thresholds.default) }}`.
+
+</details>
+
+**⭐⭐ Challenge 2:** Add a **reason** field when someone rejects.
+
+<details><summary>💡 Hint</summary>
+
+Use a custom-form response in Send and Wait.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Change the approvals to **Response type: Custom form** with a dropdown (Approve / Reject) and a textarea *Reason*. Route on the dropdown value, write `reason` to the audit row, and include it in the requester's email.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Use Slack *Send and wait* instead of email for faster approvals.
 - Create the PO in your ERP on approval.

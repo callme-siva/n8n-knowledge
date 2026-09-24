@@ -110,6 +110,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Uptime` | [Uptime.csv](../../templates/L21-website-uptime-monitor/Uptime.csv) | `time`, `name`, `changed`, `code`, `error`, `ms`, `since`, `status`, `url` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -264,7 +274,37 @@ Check that *Never error* and *Full response* are both on, so `statusCode` exists
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Alert when a site is **slow** (> 3 s) three checks in a row.
+
+<details><summary>💡 Hint</summary>
+
+Keep a counter per site in static data.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Compare with Last State*: `state.sites[url].slow = ms > 3000 ? (state.sites[url].slow || 0) + 1 : 0;` and set `changed = changed || state.sites[url].slow === 3`.
+
+</details>
+
+**⭐⭐ Challenge 2:** Compute a weekly **uptime %** per site from the Uptime sheet.
+
+<details><summary>💡 Hint</summary>
+
+Uptime = UP checks / all checks.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Schedule weekly → Sheets read `Uptime` → Code: filter the last 7 days, group by `url`, `pct = up / total * 100` rounded to 2 decimals → email a table sorted by worst first.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add a slowness alert (ms > 3000 for 3 checks in a row).
 - Weekly uptime % report from the Uptime sheet.

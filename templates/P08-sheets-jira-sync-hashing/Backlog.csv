@@ -1,0 +1,4 @@
+row_id,description,jira_key,priority,summary,sync_hash,synced_at
+1,d1,,High,New story,,
+2,edited,SCRUM-7,Low,Changed story,stale,
+3,,,,,,

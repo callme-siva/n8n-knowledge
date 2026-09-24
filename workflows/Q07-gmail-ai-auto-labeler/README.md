@@ -254,7 +254,37 @@ The `ai-labeled` label or the search exclusion is missing.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a **Recruiting** category for job applications.
+
+<details><summary>💡 Hint</summary>
+
+Categories are just name + description.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add `Recruiting`: *"Job applications, CVs, candidate follow-ups"*, create the Gmail label, and wire the new output. Put the most specific categories first.
+
+</details>
+
+**⭐⭐ Challenge 2:** Measure accuracy: log every classification and let yourself correct it.
+
+<details><summary>💡 Hint</summary>
+
+You can't improve what you don't measure.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Append `{time, subject, predicted}` to a `Labels` sheet. Once a week, fill a `correct` column for 30 rows; accuracy = matches / 30. Improve the descriptions that confuse the model and re-measure.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Route Support to P02 (AI reply drafts).
 - Post Sales leads to Slack instantly.

@@ -1,0 +1,6 @@
+row_id,company,description,status,website,b2b,icp_score,industry,processed_at,reason
+1,Co 1,B2B SaaS for invoices,pending,https://co1.example.com,,,,,
+2,Co 2,B2B SaaS for invoices,pending,https://co2.example.com,,,,,
+3,Co 3,B2B SaaS for invoices,pending,https://co3.example.com,,,,,
+4,Co 4,B2B SaaS for invoices,pending,https://co4.example.com,,,,,
+5,Co 5,B2B SaaS for invoices,pending,https://co5.example.com,,,,,

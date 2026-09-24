@@ -2,7 +2,7 @@
 
 # P01 · Accounts-payable invoice pipeline
 
-![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / accounts payable](https://img.shields.io/badge/domain-Finance_/_accounts_payable-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square) ![e2e test: passed · 6 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_6_checks-2EA44F?style=flat-square)
+![level: Real-world project](https://img.shields.io/badge/level-Real--world_project-7C3AED?style=flat-square) ![domain: Finance / accounts payable](https://img.shields.io/badge/domain-Finance_/_accounts_payable-334155?style=flat-square) ![build time: 60 min](https://img.shields.io/badge/build_time-60_min-0EA5E9?style=flat-square) ![nodes: 17](https://img.shields.io/badge/nodes-17-7C3AED?style=flat-square) ![e2e test: passed · 7 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_7_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -151,6 +151,19 @@ Replace these placeholder values with your own:
 | Append to Exceptions | `documentId` | `PASTE_YOUR_GOOGLE_SHEET_URL` |
 
 Nodes that need a credential selected after import: **Gmail**, **Gmail Trigger**, **Google Gemini Chat Model**, **Google Sheets**.
+
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Exceptions` | [Exceptions.csv](../../templates/P01-invoice-processing-pipeline/Exceptions.csv) | `invoice_no`, `logged_at`, `vendor`, `file`, `reason`, `total` |
+| `Ledger` | [Ledger.csv](../../templates/P01-invoice-processing-pipeline/Ledger.csv) | `invoice_no`, `logged_at`, `vendor`, `approval`, `currency`, `due_date`, `file`, `gstin`, `invoice_date`, `subtotal`, `tax`, `total` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
+Sample files: [invoice-valid.pdf](../../templates/files/invoice-valid.pdf) (auto-approved → ledger) · [invoice-large.pdf](../../templates/files/invoice-large.pdf) (₹1,18,000 → needs approval) · [invoice-wrong-total.pdf](../../templates/files/invoice-wrong-total.pdf) (subtotal + tax ≠ total → Exceptions)
 
 ## 🛠️ Build it step by step
 
@@ -444,7 +457,7 @@ return { json: { logged_at: new Date().toISOString(), vendor: inv.vendor_name ||
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 16/16 nodes executed in real n8n (8 credentialed nodes replaced by realistic mocks), 6 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 16/16 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 7 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Normal invoice → one ledger row, no approval.
 - [ ] Large invoice → approval email; *Approve* → ledger, *Decline* → exception.
@@ -467,7 +480,37 @@ The extractor returns dates as strings. Normalise them with Luxon in *Validate* 
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add **purchase order** matching: flag invoices without a known PO number.
+
+<details><summary>💡 Hint</summary>
+
+Extract a `po_number` attribute and look it up in a POs sheet.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add the attribute `po_number` to the extractor. After Validate, **Sheets → Get rows** from `POs` where `po_number` matches (alwaysOutputData on). IF nothing is found, send it to Exceptions with reason *"unknown PO"*. This is the start of a real **2-way match**.
+
+</details>
+
+**⭐⭐ Challenge 2:** Detect **duplicate invoices with different numbers** (same vendor, same amount, same week).
+
+<details><summary>💡 Hint</summary>
+
+Exact dedupe keys miss re-issued invoices. Add a fuzzy check.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Before the ledger, read the Ledger rows for that vendor from the last 7 days and flag if any `total` equals this total. Route matches to approval with the reason *"possible duplicate of INV-…"* instead of blocking them, because humans decide ambiguous cases.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add a 3-way match against purchase orders (P06).
 - Post approved invoices to Tally, Zoho Books or QuickBooks by API.

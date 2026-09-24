@@ -260,7 +260,42 @@ Some feeds use `pubDate` and not `isoDate`. The code handles both, so check your
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add Hacker News (`https://hnrss.org/frontpage`) as a 4th source.
+
+<details><summary>💡 Hint</summary>
+
+Merge has a *Number of inputs* setting.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add an RSS Read node with the URL (On Error → Continue), set Merge *Number of inputs* to 4, and wire the new feed to input 4. The Code node needs no change, because it reads `$input.all()`.
+
+</details>
+
+**⭐⭐ Challenge 2:** Group the digest by **source** with a heading per site.
+
+<details><summary>💡 Hint</summary>
+
+Use `reduce` to build `{ source: [articles] }`, then render.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+At the end of the Code node, replace the `li` line:
+```javascript
+const groups = articles.reduce((g, a) => ((g[a.source] ??= []).push(a), g), {});
+const html = Object.entries(groups).map(([src, list]) => `<h3>${src}</h3><ol>${list.map(a => `<li><a href="${a.link}">${a.title}</a></li>`).join('')}</ol>`).join('');
+```
+and return `html` instead of `<ol>${li}</ol>`.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add your own feeds (company blog, Hacker News `https://hnrss.org/frontpage`).
 - Continue to **L11** to have Gemini summarise this.

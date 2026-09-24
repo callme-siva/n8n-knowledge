@@ -199,7 +199,37 @@ Jira Cloud v3 uses ADF, and n8n converts plain text. Keep it simple, or use the 
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a **Screenshot** file field and attach it to the Jira issue.
+
+<details><summary>💡 Hint</summary>
+
+The Form Trigger has a *File* field type; the Jira node can add attachments.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add a form field *File* named `Screenshot`. After *Create Jira Bug*, add **Jira → Issue Attachment → Add** with issue key `{{ $json.key }}` and binary property `Screenshot`.
+
+</details>
+
+**⭐⭐ Challenge 2:** Detect probable duplicates before creating a new bug.
+
+<details><summary>💡 Hint</summary>
+
+Search Jira for open bugs with similar words first.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Before creating the bug, run **Jira → Get many** with JQL `project = X AND statusCategory != Done AND text ~ "{{ $json['What is broken?'] }}"`. IF there are results, comment on the top one instead of creating a new issue, and tell the reporter the existing key.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Accept a screenshot upload (form *File* field) and attach it to the issue.
 - Let AI detect duplicates before creating the issue (L14 agent + Jira search tool).

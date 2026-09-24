@@ -9,7 +9,7 @@ expressions, public HTTP APIs, RSS, HTML extraction, QuickChart — runs for rea
 
 Usage:  N8N_DIR=/path/with/node_modules/n8n  python3 tests/harness.py [slug-prefix …]
 """
-import copy, glob, json, os, re, subprocess, sys, tempfile, hashlib
+import base64, copy, glob, json, os, re, subprocess, sys, tempfile, hashlib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.dirname(__file__))
@@ -19,7 +19,7 @@ N8N_DIR = os.environ.get("N8N_DIR", os.getcwd())
 N8N = os.path.join(N8N_DIR, "node_modules", ".bin", "n8n")
 
 NEEDS_CREDS = {"gmail", "googleSheets", "googleDrive", "googleCalendar", "jira", "slack", "telegram", "executeWorkflow",
-               "chainLlm", "agent", "informationExtractor", "extractFromFile", "vectorStoreInMemory"}
+               "chainLlm", "agent", "informationExtractor", "vectorStoreInMemory"}
 EVENT_TRIGGERS = {"formTrigger", "webhook", "gmailTrigger", "telegramTrigger", "chatTrigger", "errorTrigger", "executeWorkflowTrigger"}
 NOT_RUNNABLE = {"mcpTrigger"}  # tools-only servers: structure-checked, not executed
 
@@ -77,6 +77,8 @@ def build_test_copy(wf, slug):
     nodes = {n["name"]: n for n in wf["nodes"]}
     ai_children = {src for src, kinds in wf["connections"].items() for k in kinds if k != "main"}
     mocked, runnable = [], True
+    sheets = {n["name"]: {"tab": (n["parameters"].get("sheetName") or {}).get("value"), "op": n["parameters"].get("operation", "read")}
+              for n in wf["nodes"] if n["type"].endswith("googleSheets")}
     new_nodes = []
     for n in wf["nodes"]:
         s = short(n["type"])
@@ -95,13 +97,17 @@ def build_test_copy(wf, slug):
         if s == "wait" and n["parameters"].get("resume") == "timeInterval":
             n["parameters"].update({"amount": 1, "unit": "seconds"})
         if s in EVENT_TRIGGERS:
-            sample = TRIGGERS.get(slug) or TRIGGERS.get(s) or [{}]
+            sample = copy.deepcopy(TRIGGERS.get(slug) or TRIGGERS.get(s) or [{}])
+            for item in sample:  # "_binary": {"key": {"file": "x.pdf"}} → embed the real sample file
+                for b in (item.get("_binary") or {}).values():
+                    if "file" in b:
+                        b["data"] = base64.b64encode(open(os.path.join(ROOT, "templates", "files", b.pop("file")), "rb").read()).decode()
             start = f"__test_start_{len(mocked)}"
             new_nodes.append({"id": start, "name": start, "type": "n8n-nodes-base.manualTrigger", "typeVersion": 1, "position": [n["position"][0] - 200, n["position"][1]], "parameters": {}})
             wf["connections"][start] = {"main": [[{"node": n["name"], "type": "main", "index": 0}]]}
             # "_binary" in a sample becomes a real binary attachment (tiny placeholder file)
             n.update({"type": "n8n-nodes-base.code", "typeVersion": 2, "parameters": {"jsCode":
-                f"return {json.dumps(sample, ensure_ascii=False)}.map(({{ _binary, ...j }}) => ({{ json: j, binary: Object.fromEntries(Object.entries(_binary || {{}}).map(([k, b]) => [k, {{ ...b, data: Buffer.from('%PDF-1.4 test').toString('base64') }}])) }}));"}})
+                f"return {json.dumps(sample, ensure_ascii=False)}.map(({{ _binary, ...j }}) => ({{ json: j, binary: Object.fromEntries(Object.entries(_binary || {{}}).map(([k, b]) => [k, {{ data: Buffer.from('placeholder').toString('base64'), ...b }}])) }}));"}})
             mocked.append(n["name"])
         elif s == "textClassifier":
             route = fx.get(n["name"], 0)
@@ -141,6 +147,7 @@ def build_test_copy(wf, slug):
             conns[src] = {"main": [[c for c in out if c["node"] in kept] for out in main]}
     wf.update({"nodes": new_nodes, "connections": conns, "pinData": {}, "active": False,
                "id": "t" + hashlib.md5(slug.encode()).hexdigest()[:15], "name": "TEST " + wf["name"]})
+    wf["_sheets"] = sheets
     return wf, mocked, runnable
 
 
@@ -155,7 +162,9 @@ def run(slugs):
             continue
         wf, mocked, runnable = build_test_copy(json.load(open(path)), slug)
         f = os.path.join(tmp, slug + ".json")
+        sheets = wf.pop("_sheets")
         json.dump(wf, open(f, "w"))
+        wf["_sheets"] = sheets
         plans.append((slug, wf, mocked, runnable, f))
     imp = os.path.join(tmp, "imp"); os.makedirs(imp)
     for slug, wf, *_rest, f in plans:
@@ -200,6 +209,14 @@ def run(slugs):
                 if (kind == "contains") != (chk[2] in blob):
                     failures.append(f"{node} {'should' if kind == 'contains' else 'must not'} contain {chk[2]!r}")
         results[slug]["checks"] = len(EXPECT.get(slug, []))
+        # record the exact rows each Google Sheets node read or wrote (used to generate templates/)
+        sheet_io = {}
+        for node, meta in wf.get("_sheets", {}).items():
+            items = [it.get("json", {}) for r in run_data.get(node, []) for out in r.get("data", {}).get("main", [])[:1] for it in (out or [])]
+            if items:
+                sheet_io.setdefault(meta["tab"], {"reads": [], "writes": []})["reads" if meta["op"] == "read" else "writes"].extend(items[:5])
+        if sheet_io:
+            results[slug]["sheets"] = sheet_io
         if failures:
             ok = False
             results[slug].update(status="failed", error="; ".join(failures))

@@ -204,7 +204,37 @@ The bearer token in the client must match the credential exactly.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a **`list_open_tickets`** read-only tool.
+
+<details><summary>💡 Hint</summary>
+
+Any sub-workflow can become a tool.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Create a sub-workflow: Execute Workflow Trigger (`email`) → Jira *Get many* (`reporter = email AND statusCategory != Done`) → Set a compact list. Add a **Call n8n Workflow** tool to P10 with a clear description.
+
+</details>
+
+**⭐⭐ Challenge 2:** Add a **write** tool (`create_ticket`) that requires human approval.
+
+<details><summary>💡 Hint</summary>
+
+Tools can pause for approval, like any workflow.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Sub-workflow: inputs (summary, customer_email) → Slack **Send and Wait** to the support lead → IF approved → Jira create → return `{created: key}`; else return `{created: false, reason: 'declined'}`. The AI client gets an honest answer either way.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add a `create_ticket` tool that needs human approval (L15 pattern).
 - Separate read-only and write MCP servers with different tokens.

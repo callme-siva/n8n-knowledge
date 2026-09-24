@@ -129,6 +129,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Gemini Chat Model**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Companies` | [Companies.csv](../../templates/P05-bulk-ai-enrichment-checkpointed/Companies.csv) | `row_id`, `company`, `description`, `status`, `website`, `b2b`, `icp_score`, `industry`, `processed_at`, `reason` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -340,7 +350,37 @@ Increase the Wait, lower the batch size, or use a paid tier. Retries (3 × 5 s) 
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Re-queue failed rows automatically once, before giving up.
+
+<details><summary>💡 Hint</summary>
+
+Track `attempts` in the sheet.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Mark Error*, add `attempts = {{ (Number($('Loop in Batches of 10').item.json.attempts) || 0) + 1 }}` and change `status` to `{{ (Number($('Loop in Batches of 10').item.json.attempts) || 0) + 1 < 2 ? 'pending' : 'error' }}`. (A Set node can't read a field it's setting in the same step, so compute it again.) Add an `attempts` column to the sheet. The next run retries failed rows once.
+
+</details>
+
+**⭐⭐ Challenge 2:** Send a **Slack summary** only when the whole list is finished.
+
+<details><summary>💡 Hint</summary>
+
+Check whether any pending rows remain after the run.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After *Summary*, **Sheets → Get rows** `status = pending` (alwaysOutputData) → IF none are left, post to Slack *"Enrichment complete: X done, Y errors"*. Schedule the workflow hourly until that fires.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Run it nightly with a Schedule Trigger.
 - Send a Slack summary when all rows are done.

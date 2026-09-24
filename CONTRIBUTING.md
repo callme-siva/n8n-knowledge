@@ -3,6 +3,10 @@
 Thanks for helping others learn! A good lesson solves **one real problem** and teaches **one or two new concepts**.
 
 ## Checklist
+- [ ] A **Concept first** entry in `tools/concepts.py` (key idea, mental model, when not to use it).
+- [ ] Two **practice challenges** (⭐ and ⭐⭐) with hint + solution in `tools/exercises.py`.
+- [ ] Projects: 3–5 **design decisions** in `tools/decisions.py`.
+- [ ] A sample event / fixtures and at least one **behaviour check** in `tests/fixtures.py`; `tests/harness.py` passes.
 - [ ] Folder `workflows/Lxx-short-name/` with `workflow.json` + `README.md` (copy an existing README's sections: problem, what you'll learn, flow, credentials, build steps, test, common errors, level up).
 - [ ] A sticky note on the canvas saying what to configure.
 - [ ] Settings live in a `⚙️ Config` Set node, not scattered across nodes.

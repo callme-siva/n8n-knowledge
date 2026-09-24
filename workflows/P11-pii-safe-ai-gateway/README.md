@@ -125,6 +125,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Gemini Chat Model**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `AI_Audit` | [AI_Audit.csv](../../templates/P11-pii-safe-ai-gateway/AI_Audit.csv) | `time`, `outcome`, `pii_counts`, `prompt_redacted`, `user` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -326,7 +336,37 @@ Keyword screens are easy to bypass. Add a classifier model, allow-listed tasks, 
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Also redact **UPI IDs** (e.g. `name@okhdfcbank`).
+
+<details><summary>💡 Hint</summary>
+
+UPI looks like an email but with a bank handle and no dot TLD.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add the rule `['UPI', /\b[\w.-]{2,}@(ok\w+|ybl|ibl|axl|paytm|upi)\b/gi]` **before** the EMAIL rule, so it wins.
+
+</details>
+
+**⭐⭐ Challenge 2:** Add **per-user rate limiting** (max 20 requests/hour).
+
+<details><summary>💡 Hint</summary>
+
+Count per user in static data, reset hourly.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Redact PII* (or a node before it): `const s = $getWorkflowStaticData('global'); const k = user + ':' + $now.toFormat('yyyyMMddHH'); s[k] = (s[k] || 0) + 1; if (s[k] > 20) → blocked`. Return **429** via Respond to Webhook.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add per-user rate limits (static data keyed by user).
 - Route by task to different models or temperatures.

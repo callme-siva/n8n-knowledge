@@ -48,5 +48,17 @@ for path in sorted(glob.glob(os.path.join(ROOT, "workflows", "*", "workflow.json
     print(f"{status} {rel}  ({len(real)} nodes)" + "".join(f"\n    - {e}" for e in errs))
     problems += len(errs)
 
+# every relative link / image in every markdown file must resolve
+for md in glob.glob(os.path.join(ROOT, "**", "*.md"), recursive=True):
+    if "/.preview/" in md or "/node_modules/" in md:
+        continue
+    for m in re.finditer(r'\]\(([^)\s]+)\)|href="([^"]+)"|src="([^"]+)"', open(md).read()):
+        link = next(g for g in m.groups() if g)
+        if re.match(r"(https?:|mailto:|#)", link) or "{" in link or not link.split("#")[0]:
+            continue
+        if not os.path.exists(os.path.normpath(os.path.join(os.path.dirname(md), link.split("#")[0]))):
+            print(f"✗ broken link in {os.path.relpath(md, ROOT)}: {link}")
+            problems += 1
+
 print(f"\n{problems} problem(s)")
 sys.exit(1 if problems else 0)

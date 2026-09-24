@@ -97,6 +97,10 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Gmail Trigger**, **Google Drive**.
 
+### 📥 Starter files
+
+Sample files: [invoice-valid.pdf](../../templates/files/invoice-valid.pdf) (email it to yourself as an attachment)
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -214,7 +218,37 @@ Use the folder URL, and make sure your Google account owns the folder.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Save PDFs into a sub-folder **per sender domain** (e.g. `/airtel.com`).
+
+<details><summary>💡 Hint</summary>
+
+You can build the file name, or use a Drive *Create folder* step first.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Quick version: prefix the name. In *Split PDF Attachments*, add `const domain = (item.json.from?.text || '').split('@')[1]?.replace('>', '') || 'unknown';` and use `` fileName: `${domain}/${date}_${name}` ``. Proper version: *Drive → Search folder by name*, create it if missing (IF), then upload into its ID.
+
+</details>
+
+**⭐⭐ Challenge 2:** Skip files you already saved, even if the same PDF arrives in a new email.
+
+<details><summary>💡 Hint</summary>
+
+Hash the file content; the Crypto node can hash binary data.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After the split, add **Crypto → Hash → SHA256** with *Binary file* on (property `data`), output `sha`. Then **Remove Duplicates → previous executions** on `{{ $json.sha }}`. Same bytes, same hash, so the file is skipped.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Route by sender: bank → /Bank, employer → /Payslips (use Switch).
 - Use Gemini to read the PDF and rename it `2026-09 Airtel bill ₹799.pdf` (see L12).

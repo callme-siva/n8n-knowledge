@@ -231,7 +231,42 @@ The free tier gives 100 searches a month. A daily run uses about 30.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Only include jobs posted **today** or **"hours ago"**.
+
+<details><summary>💡 Hint</summary>
+
+Look at `detected_extensions.posted_at` in the API output.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Format Email*, filter before slicing:
+```javascript
+const jobs = ($input.first().json.jobs_results || [])
+  .filter(j => /hour|today|just/i.test(j.detected_extensions?.posted_at || ''))
+  .slice(0, cfg.max_jobs);
+```
+
+</details>
+
+**⭐⭐ Challenge 2:** Never email the same job twice across days.
+
+<details><summary>💡 Hint</summary>
+
+n8n can remember items between runs, with no database needed.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Before *Format Email*, add a Code node that splits `jobs_results` into items (`return $json.jobs_results.map(j => ({ json: j }))`), then **Remove Duplicates** → *Remove items processed in previous executions* on `{{ $json.job_id }}`. Adjust Format Email to read `$input.all()` instead of `jobs_results`. This is the Q08 pattern.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Save jobs to Google Sheets and skip ones you've already seen (dedupe by `job_id`).
 - Add Gemini to score each job against your resume (see L18).

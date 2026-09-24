@@ -81,6 +81,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Customers` | [Customers.csv](../../templates/P10a-tool-lookup-customer/Customers.csv) | `email`, `mrr`, `plan`, `status` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -154,7 +164,7 @@ The sheet email column must be lowercase, or lowercase it in a helper column.
 
 </details>
 
-## 🚀 Level up
+## 🚀 Ideas to extend it
 
 - Add `create_ticket` and `get_invoices` tools the same way.
 

@@ -276,7 +276,37 @@ Add "no code fences" to the prompt, or strip them with `.replace(/```html|```/g,
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Make the briefing **5 bullets max, in simple English for a school student**.
+
+<details><summary>💡 Hint</summary>
+
+Change only the system message; keep the data the same.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Edit the system message: *"…write for a 14-year-old. Max 5 bullets, max 20 words each. No jargon."* Compare outputs. Prompts are code: version them.
+
+</details>
+
+**⭐⭐ Challenge 2:** Return **JSON** and render your own HTML template (no HTML from the model).
+
+<details><summary>💡 Hint</summary>
+
+Turn on *Require specific output format* and attach a Structured Output Parser.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Parser example: `{"stories":[{"title":"","why_it_matters":"","link":""}],"trend":""}`. Then a Code node renders the HTML. The model can no longer break your layout.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Ask for JSON and render your own template (this previews L12).
 - Send it to Telegram as a morning message.

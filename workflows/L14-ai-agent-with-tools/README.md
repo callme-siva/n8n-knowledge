@@ -247,7 +247,37 @@ Turn on *Optimize Response* on HTTP tools and pick only the fields you need.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a **time-in-city** tool.
+
+<details><summary>💡 Hint</summary>
+
+Another HTTP Request Tool with a placeholder.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+HTTP Request Tool `get_time`: URL `https://timeapi.io/api/Time/current/zone?timeZone={tz}`, placeholder `tz` ("IANA timezone like Asia/Kolkata"). Ask: *"What time is it in Tokyo?"*
+
+</details>
+
+**⭐⭐ Challenge 2:** Cap the cost: refuse questions unrelated to weather, currency, maths or general knowledge.
+
+<details><summary>💡 Hint</summary>
+
+Guard **before** the agent runs.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add a **Text Classifier** before the agent (categories: supported / unsupported). Route unsupported to a fixed reply. Cheap guards in front of expensive agents are a common production pattern.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add a Google Calendar tool ("what's on my calendar tomorrow?").
 - Add a Gmail tool, but put an approval step in front of it (L15).

@@ -255,7 +255,37 @@ Some sites block bots. Respect robots.txt and terms of service, and prefer offic
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Track a product from a site you use (find the CSS selector yourself).
+
+<details><summary>💡 Hint</summary>
+
+Chrome → right-click the price → Inspect → right-click → Copy selector.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add `{ name, url, selector, target }` to ⚙️ Products. If `price` comes back `NaN`, the price is rendered by JavaScript. Look for a JSON API in the Network tab instead.
+
+</details>
+
+**⭐⭐ Challenge 2:** Log every check to a sheet and include a **30-day low** in the alert.
+
+<details><summary>💡 Hint</summary>
+
+Append each result to Sheets; read the history when alerting.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After *Compare with Last Price*, append `{time, name, price}` to `PriceHistory`. Before the alert, read the history, filter the last 30 days for that product, and compute `Math.min(...)`. Put it in the email: *"lowest in 30 days: …"*
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Log every price to Sheets and chart the history (see Q05).
 - Send to Telegram instead of email (see Q03).

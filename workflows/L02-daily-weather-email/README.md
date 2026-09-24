@@ -199,7 +199,42 @@ Set the timezone in *Workflow settings → Timezone*.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Send the email only when it's likely to rain (> 50%).
+
+<details><summary>💡 Hint</summary>
+
+Add a node between *Fetch Weather* and *Email Summary* that can stop items.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add an **IF** (or **Filter**) node: `{{ $json.daily.precipitation_probability_max[0] }}` *is greater than* `50`. Connect only the **true** output to Gmail.
+
+</details>
+
+**⭐⭐ Challenge 2:** Report the weather for **3 cities** in one email.
+
+<details><summary>💡 Hint</summary>
+
+Make Config emit 3 items (Code node), let HTTP run per item, then combine.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Replace ⚙️ Config with a Code node returning 3 items `{city, latitude, longitude, timezone}`. HTTP Request runs once per city automatically. Add a Code node (*all items*) that builds one HTML table:
+```javascript
+const cfg = $('⚙️ Config').all();
+const rows = $input.all().map((it, i) => `<tr><td>${cfg[i].json.city}</td><td>${it.json.daily.temperature_2m_max[0]}°C</td><td>${it.json.daily.precipitation_probability_max[0]}%</td></tr>`).join('');
+return [{ json: { html: `<table>${rows}</table>` } }];
+```
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add an **IF** node: send only if the rain chance is above 50% (this previews L04).
 - Loop over 3 cities by making Config return 3 items.

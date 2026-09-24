@@ -108,6 +108,10 @@ No placeholder values. It runs as-is once the credentials are connected.
 
 Nodes that need a credential selected after import: **Gemini Embeddings**, **Google Gemini Chat Model**.
 
+### 📥 Starter files
+
+Sample files: [hr-policy.pdf](../../templates/files/hr-policy.pdf) (upload it in the form)
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -276,7 +280,37 @@ Use the *same* embedding model for insert and search.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Make the bot cite the **policy section number** in every answer.
+
+<details><summary>💡 Hint</summary>
+
+It's a prompt change plus good chunking.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+System message: *"End every answer with 'Source: <document> §<section>'."* Keep sections intact by making chunks slightly larger (e.g. 1500 characters) so a section isn't split.
+
+</details>
+
+**⭐⭐ Challenge 2:** Move from in-memory to a **persistent** vector store.
+
+<details><summary>💡 Hint</summary>
+
+Swap both vector store nodes; embeddings stay the same.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Replace both In-Memory Vector Store nodes with **Supabase** / **Qdrant** / **PGVector** (same insert and retrieve-as-tool modes, same embeddings). Documents now survive restarts, and several workflows can share the knowledge base.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Swap in Supabase / Qdrant / Pinecone for persistent storage.
 - Serve it inside Slack or Teams instead of n8n chat.

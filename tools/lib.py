@@ -138,6 +138,33 @@ def readme(num, title, level, domain, time, story, learn, flow, creds, steps, te
 REGISTRY = []
 
 
+SHEET_TEMPLATES = {}
+SAMPLE_FILES = {
+    "L06": [("invoice-valid.pdf", "email it to yourself as an attachment")],
+    "L13": [("hr-policy.pdf", "upload it in the form")],
+    "L18": [("resume-sample.pdf", "upload it in the form")],
+    "P01": [("invoice-valid.pdf", "auto-approved → ledger"), ("invoice-large.pdf", "₹1,18,000 → needs approval"), ("invoice-wrong-total.pdf", "subtotal + tax ≠ total → Exceptions")],
+}
+
+
+def starter_files(slug, num):
+    rows = SHEET_TEMPLATES.get(slug, [])
+    files = SAMPLE_FILES.get(num, [])
+    if not rows and not files:
+        return []
+    L = ["### 📥 Starter files", ""]
+    if rows:
+        L += ["Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.", "",
+              "| Tab | Template | Columns |", "|---|---|---|"]
+        L += [f"| `{tab}` | [{tab}.csv](../../{path}) | {', '.join(f'`{c}`' for c in cols)} |" for tab, path, cols in rows]
+        L.append("")
+        L.append("<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>")
+        L.append("")
+    if files:
+        L += ["Sample files: " + " · ".join(f"[{f}](../../templates/files/{f}) ({why})" for f, why in files), ""]
+    return L
+
+
 def _test_result(slug):
     path = os.path.join(os.path.dirname(__file__), "..", "tests", "results.json")
     try:
@@ -190,7 +217,7 @@ def render_readme(r, data, diagram):
             L.append(f"| {name.strip()} | {rest.strip() or '[docs/credentials.md](../../docs/credentials.md)'} |")
     else:
         L.append("| Nothing | Runs with zero setup |")
-    L += ["", placeholders(data), "## 🛠️ Build it step by step", "",
+    L += ["", placeholders(data), *starter_files(r.get("slug", ""), r["num"]), "## 🛠️ Build it step by step", "",
           "> [!TIP]", "> In a hurry? Import [`workflow.json`](workflow.json) (copy → paste on the n8n canvas). Learning? Build it yourself using the steps below, then compare.", ""]
     L += [f"{i}. {s}" for i, s in enumerate(r["steps"], 1)]
     L += ["", node_reference(data), "## ✅ Test it", ""]
@@ -202,7 +229,15 @@ def render_readme(r, data, diagram):
           "Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).", ""]
     for a, b in r["errors"]:
         L += [f"<details><summary><b>{a.replace('`', '')}</b></summary>", "", b, "", "</details>", ""]
-    L += ["## 🚀 Level up", "", *[f"- {x}" for x in r["extend"]], "", "---", "", "{{NAV}}"]
+    from exercises import EX
+    ex = EX.get(r["num"], [])
+    if ex:
+        L += ["## 🏋️ Practice", "", "Try each challenge **before** opening the hint. Solutions show the exact expressions and code.", ""]
+        for i, (stars, task, hint, sol) in enumerate(ex, 1):
+            L += [f"**{'⭐' * stars} Challenge {i}:** {task}", "",
+                  "<details><summary>💡 Hint</summary>", "", hint, "", "</details>",
+                  "<details><summary>✅ Solution</summary>", "", sol, "", "</details>", ""]
+    L += ["## 🚀 Ideas to extend it", "", *[f"- {x}" for x in r["extend"]], "", "---", "", "{{NAV}}"]
     return "\n".join(L)
 
 

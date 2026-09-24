@@ -143,6 +143,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Leads` | [Leads.csv](../../templates/P04-sales-followup-sequence/Leads.csv) | `email`, `name`, `company`, `need`, `started`, `status`, `updated` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -465,7 +475,37 @@ The Gmail search runs on *your* mailbox, so the lead must reply to the same acco
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Skip weekends: never send follow-ups on Saturday or Sunday.
+
+<details><summary>💡 Hint</summary>
+
+Use *Wait → At specified time* with a computed date.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Replace *Wait 3 Days* with **Wait → At specified time**: `{{ (d => d.weekday > 5 ? d.plus({ days: 8 - d.weekday }) : d)($now.plus({ days: 3 }).set({ hour: 10, minute: 0 })) }}`. This moves Saturday or Sunday to Monday 10:00.
+
+</details>
+
+**⭐⭐ Challenge 2:** Personalise email 2 using the lead's **company website**.
+
+<details><summary>💡 Hint</summary>
+
+Fetch the homepage, extract text, let AI write one relevant sentence.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Before Email 2: HTTP GET `https://{{ $('Lead Record').item.json.email.split('@')[1] }}` (On Error → Continue) → HTML extract `body` text → LLM chain: *"One sentence connecting their business to automating {{ need }}"*. Insert it into Email 2.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Personalise emails with AI using the lead's company website.
 - Skip weekends: calculate the resume time with *Wait → At specified time*.

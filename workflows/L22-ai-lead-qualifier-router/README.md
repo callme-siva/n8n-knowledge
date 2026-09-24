@@ -118,6 +118,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Gemini Chat Model**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Leads` | [Leads.csv](../../templates/L22-ai-lead-qualifier-router/Leads.csv) | `time`, `email`, `name`, `company`, `reason`, `reply`, `score`, `tier`, `use_case` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -305,7 +315,37 @@ Hot goes through alert → reply once. Check you didn't also wire Hot directly t
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add **Budget** as a form field and let it influence the score.
+
+<details><summary>💡 Hint</summary>
+
+Form field + prompt mention; the schema stays the same.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add the dropdown *Budget* (< 1L / 1–5L / > 5L), include it in the prompt text, and add to the system message: *"budget > 5L adds up to 15 points"*. Re-test the 3 sample leads.
+
+</details>
+
+**⭐⭐ Challenge 2:** Add a **human approval** before the AI reply is sent to hot leads.
+
+<details><summary>💡 Hint</summary>
+
+Insert Send-and-Wait between the alert and the personal reply.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Put a Gmail **Send and Wait** (response: free text) to the sales lead, showing the AI draft. Use the edited text if provided (`{{ $json.data.text || $('Build CRM Row').item.json.reply }}`).
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Replace the Sheet with HubSpot / Zoho CRM nodes.
 - Add an approval step (L15) before the AI reply goes out.

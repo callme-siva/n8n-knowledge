@@ -2,7 +2,7 @@
 
 # L18 · Resume ↔ job fit analyser
 
-![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Career / HR / recruiting](https://img.shields.io/badge/domain-Career_/_HR_/_recruiting-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 0 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_0_checks-2EA44F?style=flat-square)
+![level: Multi-agent & production](https://img.shields.io/badge/level-Multi--agent_%26_production-DC2626?style=flat-square) ![domain: Career / HR / recruiting](https://img.shields.io/badge/domain-Career_/_HR_/_recruiting-334155?style=flat-square) ![build time: 35 min](https://img.shields.io/badge/build_time-35_min-0EA5E9?style=flat-square) ![nodes: 11](https://img.shields.io/badge/nodes-11-7C3AED?style=flat-square) ![e2e test: passed · 1 checks](https://img.shields.io/badge/e2e_test-passed_%C2%B7_1_checks-2EA44F?style=flat-square)
 
 <img src="canvas.svg" alt="Workflow canvas snapshot" width="100%">
 
@@ -105,6 +105,10 @@ Form (PDF + JD) → Extract text → Resume Analyst → Job Fit Analyst → Inte
 No placeholder values. It runs as-is once the credentials are connected.
 
 Nodes that need a credential selected after import: **Gmail**, **Google Gemini Chat Model**.
+
+### 📥 Starter files
+
+Sample files: [resume-sample.pdf](../../templates/files/resume-sample.pdf) (upload it in the form)
 
 ## 🛠️ Build it step by step
 
@@ -253,7 +257,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ## ✅ Test it
 
 > [!TIP]
-> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (7 credentialed nodes replaced by realistic mocks), 0 behaviour checks. See [tests/](../../tests/README.md).
+> **Automated end-to-end test: passed.** 7/7 nodes executed in real n8n (6 credentialed nodes replaced by realistic mocks), 1 behaviour checks. See [tests/](../../tests/README.md).
 
 - [ ] Try the same resume against 2 very different JDs. The scores should differ clearly.
 
@@ -273,7 +277,37 @@ Add a rubric and examples of low and high scores to the prompt.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a numeric **fit score** to the email subject.
+
+<details><summary>💡 Hint</summary>
+
+Ask the Job Fit agent for structured output.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Attach a Structured Output Parser to *Job Fit Analyst* with `{"score": 78, "summary": "..."}`. Subject: `Fit {{ $('Job Fit Analyst').item.json.output.score }}/100: …`.
+
+</details>
+
+**⭐⭐ Challenge 2:** Rank **20 resumes** against one JD and email a shortlist.
+
+<details><summary>💡 Hint</summary>
+
+Loop over files; score each; sort; take the top 5.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Upload multiple files (form *Multiple files* on) → split into items → Extract text → the Job Fit agent with a score schema → **Sort** by score desc → **Limit** 5 → one summary email. Don't let AI make hiring decisions alone; this produces a shortlist for a human.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Store results in Sheets to build a candidate pipeline.
 - Loop over 20 resumes against one JD and rank them (see L20 sub-workflows).

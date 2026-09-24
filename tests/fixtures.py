@@ -16,7 +16,7 @@ MD = _today.strftime("%m-%d")
 
 TRIGGERS = {
     "L06-gmail-pdf-to-drive": [{"id": "m1", "date": "2026-09-20T10:00:00Z", "from": {"text": "billing@airtel.example.com"}, "subject": "Your bill",
-        "_binary": {"attachment_0": {"fileName": "bill.pdf", "mimeType": "application/pdf"}, "attachment_1": {"fileName": "logo.png", "mimeType": "image/png"}}}],
+        "_binary": {"attachment_0": {"fileName": "bill.pdf", "mimeType": "application/pdf", "file": "invoice-valid.pdf"}, "attachment_1": {"fileName": "logo.png", "mimeType": "image/png"}}}],
     "L07-lead-capture-sheets": [{"Name": "  Asha Rao ", "Email": "Asha@Finlytics.example.com", "Company": "Finlytics", "Interested in": "AI agents", "Monthly budget (INR)": "25k – 1L"}],
     "L09-webhook-expense-api": [{"body": {"amount": 450, "category": "Food", "note": "team lunch", "user": "asha"}}],
     "L10-form-bug-report-jira": [{"Your email": "tester@example.com", "What is broken?": "Login button does nothing", "Steps to reproduce": "1. Open app 2. Click Login", "Severity": "Blocker — cannot work", "Page / module": "Auth"}],
@@ -25,11 +25,16 @@ TRIGGERS = {
     "L14-ai-agent-with-tools": [{"chatInput": "What's 18% GST on 12499?", "sessionId": "s1"}],
     "L15-retro-ai-approval-jira": [{"Sprint": "Sprint 24", "What went well?": "Shipped search early", "What didn't go well?": "Mid-sprint requests", "Suggestions": "Protect scope", "Team morale": "3 - Neutral"}],
     "L17-complaint-handler-multi-agent": [{"customer_email": "rahul@example.com", "order_id": "ORD-88213", "complaint": "Laptop arrived with a cracked screen. Second time!"}],
-    "L18-resume-job-fit-multi-agent": [{"Candidate Name": "Test Candidate", "Email": "cand@example.com", "Job Descriptions": "Scrum Master, 5+ years, Jira, SAFe"}],
+    "L18-resume-job-fit-multi-agent": [{"Candidate Name": "Test Candidate", "Email": "cand@example.com", "Job Descriptions": "Scrum Master, 5+ years, Jira, SAFe",
+        "_binary": {"Resume": {"fileName": "resume.pdf", "mimeType": "application/pdf", "file": "resume-sample.pdf"}}}],
     "L19-global-error-handler": [{"execution": {"id": "231", "url": "https://n8n.example.com/execution/231", "error": {"message": "429 Too Many Requests"}, "lastNodeExecuted": "Get Exchange Rate", "mode": "trigger"}, "workflow": {"id": "7", "name": "L04 · Currency rate alert"}}],
     "L20a-subworkflow-send-branded-email": [{"to": "a@example.com", "title": "Happy birthday!", "body_html": "<p>Cake time</p>", "cta_text": "", "cta_url": ""}],
     "L22-ai-lead-qualifier-router": [{"Name": "Asha Rao", "Work email": "asha@finlytics.example.com", "Company": "Finlytics", "Team size": "51-200", "What do you want to automate?": "Invoice extraction", "When do you want to start?": "This month"}],
-    "P01-invoice-processing-pipeline": [{"id": "inv-mail-1", "from": {"text": "ap@vendor.example.com"}}],
+    "P01-invoice-processing-pipeline": [{"id": "inv-mail-1", "from": {"text": "ap@vendor.example.com"}, "_binary": {
+        "attachment_0": {"fileName": "INV-4411.pdf", "mimeType": "application/pdf", "file": "invoice-valid.pdf"},
+        "attachment_1": {"fileName": "INV-9001.pdf", "mimeType": "application/pdf", "file": "invoice-large.pdf"},
+        "attachment_2": {"fileName": "INV-4412.pdf", "mimeType": "application/pdf", "file": "invoice-wrong-total.pdf"},
+        "attachment_3": {"fileName": "logo.png", "mimeType": "image/png"}}}],
     "P02-support-inbox-copilot": [{"id": "sm1", "threadId": "th1", "From": "priya@example.com", "Subject": "How do I change my plan?", "snippet": "Hi, how can I upgrade my plan to annual?"}],
     "P03-incident-response-orchestrator": [{"body": {"alerts": [
         {"status": "firing", "fingerprint": "fp-pay-1", "labels": {"alertname": "HighErrorRate", "severity": "critical", "service": "payments"}, "annotations": {"summary": "5xx > 5% for 5m"}, "startsAt": "2026-09-24T10:00:00Z"},
@@ -77,18 +82,18 @@ FIXTURES = {
         "Check Escalation": AI(output={"escalate": True, "priority": "high", "reason": "Repeat, high value", "route_to": "senior-support"}),
         "Draft Response": AI(output="Dear Rahul, we're sorry… a replacement is on its way.")},
     "L18-resume-job-fit-multi-agent": {
-        "Extract Resume Text": AI(text="Test Candidate — Scrum Master, 6 years, Jira, SAFe 5"),
         **{n: AI(output=f"{n} output") for n in ("Resume Analyst", "Job Fit Analyst", "Interview Question Generator", "Learning Plan Builder")}},
     "L20-subworkflows-caller": {"Read Team Sheet": ("all", [
         {"name": "Asha", "email": "asha@example.com", "birthday": f"1990-{MD}", "joined": f"2022-{MD}"},
         {"name": "Ravi", "email": "ravi@example.com", "birthday": "1991-01-02", "joined": "2024-03-01"}])},
     "L22-ai-lead-qualifier-router": {"Qualify Lead": AI(output={"score": 82, "tier": "hot", "reason": "Clear need, right size, this month", "use_case": "Invoice extraction", "suggested_reply": "Hi Asha, …"})},
     "P01-invoice-processing-pipeline": {
-        "One Item per PDF": ("all", [{"file": "INV-4411.pdf", "from": "ap@vendor.example.com", "messageId": "inv-mail-1"},
-                                      {"file": "INV-9001.pdf", "from": "ap@vendor.example.com", "messageId": "inv-mail-1"},
-                                      {"file": "bad.pdf", "from": "ap@vendor.example.com", "messageId": "inv-mail-1"}]),
-        "PDF → Text": AI(text="TAX INVOICE …"),
-        "Extract Invoice Fields": ("code", "const outs=[{vendor_name:'Acme Supplies Pvt Ltd',vendor_gstin:'29ABCDE1234F1Z5',invoice_number:'INV-4411',invoice_date:'2026-09-01',due_date:'2026-10-01',subtotal:10000,tax_total:1800,grand_total:11800,currency:'INR'},{vendor_name:'BigCo',invoice_number:'INV-9001',invoice_date:'2026-09-02',subtotal:100000,tax_total:18000,grand_total:118000},{vendor_name:'Sloppy Ltd',vendor_gstin:'BADGSTIN',invoice_number:'S-1',invoice_date:'2026-09-03',subtotal:500,tax_total:90,grand_total:900}];\nreturn { json: { output: outs[$itemIndex] } };")},
+        # Stand-in for the AI extractor: deterministic regex over the REAL text pdf.js extracted from the sample PDFs
+        "Extract Invoice Fields": ("code", r"""const t = $json.text || '';
+const num = re => { const m = t.match(re); return m ? Number(m[1].replace(/,/g, '')) : undefined; };
+const str = re => { const m = t.match(re); return m ? m[1].trim() : undefined; };
+return { json: { output: { vendor_name: str(/TAX INVOICE\s+(.+?)\s+\d+ MG Road/), vendor_gstin: str(/GSTIN:\s*(\S+)/), invoice_number: str(/Invoice No:\s*(\S+)/),
+  invoice_date: '2026-09-01', due_date: '2026-10-01', subtotal: num(/Subtotal: INR ([\d,\.]+)/), tax_total: num(/IGST 18%: INR ([\d,\.]+)/), grand_total: num(/Grand Total: INR ([\d,\.]+)/), currency: 'INR' } } };""")},
     "P02-support-inbox-copilot": {
         "Triage": 0,
         "Load FAQ": ("all", [{"question": "How do I change my plan?", "answer": "Settings → Billing → Change plan."}, {"question": "Refund policy?", "answer": "Full refund within 14 days."}]),
@@ -139,9 +144,11 @@ EXPECT = {
     "L15-retro-ai-approval-jira": [("count", "Approved?", 0, 1), ("count", "Create Jira Task", 0, 2)],
     "L19-global-error-handler": [("contains", "Shape Error", "Rate limit")],
     "L20-subworkflows-caller": [("count", "Who Celebrates Today?", 0, 2)],
+    "L18-resume-job-fit-multi-agent": [("contains", "Extract Resume Text", "Certified Scrum Master")],
     "L22-ai-lead-qualifier-router": [("count", "Route by Tier", 0, 1)],
     "P01-invoice-processing-pipeline": [("count", "Valid?", 0, 2), ("count", "Valid?", 1, 1), ("count", "Needs Approval?", 0, 1),
-                                        ("count", "Append to Ledger", 0, 2), ("contains", "Log Exception", "≠ total"), ("contains", "Log Exception", "GSTIN format invalid")],
+                                        ("count", "Append to Ledger", 0, 2), ("contains", "Log Exception", "≠ total"), ("contains", "Validate", "\"invoice_number\":\"INV-9001\""),
+                                        ("contains", "PDF → Text", "Grand Total: INR 11,800.00")],
     "P02-support-inbox-copilot": [("count", "Confident?", 0, 1), ("count", "Create Gmail Draft", 0, 1)],
     "P03-incident-response-orchestrator": [("count", "Route", 0, 1), ("count", "Route", 1, 1), ("count", "Route", 3, 1), ("count", "Open Jira Incident", 0, 1)],
     "P04-sales-followup-sequence": [("count", "Replied? #1", 1, 1), ("count", "Replied? #2", 1, 1), ("contains", "CRM: Closed, No Reply", "no_reply_closed")],

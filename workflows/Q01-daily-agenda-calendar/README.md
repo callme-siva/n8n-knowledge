@@ -211,7 +211,37 @@ Turn on *Single events* so recurrences are expanded.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Skip meetings you've **declined**.
+
+<details><summary>💡 Hint</summary>
+
+Each attendee has a `responseStatus`; find yourself with `self: true`.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Extend the filter: `.filter(e => !(e.attendees || []).some(a => a.self && a.responseStatus === 'declined'))`.
+
+</details>
+
+**⭐⭐ Challenge 2:** Automatically **block** your biggest free slot as "Focus time".
+
+<details><summary>💡 Hint</summary>
+
+Pick the longest slot in code, then create an event.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In Build Agenda also return `best = free.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]))[0]`. Add **Google Calendar → Create event** with start/end from `best`, summary `🎯 Focus time`, and *Show me as busy*.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Auto-create a "Focus" event in the biggest free slot.
 - Add tomorrow's first meeting so you can prepare the night before.

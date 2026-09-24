@@ -99,6 +99,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Team` | [Team.csv](../../templates/L20-subworkflows-caller/Team.csv) | `email`, `name`, `birthday`, `joined` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -221,7 +231,37 @@ Input names must match exactly on both sides.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add an optional **CTA button** to birthday emails linking to a team photo album.
+
+<details><summary>💡 Hint</summary>
+
+L20a already supports `cta_text` and `cta_url`.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Who Celebrates Today?*, set `cta_text: 'See team photos'` and `cta_url: 'https://photos.example.com/team'`. No change to L20a. That's the point of sub-workflows.
+
+</details>
+
+**⭐⭐ Challenge 2:** Make an **L20b** sub-workflow *"log to audit sheet"* and call it from L20 and L19.
+
+<details><summary>💡 Hint</summary>
+
+Execute Workflow Trigger with inputs `workflow`, `event` and `details`.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+L20b: Execute Workflow Trigger (workflow, event, details) → Set (time = `$now.toISO()`) → Sheets append `Audit`. Call it with **Execute Workflow** from L20 (event `wish_sent`) and L19 (event `error`). One audit trail for everything.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Call L20a from L02, L08 and L19 to give every email the same branding.
 - Make an L20b *Log to Sheet* sub-workflow for audit logs.

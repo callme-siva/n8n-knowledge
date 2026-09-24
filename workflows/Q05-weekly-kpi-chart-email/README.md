@@ -102,6 +102,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Sales` | [Sales.csv](../../templates/Q05-weekly-kpi-chart-email/Sales.csv) | `date`, `orders`, `revenue` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -223,7 +233,37 @@ The attachment property name must match the QuickChart *output* field (`chart`).
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Chart **orders** as a second dataset.
+
+<details><summary>💡 Hint</summary>
+
+QuickChart accepts a data array per dataset, or use a line chart for the second series.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Easiest: a second QuickChart node (line) for orders, output `chart2`, and attach both (`chart`, `chart2`). Advanced: call `https://quickchart.io/chart` via HTTP with a full Chart.js config containing two datasets.
+
+</details>
+
+**⭐⭐ Challenge 2:** Highlight the week-over-week change in **red/green** in the email body.
+
+<details><summary>💡 Hint</summary>
+
+Colour based on the sign of `change`.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Message: `<p style="color:{{ $json.change >= 0 ? '#16a34a' : '#dc2626' }}">{{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%</p>`.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add an AI narrative of the trend (see P12).
 - Chart orders and revenue as two datasets.

@@ -101,6 +101,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Inbox` | [Inbox.csv](../../templates/Q03-telegram-capture-bot/Inbox.csv) | `time`, `amount`, `category`, `chat_id`, `from`, `kind`, `reply`, `text` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -217,7 +227,37 @@ Add an IF on `message.from.id` equal to your own Telegram ID.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a `/today` command that replies with today's total spend.
+
+<details><summary>💡 Hint</summary>
+
+Read the Inbox sheet, filter today's expenses, sum them.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In Parse Command, add `kind: 'report'` for `/today`. Route it (Switch) to Sheets read → Code `rows.filter(r => r.kind === 'expense' && r.time.startsWith($today.toISODate())).reduce((s, r) => s + Number(r.amount), 0)` → Telegram reply.
+
+</details>
+
+**⭐⭐ Challenge 2:** Only allow **your own** Telegram account to use the bot.
+
+<details><summary>💡 Hint</summary>
+
+Every message carries `message.from.id`.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Right after the trigger, add an IF `{{ $json.message.from.id }}` *equals* your ID (send the bot a message once and read it from the execution). Anything else: reply *"This is a private bot"* and stop.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add `/today` that reads today's expenses and replies with a total.
 - Accept voice notes and transcribe them with an AI node.

@@ -219,7 +219,37 @@ Add pagination (HTTP node → Options → Pagination) for very large repos.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Skip weekends and PRs labelled `blocked`.
+
+<details><summary>💡 Hint</summary>
+
+PR objects have `labels`; Luxon knows the weekday.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add to the filter: `&& !p.labels.some(l => l.name === 'blocked')`. The cron `0 10 * * 1-5` already skips weekends, but for idle days use business days: count only weekdays between `updated_at` and today.
+
+</details>
+
+**⭐⭐ Challenge 2:** Check **several repos** and post one combined message.
+
+<details><summary>💡 Hint</summary>
+
+Config returns N items → HTTP runs per repo → combine.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Make Config a Code node returning one item per repo. HTTP runs per repo; in *Find Stale*, use `$input.all()` and prefix each line with the repo name (`$('⚙️ Config').all()[i].json.repo`).
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - DM each reviewer instead of posting in the channel.
 - Add CI status per PR from the `/commits/{sha}/status` endpoint.

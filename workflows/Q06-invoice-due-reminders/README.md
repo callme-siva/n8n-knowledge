@@ -108,6 +108,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Invoices` | [Invoices.csv](../../templates/Q06-invoice-due-reminders/Invoices.csv) | `invoice_no`, `email`, `amount`, `client`, `due_date`, `last_reminded`, `status` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -262,7 +272,37 @@ Dates must be plain `YYYY-MM-DD` text. Format the column as *Plain text* in Shee
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a third tone: a **final notice** at 30+ days overdue, cc'd to your accountant.
+
+<details><summary>💡 Hint</summary>
+
+Extend the stage calculation and the Switch.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In the code: `stage: r.days >= 0 ? 'upcoming' : -r.days >= 30 ? 'final' : 'overdue'`. Add a Switch rule `final` → Gmail with CC (Options → CC).
+
+</details>
+
+**⭐⭐ Challenge 2:** Mark invoices **paid** automatically when the client's payment email arrives.
+
+<details><summary>💡 Hint</summary>
+
+A second workflow: Gmail trigger on payment notifications → find the invoice → update the row.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Gmail Trigger (`from:alerts@yourbank subject:credited`) → Code: regex the invoice number or amount from the email → Sheets **Append or Update** `{invoice_no, status: 'paid'}`. Reminders stop automatically, because paid rows are filtered out.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Attach the invoice PDF from Drive.
 - Escalate to a phone call task (Jira/Todoist) after 21 days overdue.

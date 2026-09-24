@@ -194,7 +194,42 @@ Check the field name spelling — JSON keys are case-sensitive.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Send the greeting for **three people** instead of one.
+
+<details><summary>💡 Hint</summary>
+
+The Set node emits one item. What if the Code node returned three?
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In **Build Greeting**, replace the code with:
+```javascript
+const people = [['Asha', 'Chennai'], ['Ravi', 'Pune'], ['Meera', 'Delhi']];
+return people.map(([name, city]) => ({ json: { name, city, greeting: `Hello ${name} from ${city}!` } }));
+```
+Gmail now runs **three times**, once per item. That's the core n8n idea: nodes run once per item.
+
+</details>
+
+**⭐⭐ Challenge 2:** Put all three greetings into **one** email instead of three.
+
+<details><summary>💡 Hint</summary>
+
+You need *many → one*. Either a Code node in *Run once for all items* mode, or the **Aggregate** node.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add an **Aggregate** node after Build Greeting: *Individual fields* → field `greeting`. In Gmail, set Message to `{{ $json.greeting.join('<br>') }}`. One item goes in, so one email goes out.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add a second item in the Set node (turn on *Include Other Input Fields*) or return two items from Code — watch Gmail send two emails.
 - Replace Gmail with Telegram or Slack.

@@ -104,6 +104,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Expenses` | [Expenses.csv](../../templates/L09-webhook-expense-api/Expenses.csv) | `date`, `amount`, `category`, `note`, `submitted_by` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -251,7 +261,44 @@ The header name or value doesn't match the credential exactly (names are case-in
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add an optional `date` field that must be a real date **not in the future**.
+
+<details><summary>💡 Hint</summary>
+
+Luxon: `DateTime.fromISO(x).isValid`.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Validate*:
+```javascript
+if (b.date) {
+  const d = DateTime.fromISO(b.date);
+  if (!d.isValid) errors.push('date must be YYYY-MM-DD');
+  else if (d > $now) errors.push('date cannot be in the future');
+}
+```
+
+</details>
+
+**⭐⭐ Challenge 2:** Return **200 with the existing row** if the same expense is posted twice within a minute (idempotency).
+
+<details><summary>💡 Hint</summary>
+
+Clients retry on timeouts. Accept an `Idempotency-Key` header and remember recent keys.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Validate*, read `$json.headers['idempotency-key']`, keep recent keys in `$getWorkflowStaticData('global').keys` (key → row, with a timestamp), and if it was seen less than 60 s ago, route to a *Respond 200* with the saved row instead of appending. This is how payment APIs (Stripe) avoid double charges.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Rotate the key: create a second credential, update clients, then delete the old one.
 - Add a daily 9 PM summary: *Sheets get rows* → sum by category → email.

@@ -277,7 +277,45 @@ Add a cooldown: store the last alert time with `$getWorkflowStaticData` (see L21
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a third zone: **Watch** when the rate is within 0.5 of either threshold.
+
+<details><summary>💡 Hint</summary>
+
+Switch rules are evaluated in order; the first match wins (unless *Send data to all matching outputs* is on).
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add a rule *before* the fallback: `{{ Math.min(Math.abs($json.rate - $('⚙️ Config').item.json.high), Math.abs($json.rate - $('⚙️ Config').item.json.low)) }}` *is less than* `0.5`, renamed `Watch`, connected to a gentle email.
+
+</details>
+
+**⭐⭐ Challenge 2:** Stop the hourly spam: alert at most **once per day per zone**.
+
+<details><summary>💡 Hint</summary>
+
+Remember when you last alerted with `$getWorkflowStaticData`.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Before each alert, add a Code node:
+```javascript
+const s = $getWorkflowStaticData('global');
+const key = 'High:' + $today.toISODate();
+if (s[key]) return [];      // already alerted today → drop the item
+s[key] = true;
+return $input.all();
+```
+Static data only persists in **active** executions (see L21).
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Track 3 currencies at once (Config returns 3 items).
 - Log every reading to Google Sheets and chart it.

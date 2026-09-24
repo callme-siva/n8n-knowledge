@@ -102,6 +102,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Google Gemini Chat Model**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `RAID` | [RAID.csv](../../templates/L12-meeting-transcript-raid-log/RAID.csv) | `logged_at`, `category`, `description`, `impact`, `meeting_date`, `meeting_title`, `meeting_type`, `mitigation`, `owner` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -276,7 +286,37 @@ Split Out must point to the array path, `output.items`.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add a `due_date` field (YYYY-MM-DD or empty) to each RAID item.
+
+<details><summary>💡 Hint</summary>
+
+Update the parser example and the *Build RAID Row* Set node.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add `"due_date": "2026-10-15"` to the example items, add a `due_date` column to the sheet and a `due_date = {{ $json.due_date }}` field in the Set node.
+
+</details>
+
+**⭐⭐ Challenge 2:** Email the **owner** of every high-impact Risk right after logging it.
+
+<details><summary>💡 Hint</summary>
+
+Filter the split items, then email per item.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After *Split RAID Items*, branch a **Filter**: `category = Risk` AND `impact` contains `high` (or add an `impact_level` enum to the schema). Then Gmail per item. Owners need emails, so map names → emails with a small Code lookup table.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Email the owner of each high-impact risk.
 - Run it over every transcript file dropped in a Drive folder.

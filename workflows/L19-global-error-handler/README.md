@@ -99,6 +99,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Errors` | [Errors.csv](../../templates/L19-global-error-handler/Errors.csv) | `time`, `hint`, `message`, `mode`, `node`, `url`, `workflow`, `workflow_id` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -201,7 +211,37 @@ Never set L19 as its own error workflow.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Also send the alert to **Slack**.
+
+<details><summary>💡 Hint</summary>
+
+Add a parallel branch from *Shape Error*.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add a Slack *Send message* node connected to Shape Error, with *On Error → Continue* so a Slack outage never hides the email.
+
+</details>
+
+**⭐⭐ Challenge 2:** Send a **weekly error report** grouped by workflow.
+
+<details><summary>💡 Hint</summary>
+
+Read the Errors sheet on a schedule and aggregate.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+New workflow: Schedule (Monday) → Sheets read `Errors` → Code: filter the last 7 days, count by `workflow`, sort desc → email the top 5 with counts and the most common hint. Flaky workflows show up before users complain.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add Slack / Telegram alerts.
 - Weekly summary: read the Errors sheet → group by workflow → email the top offenders.

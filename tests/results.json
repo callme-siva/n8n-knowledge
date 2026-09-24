@@ -103,6 +103,22 @@
       "Welcome Email"
     ],
     "real_nodes": 1,
+    "sheets": {
+      "Leads": {
+        "reads": [],
+        "writes": [
+          {
+            "budget": "25k \u2013 1L",
+            "company": "Finlytics",
+            "email": "asha@finlytics.example.com",
+            "interest": "AI agents",
+            "name": "Asha Rao",
+            "source": "web-form",
+            "timestamp": "2026-09-24T08:40:14.029+05:30"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "L08-jira-stale-stories": {
@@ -134,6 +150,20 @@
       "Validate"
     ],
     "real_nodes": 5,
+    "sheets": {
+      "Expenses": {
+        "reads": [],
+        "writes": [
+          {
+            "amount": 450,
+            "category": "food",
+            "date": "2026-09-24",
+            "note": "team lunch",
+            "submitted_by": "asha"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "L10-form-bug-report-jira": {
@@ -181,6 +211,35 @@
       "Submit Meeting Transcript"
     ],
     "real_nodes": 2,
+    "sheets": {
+      "RAID": {
+        "reads": [],
+        "writes": [
+          {
+            "category": "Risk",
+            "description": "Bank sandbox unstable",
+            "impact": "Testing slips",
+            "logged_at": "2026-09-24T08:40:22.360+05:30",
+            "meeting_date": "2026-09-12",
+            "meeting_title": "Payments Revamp weekly",
+            "meeting_type": "Project Status Meeting",
+            "mitigation": "Chase bank",
+            "owner": "Ravi"
+          },
+          {
+            "category": "Dependency",
+            "description": "Pen-test sign-off",
+            "impact": "Blocks go-live",
+            "logged_at": "2026-09-24T08:40:22.363+05:30",
+            "meeting_date": "2026-09-12",
+            "meeting_title": "Payments Revamp weekly",
+            "meeting_type": "Project Status Meeting",
+            "mitigation": "Book slot",
+            "owner": "Security"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "L13-rag-policy-chatbot": {
@@ -262,9 +321,9 @@
     "status": "passed"
   },
   "L18-resume-job-fit-multi-agent": {
-    "checks": 0,
+    "checks": 1,
     "error": "",
-    "mocked_nodes": 7,
+    "mocked_nodes": 6,
     "nodes_ran": 7,
     "ran": [
       "Candidate Submission",
@@ -275,7 +334,7 @@
       "Resume Analyst",
       "Send Analysis Email"
     ],
-    "real_nodes": 0,
+    "real_nodes": 1,
     "status": "passed"
   },
   "L19-global-error-handler": {
@@ -290,6 +349,23 @@
       "Shape Error"
     ],
     "real_nodes": 1,
+    "sheets": {
+      "Errors": {
+        "reads": [],
+        "writes": [
+          {
+            "hint": "Rate limit \u2014 add Retry on Fail or slow the schedule.",
+            "message": "429 Too Many Requests",
+            "mode": "trigger",
+            "node": "Get Exchange Rate",
+            "time": "2026-09-24T03:10:34.533Z",
+            "url": "https://n8n.example.com/execution/231",
+            "workflow": "L04 \u00b7 Currency rate alert",
+            "workflow_id": "7"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "L20-subworkflows-caller": {
@@ -304,6 +380,25 @@
       "Who Celebrates Today?"
     ],
     "real_nodes": 2,
+    "sheets": {
+      "Team": {
+        "reads": [
+          {
+            "birthday": "1990-09-24",
+            "email": "asha@example.com",
+            "joined": "2022-09-24",
+            "name": "Asha"
+          },
+          {
+            "birthday": "1991-01-02",
+            "email": "ravi@example.com",
+            "joined": "2024-03-01",
+            "name": "Ravi"
+          }
+        ],
+        "writes": []
+      }
+    },
     "status": "passed"
   },
   "L20a-subworkflow-send-branded-email": {
@@ -334,6 +429,46 @@
       "State Changed?"
     ],
     "real_nodes": 5,
+    "sheets": {
+      "Uptime": {
+        "reads": [],
+        "writes": [
+          {
+            "changed": false,
+            "code": 200,
+            "error": "",
+            "ms": 10070,
+            "name": "n8n website",
+            "since": "2026-09-24T03:10:49.562Z",
+            "status": "UP",
+            "time": "2026-09-24T03:10:49.562Z",
+            "url": "https://n8n.io"
+          },
+          {
+            "changed": false,
+            "code": 200,
+            "error": "",
+            "ms": 10070,
+            "name": "GitHub API",
+            "since": "2026-09-24T03:10:49.562Z",
+            "status": "UP",
+            "time": "2026-09-24T03:10:49.562Z",
+            "url": "https://api.github.com"
+          },
+          {
+            "changed": false,
+            "code": 0,
+            "error": "timeout of 10000ms exceeded",
+            "ms": 10070,
+            "name": "Demo: always down",
+            "since": "2026-09-24T03:10:49.562Z",
+            "status": "DOWN",
+            "time": "2026-09-24T03:10:49.562Z",
+            "url": "https://httpstat.us/503"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "L22-ai-lead-qualifier-router": {
@@ -351,12 +486,30 @@
       "\ud83d\udd25 Alert Sales Now"
     ],
     "real_nodes": 2,
+    "sheets": {
+      "Leads": {
+        "reads": [],
+        "writes": [
+          {
+            "company": "Finlytics",
+            "email": "asha@finlytics.example.com",
+            "name": "Asha Rao",
+            "reason": "Clear need, right size, this month",
+            "reply": "Hi Asha, \u2026",
+            "score": "82",
+            "tier": "hot",
+            "time": "2026-09-24T08:40:51.263+05:30",
+            "use_case": "Invoice extraction"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "P01-invoice-processing-pipeline": {
-    "checks": 6,
+    "checks": 7,
     "error": "",
-    "mocked_nodes": 8,
+    "mocked_nodes": 6,
     "nodes_ran": 16,
     "ran": [
       "Append to Exceptions",
@@ -376,7 +529,55 @@
       "Validate",
       "\u2699\ufe0f Config"
     ],
-    "real_nodes": 8,
+    "real_nodes": 10,
+    "sheets": {
+      "Exceptions": {
+        "reads": [],
+        "writes": [
+          {
+            "file": "INV-4412.pdf",
+            "invoice_no": "INV-4412",
+            "logged_at": "2026-09-24T03:10:53.391Z",
+            "reason": "subtotal + tax (11800) \u2260 total (12300)",
+            "total": 12300,
+            "vendor": "Acme Supplies Pvt Ltd"
+          }
+        ]
+      },
+      "Ledger": {
+        "reads": [],
+        "writes": [
+          {
+            "approval": "approved",
+            "currency": "INR",
+            "due_date": "2026-10-01",
+            "file": "INV-9001.pdf",
+            "gstin": "27PQRSX5678K1Z2",
+            "invoice_date": "2026-09-01",
+            "invoice_no": "INV-9001",
+            "logged_at": "2026-09-24T03:10:53.383Z",
+            "subtotal": 100000,
+            "tax": 18000,
+            "total": 118000,
+            "vendor": "Acme Supplies Pvt Ltd"
+          },
+          {
+            "approval": "auto (under limit)",
+            "currency": "INR",
+            "due_date": "2026-10-01",
+            "file": "INV-4411.pdf",
+            "gstin": "29ABCDE1234F1Z5",
+            "invoice_date": "2026-09-01",
+            "invoice_no": "INV-4411",
+            "logged_at": "2026-09-24T03:10:53.387Z",
+            "subtotal": 10000,
+            "tax": 1800,
+            "total": 11800,
+            "vendor": "Acme Supplies Pvt Ltd"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "P02-support-inbox-copilot": {
@@ -395,6 +596,21 @@
       "Triage"
     ],
     "real_nodes": 3,
+    "sheets": {
+      "FAQ": {
+        "reads": [
+          {
+            "answer": "Settings \u2192 Billing \u2192 Change plan.",
+            "question": "How do I change my plan?"
+          },
+          {
+            "answer": "Full refund within 14 days.",
+            "question": "Refund policy?"
+          }
+        ],
+        "writes": []
+      }
+    },
     "status": "passed"
   },
   "P03-incident-response-orchestrator": {
@@ -437,6 +653,26 @@
       "Wait 4 Days"
     ],
     "real_nodes": 5,
+    "sheets": {
+      "Leads": {
+        "reads": [],
+        "writes": [
+          {
+            "company": "Pixel Studio",
+            "email": "karan@studio.example.com",
+            "name": "Karan",
+            "need": "Automate social posting",
+            "started": "2026-09-24T08:40:58.415+05:30",
+            "status": "email_1_sent"
+          },
+          {
+            "email": "karan@studio.example.com",
+            "status": "no_reply_closed",
+            "updated": "2026-09-24T08:41:00.473+05:30"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "P05-bulk-ai-enrichment-checkpointed": {
@@ -456,6 +692,94 @@
       "Summary"
     ],
     "real_nodes": 7,
+    "sheets": {
+      "Companies": {
+        "reads": [
+          {
+            "company": "Co 1",
+            "description": "B2B SaaS for invoices",
+            "row_id": "1",
+            "status": "pending",
+            "website": "https://co1.example.com"
+          },
+          {
+            "company": "Co 2",
+            "description": "B2B SaaS for invoices",
+            "row_id": "2",
+            "status": "pending",
+            "website": "https://co2.example.com"
+          },
+          {
+            "company": "Co 3",
+            "description": "B2B SaaS for invoices",
+            "row_id": "3",
+            "status": "pending",
+            "website": "https://co3.example.com"
+          },
+          {
+            "company": "Co 4",
+            "description": "B2B SaaS for invoices",
+            "row_id": "4",
+            "status": "pending",
+            "website": "https://co4.example.com"
+          },
+          {
+            "company": "Co 5",
+            "description": "B2B SaaS for invoices",
+            "row_id": "5",
+            "status": "pending",
+            "website": "https://co5.example.com"
+          }
+        ],
+        "writes": [
+          {
+            "b2b": "true",
+            "icp_score": "78",
+            "industry": "SaaS",
+            "processed_at": "2026-09-24T08:41:02.168+05:30",
+            "reason": "Digital, process-heavy",
+            "row_id": "1",
+            "status": "done"
+          },
+          {
+            "b2b": "true",
+            "icp_score": "78",
+            "industry": "SaaS",
+            "processed_at": "2026-09-24T08:41:02.170+05:30",
+            "reason": "Digital, process-heavy",
+            "row_id": "2",
+            "status": "done"
+          },
+          {
+            "b2b": "true",
+            "icp_score": "78",
+            "industry": "SaaS",
+            "processed_at": "2026-09-24T08:41:02.171+05:30",
+            "reason": "Digital, process-heavy",
+            "row_id": "3",
+            "status": "done"
+          },
+          {
+            "b2b": "true",
+            "icp_score": "78",
+            "industry": "SaaS",
+            "processed_at": "2026-09-24T08:41:02.172+05:30",
+            "reason": "Digital, process-heavy",
+            "row_id": "4",
+            "status": "done"
+          },
+          {
+            "b2b": "true",
+            "icp_score": "78",
+            "industry": "SaaS",
+            "processed_at": "2026-09-24T08:41:02.173+05:30",
+            "reason": "Digital, process-heavy",
+            "row_id": "5",
+            "status": "done"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "P06-purchase-approval-multilevel": {
@@ -478,6 +802,30 @@
       "\u2699\ufe0f Config"
     ],
     "real_nodes": 8,
+    "sheets": {
+      "Requests": {
+        "reads": [],
+        "writes": [
+          {
+            "amount": 215000,
+            "cost_centre": "Engineering",
+            "created": "2026-09-24T03:11:06.965Z",
+            "item": "MacBook Pro",
+            "justification": "Laptop replacement",
+            "manager": "mgr@example.com",
+            "request_id": "PR-260924-9OWI",
+            "requester": "req@example.com",
+            "status": "pending_manager"
+          },
+          {
+            "decided": "2026-09-24T08:41:06.998+05:30",
+            "request_id": "PR-260924-9OWI",
+            "requester": "req@example.com",
+            "status": "approved"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "P07-employee-onboarding-orchestrator": {
@@ -520,6 +868,50 @@
       "Updated \u2192 Write Back"
     ],
     "real_nodes": 7,
+    "sheets": {
+      "Backlog": {
+        "reads": [
+          {
+            "description": "d1",
+            "jira_key": "",
+            "priority": "High",
+            "row_id": "1",
+            "summary": "New story",
+            "sync_hash": ""
+          },
+          {
+            "description": "edited",
+            "jira_key": "SCRUM-7",
+            "priority": "Low",
+            "row_id": "2",
+            "summary": "Changed story",
+            "sync_hash": "stale"
+          },
+          {
+            "description": "",
+            "jira_key": "",
+            "priority": "",
+            "row_id": "3",
+            "summary": "",
+            "sync_hash": ""
+          }
+        ],
+        "writes": [
+          {
+            "jira_key": "MOCK-1",
+            "row_id": "1",
+            "sync_hash": "55ed7ccc0c59cb0294170b8fb2362a066e3c942525d4d071a603dbdf5807a7b5",
+            "synced_at": "2026-09-24T08:41:10.361+05:30"
+          },
+          {
+            "jira_key": "SCRUM-7",
+            "row_id": "2",
+            "sync_hash": "1c73430754cf9ac2b0b5efd16195cfe398165795039c62a039dc587a429d9c16",
+            "synced_at": "2026-09-24T08:41:10.367+05:30"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "P09-deep-research-agent": {
@@ -550,6 +942,19 @@
       "When Called as Tool"
     ],
     "real_nodes": 1,
+    "sheets": {
+      "Customers": {
+        "reads": [
+          {
+            "email": "asha@finlytics.example.com",
+            "mrr": 12000,
+            "plan": "Pro",
+            "status": "active"
+          }
+        ],
+        "writes": []
+      }
+    },
     "status": "passed"
   },
   "P11-pii-safe-ai-gateway": {
@@ -569,6 +974,20 @@
       "Restore Tokens for Caller"
     ],
     "real_nodes": 6,
+    "sheets": {
+      "AI_Audit": {
+        "reads": [],
+        "writes": [
+          {
+            "outcome": "answered",
+            "pii_counts": "{\"EMAIL\":1,\"CARD\":1,\"PAN\":1,\"PHONE\":1}",
+            "prompt_redacted": "Reply to Rahul ([EMAIL_1], [PHONE_4]) about refund to card [CARD_2], PAN [PAN_3]",
+            "time": "2026-09-24T08:41:15.362+05:30",
+            "user": "asha"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "P12-weekly-exec-kpi-report": {
@@ -592,6 +1011,23 @@
       "\u2699\ufe0f Config"
     ],
     "real_nodes": 8,
+    "sheets": {
+      "Sales": {
+        "reads": [
+          {
+            "date": "2026-09-22",
+            "orders": "12",
+            "revenue": "45000"
+          },
+          {
+            "date": "2026-09-15",
+            "orders": "10",
+            "revenue": "40000"
+          }
+        ],
+        "writes": []
+      }
+    },
     "status": "passed"
   },
   "Q01-daily-agenda-calendar": {
@@ -637,6 +1073,23 @@
       "Valid Command?"
     ],
     "real_nodes": 2,
+    "sheets": {
+      "Inbox": {
+        "reads": [],
+        "writes": [
+          {
+            "amount": 120,
+            "category": "travel",
+            "chat_id": 42,
+            "from": "Asha",
+            "kind": "expense",
+            "reply": "\u2705 \u20b9120 logged under travel",
+            "text": "auto to office",
+            "time": "2026-09-24T03:11:22.904Z"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "Q04-github-stale-pr-reminder": {
@@ -668,6 +1121,38 @@
       "Read Daily Sales"
     ],
     "real_nodes": 3,
+    "sheets": {
+      "Sales": {
+        "reads": [
+          {
+            "date": "2026-08-01",
+            "orders": "1",
+            "revenue": "20900"
+          },
+          {
+            "date": "2026-08-03",
+            "orders": "3",
+            "revenue": "22700"
+          },
+          {
+            "date": "2026-08-05",
+            "orders": "5",
+            "revenue": "24500"
+          },
+          {
+            "date": "2026-08-07",
+            "orders": "7",
+            "revenue": "26300"
+          },
+          {
+            "date": "2026-08-09",
+            "orders": "9",
+            "revenue": "28100"
+          }
+        ],
+        "writes": []
+      }
+    },
     "status": "passed"
   },
   "Q06-invoice-due-reminders": {
@@ -686,6 +1171,49 @@
       "Write Back"
     ],
     "real_nodes": 4,
+    "sheets": {
+      "Invoices": {
+        "reads": [
+          {
+            "amount": "11800",
+            "client": "Acme",
+            "due_date": "2026-09-27",
+            "email": "a@example.com",
+            "invoice_no": "INV-1",
+            "last_reminded": "",
+            "status": "unpaid"
+          },
+          {
+            "amount": "5000",
+            "client": "Beta",
+            "due_date": "2026-09-23",
+            "email": "b@example.com",
+            "invoice_no": "INV-2",
+            "last_reminded": "",
+            "status": "unpaid"
+          },
+          {
+            "amount": "900",
+            "client": "Gamma",
+            "due_date": "2026-09-27",
+            "email": "c@example.com",
+            "invoice_no": "INV-3",
+            "last_reminded": "",
+            "status": "paid"
+          }
+        ],
+        "writes": [
+          {
+            "invoice_no": "INV-1",
+            "last_reminded": "2026-09-24"
+          },
+          {
+            "invoice_no": "INV-2",
+            "last_reminded": "2026-09-24"
+          }
+        ]
+      }
+    },
     "status": "passed"
   },
   "Q07-gmail-ai-auto-labeler": {

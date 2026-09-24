@@ -148,6 +148,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Gemini Chat Model**, **Google Sheets**, **HTTP Request**, **Jira Software**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Sales` | [Sales.csv](../../templates/P12-weekly-exec-kpi-report/Sales.csv) | `date`, `orders`, `revenue` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -389,7 +399,37 @@ Static data only saves in **active** (scheduled) runs, not manual ones.
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add **support backlog** as a 4th KPI.
+
+<details><summary>💡 Hint</summary>
+
+Add a 4th branch and a 4th Merge input.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Add Jira `project = SUP AND statusCategory != Done` (or your helpdesk API) → Aggregate → Merge input 4 (set *Number of inputs* to 4). Add `support_backlog` in Compute KPIs; the table and narrative pick it up automatically.
+
+</details>
+
+**⭐⭐ Challenge 2:** Keep **12 weeks** of KPIs and chart the trend.
+
+<details><summary>💡 Hint</summary>
+
+Static data isn't history. Store weekly rows.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After Compute KPIs, append `{week: $today.startOf('week').toISODate(), ...kpis}` to a `KPIs` sheet. Read the last 12 rows for a line chart (QuickChart `line`). Trends show whether a change is a blip or a direction.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add NPS or support backlog from your helpdesk API.
 - Post to Slack with the chart as an image.

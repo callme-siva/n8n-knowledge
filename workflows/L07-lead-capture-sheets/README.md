@@ -96,6 +96,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `Leads` | [Leads.csv](../../templates/L07-lead-capture-sheets/Leads.csv) | `timestamp`, `email`, `name`, `company`, `budget`, `interest`, `source` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -195,7 +205,37 @@ Test URLs listen only while you click *Execute*. Use the Production URL once the
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Reject personal email domains (gmail, yahoo, hotmail) with a polite message.
+
+<details><summary>💡 Hint</summary>
+
+Add an IF after *Clean Lead*.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+IF `{{ /@(gmail|yahoo|hotmail|outlook)\./i.test($json.email) }}` *is true*: send a "please use your work email" reply and stop. On false, continue to Sheets.
+
+</details>
+
+**⭐⭐ Challenge 2:** Don't store duplicate leads. Update the existing row instead.
+
+<details><summary>💡 Hint</summary>
+
+Sheets has an *Append or Update* operation with a matching column.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Change the Sheets operation to **Append or Update Row**, matching column `email`. Resubmitting the form now updates the same row (like Q06 and P04).
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add a duplicate check: *Sheets → Get rows* filtered by email before appending.
 - Score the lead with AI and route hot leads to Slack (see **L22**).

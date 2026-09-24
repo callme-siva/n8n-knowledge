@@ -364,7 +364,37 @@ Static data survives restarts but not re-imports. For production, keep state in 
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Include a **runbook link** per alert name in the Slack message.
+
+<details><summary>💡 Hint</summary>
+
+A small lookup table in code.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+In *Decide Action*: `const RUNBOOKS = { HighErrorRate: 'https://wiki/runbooks/5xx', DiskFilling: 'https://wiki/runbooks/disk' };` and add `runbook: RUNBOOKS[a.labels?.alertname] || ''` to the output. Show it in Slack.
+
+</details>
+
+**⭐⭐ Challenge 2:** **Escalate** if nobody acknowledges a P1 within 10 minutes.
+
+<details><summary>💡 Hint</summary>
+
+Wait, then check an acknowledgement flag.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+After paging, add **Wait 10 min** → Jira *Get issue* → IF the status is still *Open* (nobody picked it up), page the secondary on-call and post *"Escalated"* in Slack. For a real ack button, use Slack **Send and Wait** as the page.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Add an escalation Wait: if not acknowledged in 10 min, page the secondary on-call.
 - Update a public status page via API.

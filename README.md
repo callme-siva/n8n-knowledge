@@ -44,8 +44,8 @@ Retries, guards, idempotency, human approval, a global error handler. You learn 
 <tr>
 <td valign="top">
 
-### 📖 Build it yourself
-Every lesson has step-by-step build instructions, a test checklist and troubleshooting, not just a JSON to import.
+### 📖 Learn by doing
+Every lesson: **concept first**, build steps, **84 practice challenges** with hints and solutions, a quiz, and ready-made sheet templates.
 
 </td>
 <td valign="top">
@@ -265,7 +265,8 @@ Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, a
 | Build-it-yourself steps | ❌ | ✅ | ✅ |
 | Concept-first + system-context architecture per workflow | ❌ | ❌ | ✅ |
 | Design decisions & trade-offs | ❌ | rarely | ✅ all 12 projects |
-| Test data + test checklist | ❌ | sometimes | ✅ |
+| Test data, sheet templates, sample PDFs | ❌ | sometimes | ✅ |
+| Practice challenges with solutions | ❌ | sometimes | ✅ 84 + 30-question quiz |
 | Troubleshooting per workflow | ❌ | ❌ | ✅ |
 | Production practices | rarely | rarely | ✅ |
 | Every workflow executed in CI | ❌ | n/a | ✅ 44 workflows · 61 behaviour checks |
@@ -285,7 +286,8 @@ If you want *any* template for a niche app, the big collections are great. This 
 | 🧬 [Workflow anatomy](docs/workflow-anatomy.md) | Every property inside a workflow.json, plus an expressions cheat sheet |
 | 🧯 [Common mistakes](docs/common-mistakes.md) | 40+ mistakes with fixes, a debugging flowchart and a pre-flight checklist |
 | 🧪 [Testing](docs/testing.md) · [E2E tests](tests/README.md) | Test in the editor, validate, and the automated end-to-end harness |
-| 🧾 [Sample data](docs/sample-data.md) | Made-up inputs for every AI lesson |
+| 🧾 [Sample data](docs/sample-data.md) · [📥 Templates](templates/) | Made-up inputs, **CSV templates for every sheet**, sample invoice / resume / policy PDFs |
+| 🧠 [Self-check quiz](docs/quiz.md) | 30 questions across all tracks, with answers |
 
 <details>
 <summary><b>📁 Repo layout</b></summary>

@@ -140,6 +140,16 @@ Replace these placeholder values with your own:
 
 Nodes that need a credential selected after import: **Gmail**, **Gmail Trigger**, **Google Gemini Chat Model**, **Google Sheets**.
 
+### 📥 Starter files
+
+Create each tab from its template, so column names match exactly: **Google Sheets → File → Import → Upload** the CSV → *Insert new sheet(s)*. The tab takes the file's name.
+
+| Tab | Template | Columns |
+|---|---|---|
+| `FAQ` | [FAQ.csv](../../templates/P02-support-inbox-copilot/FAQ.csv) | `answer`, `question` |
+
+<sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
+
 ## 🛠️ Build it step by step
 
 > [!TIP]
@@ -350,7 +360,37 @@ Models are overconfident. Keep the `needs_human` rule and tune the threshold wit
 
 </details>
 
-## 🚀 Level up
+## 🏋️ Practice
+
+Try each challenge **before** opening the hint. Solutions show the exact expressions and code.
+
+**⭐ Challenge 1:** Add the customer's **last order** to the AI context.
+
+<details><summary>💡 Hint</summary>
+
+Look it up by the sender's email before drafting.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Between Triage and Draft Answer, add **Sheets → Get rows** from `Orders` where `email = sender` (alwaysOutputData). Include `{{ JSON.stringify($json) }}` in the prompt as *"Customer context"*. Answers become specific, not generic.
+
+</details>
+
+**⭐⭐ Challenge 2:** Measure the copilot: how often do agents send the draft **unchanged**?
+
+<details><summary>💡 Hint</summary>
+
+Compare the AI draft with what was actually sent.
+
+</details>
+<details><summary>✅ Solution</summary>
+
+Store `{threadId, draft}` in a sheet when drafting. A daily workflow reads your **Sent** mail for those threads and computes the similarity (e.g. the share of identical sentences). Report the % sent unchanged, by FAQ entry. That tells you which answers to fix and when auto-send might be safe.
+
+</details>
+
+## 🚀 Ideas to extend it
 
 - Track draft → sent edits to measure AI accuracy.
 - Replace the FAQ sheet with RAG over your help centre (L13).
