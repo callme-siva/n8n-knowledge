@@ -247,6 +247,22 @@
     },
     {
       "parameters": {
+        "content": "⚠️ A repeat invoice is dropped **silently** here — no exception row, no email.\nThat's by design (see the AP-team overload it prevents), but it's why running the same test PDF twice looks like nothing happened the 2nd time.",
+        "width": 300,
+        "height": 150,
+        "color": 4
+      },
+      "id": "9a20a9fc-f8f0-58ff-92c9-6768a7648217",
+      "name": "Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        320
+      ]
+    },
+    {
+      "parameters": {
         "operation": "removeItemsSeenInPreviousExecutions",
         "dedupeValue": "={{ $json.dedupe_key }}",
         "options": {

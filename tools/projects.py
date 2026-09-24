@@ -44,6 +44,7 @@ def P01(root):
         "return { json: { ...x, subtotal: sub || null, tax_total: tax || null, grand_total: total, file: src.file, from: src.from,\n"
         "  dedupe_key: `${(x.vendor_name || '').toLowerCase().replace(/\\W/g, '')}|${x.invoice_number}`, valid: errors.length === 0, errors: errors.join('; ') } };"}, (1040, 0))
     w.add("Valid?", "if", 2.2, {"conditions": conditions(cond("={{ $json.valid }}", "boolean", "true")), "options": {}}, (1240, 0))
+    w.note("⚠️ A repeat invoice is dropped **silently** here — no exception row, no email.\nThat's by design (see the AP-team overload it prevents), but it's why running the same test PDF twice looks like nothing happened the 2nd time.", (1440, 320), 300, 150, 4)
     w.add("Block Duplicates", "removeDuplicates", 2, {"operation": "removeItemsSeenInPreviousExecutions", "dedupeValue": "={{ $json.dedupe_key }}", "options": {"historySize": 100000}}, (1440, -120))
     w.add("Needs Approval?", "if", 2.2, {"conditions": conditions(cond("={{ $json.grand_total }}", "number", "gt", f"={{{{ {CFG}.approval_limit }}}}")), "options": {}}, (1640, -120))
     w.add("Ask Approver", "gmail", 2.1, approval(f"={{{{ {CFG}.approver_email }}}}", "=Approve ₹{{ $json.grand_total }} invoice from {{ $json.vendor_name }}?",
