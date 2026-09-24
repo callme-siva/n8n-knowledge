@@ -12,7 +12,7 @@
 
 | Option | Best for | Cost | 24/7 schedules? |
 |---|---|---|---|
-| **n8n Cloud** (n8n.io → Get started) | Fastest start, no install | 14-day trial, then paid | ✅ |
+| **[n8n Cloud](https://app.n8n.cloud/register)** — sign up, no card | Fastest start, no install | 14-day trial, then paid | ✅ |
 | **npx** on your laptop | Learning L01–L15 | Free | ❌ only while the laptop is on |
 | **Docker** on laptop / VPS | Serious use, L19–L21 | Free (plus VPS about ₹500/month) | ✅ on a VPS |
 

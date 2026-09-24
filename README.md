@@ -14,6 +14,8 @@
 
 [🚀 Start](#-start-in-3-steps) · [🗺️ Learning path](#-the-learning-path) · [🖼️ Gallery](#-gallery) · [🏗️ Architecture](docs/architecture.md) · [🧯 Mistakes](docs/common-mistakes.md) · [🧪 Testing](docs/testing.md) · [🤝 Contribute](CONTRIBUTING.md)
 
+**No n8n yet?** → **[Start a free n8n Cloud trial](https://app.n8n.cloud/register)** (no card, 14 days) or run `npx n8n` locally — either way, [L01](workflows/L01-hello-n8n/README.md) takes 10 minutes. Don't wait to have it all figured out; open L01 and go.
+
 </div>
 
 ---
@@ -69,7 +71,7 @@ Every push **executes all 44 workflows in real n8n** with 61 behaviour checks, a
 
 | | Step | Guide |
 |:-:|---|---|
-| **1** | Run n8n (Cloud trial, `npx n8n`, or Docker) | [getting-started.md](docs/getting-started.md) |
+| **1** | Run n8n: [free Cloud trial](https://app.n8n.cloud/register) (no install), `npx n8n`, or Docker | [getting-started.md](docs/getting-started.md) |
 | **2** | Add credentials once: Gemini key, Google, Jira | [credentials.md](docs/credentials.md) |
 | **3** | Open **L01** and work down the list | [L01 · Hello n8n](workflows/L01-hello-n8n/README.md) |
 
