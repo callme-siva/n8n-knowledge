@@ -164,6 +164,20 @@ def split_cred(c):
     return c, ""
 
 
+def render_checklist(items):
+    """Render '## Test it' bullets as '- [ ] text'. An item containing a fenced code block
+    (e.g. a curl command) can't be a list item: GFM only opens a fence at the start of a line,
+    so '- [ ] ```bash' renders as literal backtick text, not a code block (confirmed on GitHub).
+    Such items are rendered as their own paragraph instead, keeping the fence unindented."""
+    L = []
+    for x in items:
+        if "```" in x:
+            L += ["", x.strip(), ""]
+        else:
+            L.append(f"- [ ] {x}")
+    return L
+
+
 def readme(num, title, level, domain, time, story, learn, flow, creds, steps, test, errors, extend):
     return dict(num=num, title=title, level=level, domain=domain, time=time, story=story, learn=learn,
                 flow=flow, creds=creds, steps=steps, test=test, errors=errors, extend=extend)
@@ -268,7 +282,7 @@ def render_readme(r, data, diagram):
     elif t and t.get("status") == "passed":
         L += ["> [!TIP]", f"> **Automated end-to-end test: passed.** {t.get('nodes_ran')}/{t.get('real_nodes', 0) + t.get('mocked_nodes', 0)} nodes executed in real n8n "
               f"({t.get('mocked_nodes')} credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), {t.get('checks', 0)} behaviour checks. See [tests/](../../tests/README.md).", ""]
-    L += [*[f"- [ ] {x}" for x in r["test"]], "",
+    L += [*render_checklist(r["test"]), "",
           "## 🧯 Troubleshooting", "",
           "Problems specific to this workflow are below. For general ones (expressions, items, triggers, AI), see [common mistakes](../../docs/common-mistakes.md).", ""]
     for a, b in r["errors"]:

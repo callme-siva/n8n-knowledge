@@ -356,9 +356,11 @@ return { json: { ...a, jira_key: $json.key } };
 > [!TIP]
 > **Automated end-to-end test: passed.** 10/12 nodes executed in real n8n (6 credentialed or AI nodes replaced by fixtures, so AI output itself isn't tested), 4 behaviour checks. See [tests/](../../tests/README.md).
 
-- [ ] ```bash
+
+```bash
 curl -X POST https://<n8n>/webhook/alerts -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{"alerts":[{"status":"firing","fingerprint":"abc","labels":{"alertname":"HighErrorRate","severity":"critical","service":"payments"},"annotations":{"summary":"5xx > 5% for 5m"},"startsAt":"2026-09-23T10:00:00Z"}]}'
 ```
+
 - [ ] Send the same payload 3 times: only **one** Jira issue and one page.
 - [ ] Send it again with `"status":"resolved"` and `"endsAt"`: you should get a postmortem draft in Slack.
 
