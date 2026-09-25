@@ -122,7 +122,7 @@ Why it's built this way, and what it costs.
 |---|---|
 | Jira Software Cloud API token | [docs/credentials.md](../../docs/credentials.md) |
 | GitHub API token | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (tab `Sales` from Q05) | [docs/credentials.md](../../docs/credentials.md) |
+| Google Sheets OAuth2 | tab `Sales` from Q05 |
 | Google Gemini API key | [docs/credentials.md](../../docs/credentials.md) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 

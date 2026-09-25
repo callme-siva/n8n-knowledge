@@ -139,6 +139,31 @@ def badge(label, value, color):
     return f"![{label}: {value}](https://img.shields.io/badge/{q(label)}-{q(value)}-{color}?style=flat-square)"
 
 
+def split_cred(c):
+    """Split a credentials-table entry into (name, detail).
+    Prefers a ': ' that sits outside any parentheses ("SerpAPI key: free at serpapi.com" ->
+    "SerpAPI key" / "free at serpapi.com"), so a colon inside a parenthetical detail
+    ("Google Sheets OAuth2 (tab `Errors`: time, workflow, ...)") never splits the name mid-sentence.
+    With no such colon, unwraps a single trailing "(...)" as the detail instead.
+    Plain strings with neither ("Gmail OAuth2") return an empty detail."""
+    c = c.strip()
+    depth, colon_at, paren_at = 0, None, None
+    for i, ch in enumerate(c):
+        if ch == "(":
+            if depth == 0 and paren_at is None:
+                paren_at = i
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        elif ch == ":" and depth == 0 and colon_at is None and c[i:i + 2] == ": ":
+            colon_at = i
+    if colon_at is not None:
+        return c[:colon_at].strip(), c[colon_at + 2:].strip()
+    if paren_at is not None and c.endswith(")"):
+        return c[:paren_at].strip(), c[paren_at + 1:-1].strip()
+    return c, ""
+
+
 def readme(num, title, level, domain, time, story, learn, flow, creds, steps, test, errors, extend):
     return dict(num=num, title=title, level=level, domain=domain, time=time, story=story, learn=learn,
                 flow=flow, creds=creds, steps=steps, test=test, errors=errors, extend=extend)
@@ -226,8 +251,8 @@ def render_readme(r, data, diagram):
     L += ["## 🔑 Credentials", "", "| You need | Where to get it |", "|---|---|"]
     if r["creds"]:
         for c in r["creds"]:
-            name, _, rest = c.partition(": ")
-            L.append(f"| {name.strip()} | {rest.strip() or '[docs/credentials.md](../../docs/credentials.md)'} |")
+            name, rest = split_cred(c)
+            L.append(f"| {name} | {rest or '[docs/credentials.md](../../docs/credentials.md)'} |")
     else:
         L.append("| Nothing | Runs with zero setup |")
     L += ["", placeholders(data), *starter_files(r.get("slug", ""), r["num"])]

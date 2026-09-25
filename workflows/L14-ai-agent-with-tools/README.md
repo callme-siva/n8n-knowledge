@@ -81,7 +81,7 @@ flowchart LR
 
 | You need | Where to get it |
 |---|---|
-| Google Gemini API key (all tools used here are free and keyless) | [docs/credentials.md](../../docs/credentials.md) |
+| Google Gemini API key | all tools used here are free and keyless |
 
 ## 📝 Before you run it
 

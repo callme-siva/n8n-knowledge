@@ -111,7 +111,7 @@ Why it's built this way, and what it costs.
 
 | You need | Where to get it |
 |---|---|
-| Header Auth credential (e.g. `Authorization | Bearer <long random>`) |
+| Header Auth credential | e.g. `Authorization: Bearer <long random>` |
 | Jira Software Cloud API token | [docs/credentials.md](../../docs/credentials.md) |
 | Slack API | [docs/credentials.md](../../docs/credentials.md) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |

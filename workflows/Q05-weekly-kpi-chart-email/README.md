@@ -73,7 +73,7 @@ flowchart LR
 
 | You need | Where to get it |
 |---|---|
-| Google Sheets OAuth2 (tab `Sales` | date, revenue, orders) |
+| Google Sheets OAuth2 | tab `Sales`: date, revenue, orders |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

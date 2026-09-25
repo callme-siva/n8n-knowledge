@@ -83,7 +83,7 @@ flowchart LR
 
 | You need | Where to get it |
 |---|---|
-| Google Gemini API key (used for chat and embeddings) | [docs/credentials.md](../../docs/credentials.md) |
+| Google Gemini API key | used for chat and embeddings |
 
 ## 📝 Before you run it
 

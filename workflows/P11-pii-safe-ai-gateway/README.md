@@ -97,9 +97,9 @@ Why it's built this way, and what it costs.
 
 | You need | Where to get it |
 |---|---|
-| Header Auth credential (e.g. `X-API-Key | <long random>`) |
+| Header Auth credential | e.g. `X-API-Key: <long random>` |
 | Google Gemini API key | use a **paid-tier** key for real data. On the free tier, Google may use prompts to improve its products, which defeats the point of a PII gateway (see ai.google.dev/gemini-api/terms) |
-| Google Sheets OAuth2 (tab `AI_Audit` | time, user, outcome, pii_counts, prompt_redacted) |
+| Google Sheets OAuth2 | tab `AI_Audit`: time, user, outcome, pii_counts, prompt_redacted |
 
 ## 📝 Before you run it
 

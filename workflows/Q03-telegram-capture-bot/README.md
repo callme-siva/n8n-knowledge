@@ -72,7 +72,7 @@ flowchart LR
 | You need | Where to get it |
 |---|---|
 | Telegram bot token | talk to **@BotFather** → `/newbot` |
-| Google Sheets OAuth2 (tab `Inbox` | time, chat_id, from, kind, amount, category, text, reply) |
+| Google Sheets OAuth2 | tab `Inbox`: time, chat_id, from, kind, amount, category, text, reply |
 
 ## 📝 Before you run it
 

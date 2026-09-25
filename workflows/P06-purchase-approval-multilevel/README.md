@@ -116,7 +116,7 @@ Why it's built this way, and what it costs.
 | You need | Where to get it |
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (tab `Team` | email, manager_email; tab `Requests`: request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided) |
+| Google Sheets OAuth2 | tab `Team`: email, manager_email; tab `Requests`: request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided |
 
 ## 📝 Before you run it
 

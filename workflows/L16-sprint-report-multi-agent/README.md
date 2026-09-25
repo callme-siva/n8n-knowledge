@@ -93,7 +93,7 @@ flowchart TB
 
 | You need | Where to get it |
 |---|---|
-| GitHub API token (classic PAT with `read:project`, `repo`) | [docs/credentials.md](../../docs/credentials.md) |
+| GitHub API token | classic PAT with `read:project`, `repo` |
 | Google Gemini API key | [docs/credentials.md](../../docs/credentials.md) |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 

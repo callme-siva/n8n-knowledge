@@ -66,7 +66,7 @@ flowchart LR
 
 | You need | Where to get it |
 |---|---|
-| Google Calendar OAuth2 (same Google Cloud project as Gmail) | [docs/credentials.md](../../docs/credentials.md) |
+| Google Calendar OAuth2 | same Google Cloud project as Gmail |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

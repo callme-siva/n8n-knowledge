@@ -94,7 +94,7 @@ Why it's built this way, and what it costs.
 | You need | Where to get it |
 |---|---|
 | Google Gemini API key | [docs/credentials.md](../../docs/credentials.md) |
-| SerpAPI key (100 free searches a month) | [docs/credentials.md](../../docs/credentials.md) |
+| SerpAPI key | 100 free searches a month |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

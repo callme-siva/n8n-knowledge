@@ -79,7 +79,7 @@ flowchart TB
 
 | You need | Where to get it |
 |---|---|
-| Telegram bot token (add the bot as an **admin** of your channel) | [docs/credentials.md](../../docs/credentials.md) |
+| Telegram bot token | add the bot as an **admin** of your channel |
 
 ## 📝 Before you run it
 

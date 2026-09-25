@@ -83,7 +83,7 @@ flowchart TB
 | You need | Where to get it |
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (tab `Uptime` | time, name, url, status, code, ms, changed, since, error) |
+| Google Sheets OAuth2 | tab `Uptime`: time, name, url, status, code, ms, changed, since, error |
 
 ## 📝 Before you run it
 

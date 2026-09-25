@@ -100,7 +100,7 @@ Why it's built this way, and what it costs.
 
 | You need | Where to get it |
 |---|---|
-| Google Sheets OAuth2 (tab `Companies` | row_id, company, website, description, status, industry, b2b, icp_score, reason, processed_at) |
+| Google Sheets OAuth2 | tab `Companies`: row_id, company, website, description, status, industry, b2b, icp_score, reason, processed_at |
 | Google Gemini API key | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

@@ -95,7 +95,7 @@ Why it's built this way, and what it costs.
 
 | You need | Where to get it |
 |---|---|
-| Google Sheets OAuth2 (tab `Backlog` | row_id, summary, description, priority, jira_key, sync_hash, synced_at) |
+| Google Sheets OAuth2 | tab `Backlog`: row_id, summary, description, priority, jira_key, sync_hash, synced_at |
 | Jira Software Cloud API token | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

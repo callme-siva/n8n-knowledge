@@ -69,7 +69,7 @@ flowchart LR
 | You need | Where to get it |
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (tab `Errors` | time, workflow, workflow_id, node, message, hint, url, mode) |
+| Google Sheets OAuth2 | tab `Errors`: time, workflow, workflow_id, node, message, hint, url, mode |
 
 ## 📝 Before you run it
 

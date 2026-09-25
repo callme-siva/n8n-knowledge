@@ -68,7 +68,7 @@ flowchart LR
 | You need | Where to get it |
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
-| Google Drive OAuth2 (the same Google Cloud project works, see docs/credentials.md) | [docs/credentials.md](../../docs/credentials.md) |
+| Google Drive OAuth2 | the same Google Cloud project works, see docs/credentials.md |
 
 ## 📝 Before you run it
 

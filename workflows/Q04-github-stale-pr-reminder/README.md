@@ -73,7 +73,7 @@ flowchart TB
 
 | You need | Where to get it |
 |---|---|
-| GitHub API token (read access to the repo) | [docs/credentials.md](../../docs/credentials.md) |
+| GitHub API token | read access to the repo |
 | Slack app with `chat:write` scope | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

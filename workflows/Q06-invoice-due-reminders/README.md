@@ -77,7 +77,7 @@ flowchart TB
 
 | You need | Where to get it |
 |---|---|
-| Google Sheets OAuth2 (tab `Invoices`) | [docs/credentials.md](../../docs/credentials.md) |
+| Google Sheets OAuth2 | tab `Invoices` |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

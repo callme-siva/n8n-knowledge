@@ -120,8 +120,8 @@ Why it's built this way, and what it costs.
 | You need | Where to get it |
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
-| Google Gemini API key (paid tier for real invoices | free-tier prompts may be used by Google to improve its products) |
-| Google Sheets OAuth2 (tabs `Ledger` with a `dedupe_key` column, `Exceptions`) | [docs/credentials.md](../../docs/credentials.md) |
+| Google Gemini API key | paid tier for real invoices: free-tier prompts may be used by Google to improve its products |
+| Google Sheets OAuth2 | tabs `Ledger` with a `dedupe_key` column, `Exceptions` |
 
 ## 📝 Before you run it
 

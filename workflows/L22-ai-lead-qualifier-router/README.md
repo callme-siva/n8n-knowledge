@@ -87,7 +87,7 @@ flowchart TB
 | You need | Where to get it |
 |---|---|
 | Google Gemini API key | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (tab `Leads` | time, name, email, company, score, tier, reason, use_case, reply) |
+| Google Sheets OAuth2 | tab `Leads`: time, name, email, company, score, tier, reason, use_case, reply |
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

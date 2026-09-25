@@ -107,7 +107,7 @@ Why it's built this way, and what it costs.
 |---|---|
 | Gmail OAuth2 | [docs/credentials.md](../../docs/credentials.md) |
 | Google Gemini API key | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (tab `FAQ` | question, answer) |
+| Google Sheets OAuth2 | tab `FAQ`: question, answer |
 | Slack API | [docs/credentials.md](../../docs/credentials.md) |
 
 ## 📝 Before you run it

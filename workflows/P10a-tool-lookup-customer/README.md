@@ -52,7 +52,7 @@ flowchart LR
 
 | You need | Where to get it |
 |---|---|
-| Google Sheets OAuth2 (tab `Customers` | email, name, plan, mrr, status, last_ticket) |
+| Google Sheets OAuth2 | tab `Customers`: email, name, plan, mrr, status, last_ticket |
 
 ## 📝 Before you run it
 

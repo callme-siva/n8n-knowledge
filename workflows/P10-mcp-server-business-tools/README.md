@@ -76,8 +76,8 @@ Why it's built this way, and what it costs.
 
 | You need | Where to get it |
 |---|---|
-| Bearer auth credential (make a long random token) | [docs/credentials.md](../../docs/credentials.md) |
-| Google Sheets OAuth2 (for P10a) | [docs/credentials.md](../../docs/credentials.md) |
+| Bearer auth credential | make a long random token |
+| Google Sheets OAuth2 | for P10a |
 
 ## 📝 Before you run it
 

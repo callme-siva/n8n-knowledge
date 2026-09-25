@@ -83,7 +83,7 @@ flowchart TB
 
 | You need | Where to get it |
 |---|---|
-| Gmail OAuth2 (open.er-api.com needs no key) | [docs/credentials.md](../../docs/credentials.md) |
+| Gmail OAuth2 | open.er-api.com needs no key |
 
 ## 📝 Before you run it
 
