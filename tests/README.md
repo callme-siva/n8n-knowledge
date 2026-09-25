@@ -2,7 +2,7 @@
 
 # 🧪 End-to-end tests
 
-**Every push imports all 46 workflows into a real n8n and runs 45 of them, with 95 behaviour checks.** Credentialed and AI nodes are replaced with fixtures, so these tests prove logic, wiring and routing, not the quality of AI output.
+**Every push imports all 47 workflows into a real n8n and runs 46 of them, with 98 behaviour checks.** Credentialed and AI nodes are replaced with fixtures, so these tests prove logic, wiring and routing, not the quality of AI output.
 
 </div>
 

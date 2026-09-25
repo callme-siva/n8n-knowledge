@@ -253,4 +253,4 @@ After *Max 5 per Run*, add a Basic LLM Chain + Gemini: *"Write one catchy line (
 
 ---
 
-<p align="center"><a href="../Q07-gmail-ai-auto-labeler/README.md">← Q07 · Gmail AI auto-labeler</a> &nbsp;·&nbsp; <a href="../../README.md#-the-learning-path">📚 All lessons</a> &nbsp;·&nbsp; 🏁 End of Quick wins</p>
+<p align="center"><a href="../Q07-gmail-ai-auto-labeler/README.md">← Q07 · Gmail AI auto-labeler</a> &nbsp;·&nbsp; <a href="../../README.md#-the-learning-path">📚 All lessons</a> &nbsp;·&nbsp; <a href="../Q09-jira-issue-alert-email/README.md">Q09 · Jira issue alert → email →</a></p>

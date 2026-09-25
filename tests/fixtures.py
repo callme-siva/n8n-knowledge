@@ -19,6 +19,9 @@ TRIGGERS = {
         "_binary": {"attachment_0": {"fileName": "bill.pdf", "mimeType": "application/pdf", "file": "invoice-valid.pdf"}, "attachment_1": {"fileName": "logo.png", "mimeType": "image/png"}}}],
     "L07-lead-capture-sheets": [{"Name": "  Asha Rao ", "Email": "Asha@Finlytics.example.com", "Company": "Finlytics", "Interested in": "AI agents", "Monthly budget (USD)": "$500 – $2,000"}],
     "L09-webhook-expense-api": [{"body": {"amount": 450, "category": "Food", "note": "team lunch", "user": "asha"}}],
+    "Q09-jira-issue-alert-email": [{"body": {"webhookEvent": "jira:issue_created", "issue": {"key": "PROJ-123", "fields": {
+        "summary": "Login button does nothing", "issuetype": {"name": "Bug"}, "priority": {"name": "High"}, "status": {"name": "To Do"},
+        "reporter": {"displayName": "Asha Rao"}, "assignee": None, "project": {"key": "PROJ", "name": "Platform"}}}}}],
     "L10-form-bug-report-jira": [{"Your email": "tester@example.com", "What is broken?": "Login button does nothing", "Steps to reproduce": "1. Open app 2. Click Login", "Severity": "Blocker — cannot work", "Page / module": "Auth"}],
     "L12-meeting-transcript-raid-log": [{"Meeting Title": "Payments Revamp weekly", "Meeting Date": "2026-09-12", "Meeting Type": "Project Status Meeting", "Transcript": "Anita: go-live 15 Oct. Ravi: bank sandbox down twice…"}],
     "L13-rag-policy-chatbot": [{"chatInput": "How many casual leaves can I carry forward?", "sessionId": "s1"}],
@@ -188,5 +191,6 @@ EXPECT = {
     "Q04-github-stale-pr-reminder": [("contains", "Find Stale", "\"count\":1")],
     "Q05-weekly-kpi-chart-email": [("contains", "Group by Week", "\"labels\"")],
     "Q08-rss-to-telegram-dedupe": [("count", "Recent Only", 0, 6), ("count", "Post to Channel", 0, 6), ("contains", "Oldest First", "p5\"")],
+    "Q09-jira-issue-alert-email": [("count", "Worth Alerting?", 0, 1), ("contains", "Extract Issue", "\"key\":\"PROJ-123\""), ("contains", "Worth Alerting?", "\"priority\":\"High\"")],
     "Q06-invoice-due-reminders": [("count", "Stage", 0, 1), ("count", "Stage", 1, 1), ("count", "Write Back", 0, 2)],
 }

@@ -1,3 +1,3 @@
 logged_at,category,description,impact,meeting_date,meeting_title,meeting_type,mitigation,owner
-2026-09-25T09:24:17.027+05:30,Risk,Bank sandbox unstable,Testing slips,2026-09-12,Payments Revamp weekly,Project Status Meeting,Chase bank,Ravi
-2026-09-25T09:24:17.029+05:30,Dependency,Pen-test sign-off,Blocks go-live,2026-09-12,Payments Revamp weekly,Project Status Meeting,Book slot,Security
+2026-09-25T10:57:47.082+05:30,Risk,Bank sandbox unstable,Testing slips,2026-09-12,Payments Revamp weekly,Project Status Meeting,Chase bank,Ravi
+2026-09-25T10:57:47.085+05:30,Dependency,Pen-test sign-off,Blocks go-live,2026-09-12,Payments Revamp weekly,Project Status Meeting,Book slot,Security

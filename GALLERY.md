@@ -2,7 +2,7 @@
 
 # 🖼️ Gallery
 
-**Every workflow's canvas, 44 in total.** Click one to open its lesson.
+**Every workflow's canvas, 45 in total.** Click one to open its lesson.
 
 </div>
 
@@ -68,31 +68,34 @@
 <td width="50%" align="center" valign="top"><a href="workflows/Q08-rss-to-telegram-dedupe/README.md"><img src="workflows/Q08-rss-to-telegram-dedupe/canvas.svg" alt="Q08 canvas"></a><br/><b>Q08</b> · RSS → Telegram channel with dedupe across runs</td>
 </tr>
 <tr>
+<td width="50%" align="center" valign="top"><a href="workflows/Q09-jira-issue-alert-email/README.md"><img src="workflows/Q09-jira-issue-alert-email/canvas.svg" alt="Q09 canvas"></a><br/><b>Q09</b> · Jira issue alert → email</td>
 <td width="50%" align="center" valign="top"><a href="workflows/P01-invoice-processing-pipeline/README.md"><img src="workflows/P01-invoice-processing-pipeline/canvas.svg" alt="P01 canvas"></a><br/><b>P01</b> · Accounts-payable invoice pipeline</td>
+</tr>
+<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P02-support-inbox-copilot/README.md"><img src="workflows/P02-support-inbox-copilot/canvas.svg" alt="P02 canvas"></a><br/><b>P02</b> · Support inbox copilot</td>
-</tr>
-<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P03-incident-response-orchestrator/README.md"><img src="workflows/P03-incident-response-orchestrator/canvas.svg" alt="P03 canvas"></a><br/><b>P03</b> · Incident response orchestrator</td>
+</tr>
+<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P04-sales-followup-sequence/README.md"><img src="workflows/P04-sales-followup-sequence/canvas.svg" alt="P04 canvas"></a><br/><b>P04</b> · Multi-touch sales follow-up sequence</td>
-</tr>
-<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P05-bulk-ai-enrichment-checkpointed/README.md"><img src="workflows/P05-bulk-ai-enrichment-checkpointed/canvas.svg" alt="P05 canvas"></a><br/><b>P05</b> · Bulk AI enrichment with batches and checkpoints</td>
+</tr>
+<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P06-purchase-approval-multilevel/README.md"><img src="workflows/P06-purchase-approval-multilevel/canvas.svg" alt="P06 canvas"></a><br/><b>P06</b> · Purchase request with multi-level approval</td>
-</tr>
-<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P07-employee-onboarding-orchestrator/README.md"><img src="workflows/P07-employee-onboarding-orchestrator/canvas.svg" alt="P07 canvas"></a><br/><b>P07</b> · Employee onboarding orchestrator</td>
+</tr>
+<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P08-sheets-jira-sync-hashing/README.md"><img src="workflows/P08-sheets-jira-sync-hashing/canvas.svg" alt="P08 canvas"></a><br/><b>P08</b> · Sheets → Jira sync with change detection</td>
-</tr>
-<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P09-deep-research-agent/README.md"><img src="workflows/P09-deep-research-agent/canvas.svg" alt="P09 canvas"></a><br/><b>P09</b> · Deep research agent</td>
+</tr>
+<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P10-mcp-server-business-tools/README.md"><img src="workflows/P10-mcp-server-business-tools/canvas.svg" alt="P10 canvas"></a><br/><b>P10</b> · MCP server for company tools</td>
-</tr>
-<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/P11-pii-safe-ai-gateway/README.md"><img src="workflows/P11-pii-safe-ai-gateway/canvas.svg" alt="P11 canvas"></a><br/><b>P11</b> · PII-safe AI gateway</td>
-<td width="50%" align="center" valign="top"><a href="workflows/P12-weekly-exec-kpi-report/README.md"><img src="workflows/P12-weekly-exec-kpi-report/canvas.svg" alt="P12 canvas"></a><br/><b>P12</b> · Weekly executive KPI report</td>
 </tr>
 <tr>
+<td width="50%" align="center" valign="top"><a href="workflows/P12-weekly-exec-kpi-report/README.md"><img src="workflows/P12-weekly-exec-kpi-report/canvas.svg" alt="P12 canvas"></a><br/><b>P12</b> · Weekly executive KPI report</td>
 <td width="50%" align="center" valign="top"><a href="workflows/X01-debug-order-report/README.md"><img src="workflows/X01-debug-order-report/canvas.svg" alt="X01 canvas"></a><br/><b>X01</b> · Debug me: the paid-orders report</td>
+</tr>
+<tr>
 <td width="50%" align="center" valign="top"><a href="workflows/X02-debug-top-leads/README.md"><img src="workflows/X02-debug-top-leads/canvas.svg" alt="X02 canvas"></a><br/><b>X02</b> · Debug me: the top-2 leads list</td>
 </tr>
 </table>

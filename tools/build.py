@@ -66,21 +66,45 @@ s = re.sub(r"<!-- GALLERY:START -->.*<!-- GALLERY:END -->", lambda m: "<!-- GALL
 open(p, "w").write(s)
 print("README tables + gallery updated")
 
-# ---- counts quoted in the docs come from the test fixtures, never typed by hand
+# ---- counts quoted in the docs come from the test fixtures and REGISTRY, never typed by hand
 sys.path.insert(0, os.path.join(ROOT, "tests"))
 from fixtures import EXPECT
 n_checks = sum(map(len, EXPECT.values()))
 n_wf = len(os.listdir(os.path.join(ROOT, "workflows")))
 n_run = n_wf - 1   # P10 (MCP server) is structure-checked only
-for f in ("README.md", "tests/README.md", "docs/testing.md"):
+by_track = {}
+for r in REGISTRY:
+    if r["num"].endswith("a") or r["level"].startswith("🐞"):
+        continue
+    by_track.setdefault(r["num"][0], []).append(r["num"])
+n_core, n_quick, n_proj = len(by_track.get("L", [])), len(by_track.get("Q", [])), len(by_track.get("P", []))
+n_lessons = n_core + n_quick + n_proj
+last_q = f"Q{n_quick:02d}"
+from exercises import EX
+n_ex = sum(len(v) for v in EX.values())
+for f in ("README.md", "tests/README.md", "docs/testing.md", "docs/architecture.md", "docs/quiz.md", "docs/real-world-guide.md"):
     p = os.path.join(ROOT, f); t = open(p).read()
     t = re.sub(r"\d+ behaviour checks", f"{n_checks} behaviour checks", t)
     t = re.sub(r"imports all \d+ workflows", f"imports all {n_wf} workflows", t)
     t = re.sub(r"runs \d+ of them", f"runs {n_run} of them", t)
     t = re.sub(r"runs \d+ of the \d+ workflows", f"runs {n_run} of the {n_wf} workflows", t)
     t = re.sub(r"✅ \d+ run ·", f"✅ {n_run} run ·", t)
+    t = re.sub(r"building \d+ workflows,", f"building {n_lessons} workflows,", t)
+    t = re.sub(r"across all \d+ workflows", f"across all {n_lessons} workflows", t)   # "all N workflows" alone also matches "imports all N workflows" above — too broad
+    t = re.sub(r"\d+ real workflows", f"{n_lessons} real workflows", t)
+    t = re.sub(r"Q01[–-]Q\d+", f"Q01–{last_q}", t)
+    t = re.sub(r"workflows-\d+-7C3AED", f"workflows-{n_lessons}-7C3AED", t)
+    if f == "README.md":   # "N quick wins" appears elsewhere (e.g. a rollout plan's "ship 3 quick wins") with an unrelated meaning
+        t = re.sub(r"\d+ quick wins", f"{n_quick} quick wins", t)
+        t = re.sub(r"\d+ practice challenges", f"{n_ex} practice challenges", t)
+        t = re.sub(r"✅ \d+ \+ 30-question quiz", f"✅ {n_ex} + 30-question quiz", t)
     open(p, "w").write(t)
-print(n_checks, "behaviour checks")
+banner = os.path.join(ROOT, "assets", "banner.svg")
+if os.path.exists(banner):
+    t = open(banner).read()
+    t = re.sub(r"\d+ real workflows", f"{n_lessons} real workflows", t)
+    open(banner, "w").write(t)
+print(n_checks, "behaviour checks ·", n_lessons, "lessons ·", n_quick, "quick wins")
 
 import roadmap
 roadmap.build(os.path.join(ROOT, "assets", "learning-path.svg"))

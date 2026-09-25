@@ -114,7 +114,7 @@
             "interest": "AI agents",
             "name": "Asha Rao",
             "source": "web-form",
-            "timestamp": "2026-09-25T09:26:15.989+05:30"
+            "timestamp": "2026-09-25T10:57:39.448+05:30"
           }
         ]
       }
@@ -219,7 +219,7 @@
             "category": "Risk",
             "description": "Bank sandbox unstable",
             "impact": "Testing slips",
-            "logged_at": "2026-09-25T09:24:17.027+05:30",
+            "logged_at": "2026-09-25T10:57:47.082+05:30",
             "meeting_date": "2026-09-12",
             "meeting_title": "Payments Revamp weekly",
             "meeting_type": "Project Status Meeting",
@@ -230,7 +230,7 @@
             "category": "Dependency",
             "description": "Pen-test sign-off",
             "impact": "Blocks go-live",
-            "logged_at": "2026-09-25T09:24:17.029+05:30",
+            "logged_at": "2026-09-25T10:57:47.085+05:30",
             "meeting_date": "2026-09-12",
             "meeting_title": "Payments Revamp weekly",
             "meeting_type": "Project Status Meeting",
@@ -359,7 +359,7 @@
             "message": "429 Too Many Requests",
             "mode": "trigger",
             "node": "Get Exchange Rate",
-            "time": "2026-09-25T03:54:29.291Z",
+            "time": "2026-09-25T05:27:58.186Z",
             "url": "https://n8n.example.com/execution/231",
             "workflow": "L04 \u00b7 Currency rate alert",
             "workflow_id": "7"
@@ -438,33 +438,33 @@
             "changed": false,
             "code": 200,
             "error": "",
-            "ms": 8314,
+            "ms": 10064,
             "name": "n8n website",
-            "since": "2026-09-25T03:54:42.291Z",
+            "since": "2026-09-25T05:28:12.886Z",
             "status": "UP",
-            "time": "2026-09-25T03:54:42.291Z",
+            "time": "2026-09-25T05:28:12.886Z",
             "url": "https://n8n.io"
           },
           {
             "changed": false,
             "code": 200,
             "error": "",
-            "ms": 8314,
+            "ms": 10064,
             "name": "GitHub API",
-            "since": "2026-09-25T03:54:42.291Z",
+            "since": "2026-09-25T05:28:12.886Z",
             "status": "UP",
-            "time": "2026-09-25T03:54:42.291Z",
+            "time": "2026-09-25T05:28:12.886Z",
             "url": "https://api.github.com"
           },
           {
             "changed": false,
-            "code": 404,
-            "error": "",
-            "ms": 8314,
+            "code": 0,
+            "error": "timeout of 10000ms exceeded",
+            "ms": 10064,
             "name": "Demo: always down",
-            "since": "2026-09-25T03:54:42.291Z",
+            "since": "2026-09-25T05:28:12.886Z",
             "status": "DOWN",
-            "time": "2026-09-25T03:54:42.291Z",
+            "time": "2026-09-25T05:28:12.886Z",
             "url": "https://httpstat.us/503"
           }
         ]
@@ -499,7 +499,7 @@
             "reply": "Hi Asha, \u2026",
             "score": "82",
             "tier": "hot",
-            "time": "2026-09-25T09:24:43.851+05:30",
+            "time": "2026-09-25T10:58:14.427+05:30",
             "use_case": "Invoice extraction"
           }
         ]
@@ -539,7 +539,7 @@
           {
             "file": "INV-4412.pdf",
             "invoice_no": "INV-4412",
-            "logged_at": "2026-09-25T09:26:22.572+05:30",
+            "logged_at": "2026-09-25T10:58:16.480+05:30",
             "reason": "subtotal + tax (11800) \u2260 total (12300)",
             "total": 12300,
             "vendor": "Acme Supplies Pvt Ltd"
@@ -574,7 +574,7 @@
             "gstin": "27PQRSX5678K1Z2",
             "invoice_date": "2026-09-01",
             "invoice_no": "INV-9001",
-            "logged_at": "2026-09-25T09:26:22.568+05:30",
+            "logged_at": "2026-09-25T10:58:16.476+05:30",
             "subtotal": 100000,
             "tax": 18000,
             "total": 118000,
@@ -668,13 +668,13 @@
             "email": "karan@studio.example.com",
             "name": "Karan",
             "need": "Automate social posting",
-            "started": "2026-09-25T09:24:50.627+05:30",
+            "started": "2026-09-25T10:58:21.159+05:30",
             "status": "email_1_sent"
           },
           {
             "email": "karan@studio.example.com",
             "status": "no_reply_closed",
-            "updated": "2026-09-25T09:24:52.671+05:30"
+            "updated": "2026-09-25T10:58:23.213+05:30"
           }
         ]
       }
@@ -742,7 +742,7 @@
             "b2b": "true",
             "icp_score": "78",
             "industry": "SaaS",
-            "processed_at": "2026-09-25T09:24:54.272+05:30",
+            "processed_at": "2026-09-25T10:58:24.845+05:30",
             "reason": "Digital, process-heavy",
             "row_id": "1",
             "status": "done"
@@ -751,7 +751,7 @@
             "b2b": "true",
             "icp_score": "78",
             "industry": "SaaS",
-            "processed_at": "2026-09-25T09:24:54.273+05:30",
+            "processed_at": "2026-09-25T10:58:24.847+05:30",
             "reason": "Digital, process-heavy",
             "row_id": "2",
             "status": "done"
@@ -760,7 +760,7 @@
             "b2b": "true",
             "icp_score": "78",
             "industry": "SaaS",
-            "processed_at": "2026-09-25T09:24:54.275+05:30",
+            "processed_at": "2026-09-25T10:58:24.849+05:30",
             "reason": "Digital, process-heavy",
             "row_id": "3",
             "status": "done"
@@ -769,7 +769,7 @@
             "b2b": "true",
             "icp_score": "78",
             "industry": "SaaS",
-            "processed_at": "2026-09-25T09:24:54.276+05:30",
+            "processed_at": "2026-09-25T10:58:24.850+05:30",
             "reason": "Digital, process-heavy",
             "row_id": "4",
             "status": "done"
@@ -778,7 +778,7 @@
             "b2b": "true",
             "icp_score": "78",
             "industry": "SaaS",
-            "processed_at": "2026-09-25T09:24:54.277+05:30",
+            "processed_at": "2026-09-25T10:58:24.850+05:30",
             "reason": "Digital, process-heavy",
             "row_id": "5",
             "status": "done"
@@ -817,17 +817,17 @@
           {
             "amount": 2400,
             "cost_centre": "Engineering",
-            "created": "2026-09-25T09:26:24.111+05:30",
+            "created": "2026-09-25T10:58:29.535+05:30",
             "item": "MacBook Pro",
             "justification": "Laptop replacement",
             "manager": "mgr@example.com",
-            "request_id": "PR-260925-11",
+            "request_id": "PR-260925-29",
             "requester": "req@example.com",
             "status": "pending_manager"
           },
           {
-            "decided": "2026-09-25T09:26:24.130+05:30",
-            "request_id": "PR-260925-11",
+            "decided": "2026-09-25T10:58:29.554+05:30",
+            "request_id": "PR-260925-29",
             "requester": "req@example.com",
             "status": "approved"
           }
@@ -918,13 +918,13 @@
             "jira_key": "MOCK-1",
             "row_id": "1",
             "sync_hash": "55ed7ccc0c59cb0294170b8fb2362a066e3c942525d4d071a603dbdf5807a7b5",
-            "synced_at": "2026-09-25T09:25:02.129+05:30"
+            "synced_at": "2026-09-25T10:58:32.650+05:30"
           },
           {
             "jira_key": "SCRUM-7",
             "row_id": "2",
             "sync_hash": "1c73430754cf9ac2b0b5efd16195cfe398165795039c62a039dc587a429d9c16",
-            "synced_at": "2026-09-25T09:25:02.136+05:30"
+            "synced_at": "2026-09-25T10:58:32.656+05:30"
           }
         ]
       }
@@ -999,7 +999,7 @@
             "outcome": "answered",
             "pii_counts": "{\"EMAIL\":1,\"CARD\":1,\"PAN\":1,\"PHONE\":1}",
             "prompt_redacted": "Reply to Rahul ([EMAIL_1], [PHONE_4]) about refund to card [CARD_2], PAN [PAN_3]",
-            "time": "2026-09-25T09:25:06.853+05:30",
+            "time": "2026-09-25T10:58:37.238+05:30",
             "user": "asha"
           }
         ]
@@ -1103,7 +1103,7 @@
             "kind": "expense",
             "reply": "\u2705 $120 logged under travel",
             "text": "auto to office",
-            "time": "2026-09-25T03:56:25.655Z"
+            "time": "2026-09-25T05:28:44.375Z"
           }
         ]
       }
@@ -1262,6 +1262,21 @@
       "\u2699\ufe0f Config"
     ],
     "real_nodes": 5,
+    "status": "passed"
+  },
+  "Q09-jira-issue-alert-email": {
+    "checks": 3,
+    "error": "",
+    "mocked_nodes": 2,
+    "nodes_ran": 5,
+    "ran": [
+      "Email Alert",
+      "Extract Issue",
+      "Jira Webhook",
+      "Worth Alerting?",
+      "\u2699\ufe0f Config"
+    ],
+    "real_nodes": 3,
     "status": "passed"
   },
   "X01-debug-order-report": {

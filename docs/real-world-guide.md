@@ -147,7 +147,7 @@ The projects in this repo follow these on purpose:
 ```mermaid
 timeline
   title Introducing automation to a team
-  Days 1-30 : Self-host n8n (Docker + Postgres) : Set up the error workflow (L19) : Ship 3 quick wins (Q01-Q08) : Measure time saved
+  Days 1-30 : Self-host n8n (Docker + Postgres) : Set up the error workflow (L19) : Ship 3 quick wins (Q01–Q09) : Measure time saved
   Days 31-60 : One real project (P01, P02 or P06) : Add approvals + audit logs : Export workflows to Git with CI validation
   Days 61-90 : Build a shared sub-workflow library (L20) : MCP server for internal AI assistants (P10) : Quarterly ROI report to leadership
 ```

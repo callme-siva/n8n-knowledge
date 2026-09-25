@@ -266,6 +266,14 @@ EX.update({
          "LLM chain per item, after the Limit (so you pay for max 5).",
          "After *Max 5 per Run*, add a Basic LLM Chain + Gemini: *\"Write one catchy line (max 15 words) about: {{ $json.title }}\"*. Use `{{ $json.text }}` in the Telegram message."),
     ],
+    "Q09": [
+        (1, "Only alert for **High** or **Highest** priority issues.",
+         "Add a Filter condition (or extend the existing one).",
+         "In **Worth Alerting?**, add an AND condition: `{{ ['High', 'Highest'].includes($json.priority) }}` is true."),
+        (2, "Route by priority: Slack for everything, email only for High/Highest.",
+         "A Switch after *Extract Issue*, two branches into Slack and Gmail.",
+         "Add a **Switch**: rule 1 `{{ ['High', 'Highest'].includes($json.priority) }}` → output *Urgent* → Gmail; fallback output *Normal* → Slack post with the same fields."),
+    ],
     "P01": [
         (1, "Add **purchase order** matching: flag invoices without a known PO number.",
          "Extract a `po_number` attribute and look it up in a POs sheet.",

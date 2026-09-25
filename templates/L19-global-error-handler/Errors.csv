@@ -1,2 +1,2 @@
 time,hint,message,mode,node,url,workflow,workflow_id
-2026-09-25T03:54:29.291Z,Rate limit — add Retry on Fail or slow the schedule.,429 Too Many Requests,trigger,Get Exchange Rate,https://n8n.example.com/execution/231,L04 · Currency rate alert,7
+2026-09-25T05:27:58.186Z,Rate limit — add Retry on Fail or slow the schedule.,429 Too Many Requests,trigger,Get Exchange Rate,https://n8n.example.com/execution/231,L04 · Currency rate alert,7

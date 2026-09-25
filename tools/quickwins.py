@@ -316,4 +316,43 @@ def Q08(root):
         ["Add AI to write a one-line hook per article.", "Merge several feeds (see L05)."]))
 
 
-ALL = [Q01, Q02, Q03, Q04, Q05, Q06, Q07, Q08]
+def Q09(root):
+    w = WF("Q09-jira-issue-alert-email", "Q09 · Jira issue alert → email (Webhook)")
+    w.note("## 🔔 Q09 · Jira → your inbox\nJira posts a webhook the moment an issue is created → n8n emails you a clean summary.\nProtected by **Header Auth**: only calls with the right key are accepted.", (0, 0), 460, 190, 5)
+    w.add("Jira Webhook", "webhook", 2, {"httpMethod": "POST", "path": "jira-alert", "authentication": "headerAuth", "responseMode": "onReceived", "options": {}}, (0, 0))
+    w.add("⚙️ Config", "set", 3.4, {**assign(jira_base_url="https://your-site.atlassian.net", alert_to=EMAIL), "includeOtherFields": True, "include": "all"}, (220, 0))
+    w.add("Extract Issue", "code", 2, {"jsCode":
+        "const b = $json.body || {};\n"
+        "const issue = b.issue || {};\n"
+        "const f = issue.fields || {};\n"
+        "return [{ json: {\n"
+        "  jira_base_url: $json.jira_base_url, alert_to: $json.alert_to, event: b.webhookEvent || '', key: issue.key || '',\n"
+        "  summary: f.summary || '(no summary)', type: f.issuetype?.name || '', priority: f.priority?.name || 'None', status: f.status?.name || '',\n"
+        "  reporter: f.reporter?.displayName || 'Unknown', assignee: f.assignee?.displayName || 'Unassigned', project: f.project?.name || f.project?.key || '',\n"
+        "} }];"}, (440, 0))
+    w.note("⚠️ **No email?** Check `key` in this node's output.\nFires only if the webhook body actually contains a Jira `issue` (set in *Extract Issue*).\nTo test: send the sample curl below before wiring up real Jira.", (660, 220), 300, 170, 4)
+    w.add("Worth Alerting?", "filter", 2.2, {"conditions": conditions(cond("={{ $json.key }}", "string", "notEmpty")), "options": {}}, (660, 0))
+    w.add("Email Alert", "gmail", 2.1, gmail_send("={{ $json.alert_to }}", "=🔔 {{ $json.type || 'Issue' }} {{ $json.key }}: {{ $json.summary }}",
+        "=<p><b>{{ $json.key }}</b> — {{ $json.summary }}</p><p>Type: {{ $json.type }} · Priority: {{ $json.priority }} · Status: {{ $json.status }}</p>"
+        "<p>Reporter: {{ $json.reporter }} · Assignee: {{ $json.assignee }}</p><p><a href=\"{{ $json.jira_base_url }}/browse/{{ $json.key }}\">Open in Jira</a></p>"), (880, 0))
+    w.chain("Jira Webhook", "⚙️ Config", "Extract Issue", "Worth Alerting?", "Email Alert")
+    write(root, w, readme("Q09", "Jira issue alert → email", Q, "Agile / Scrum / support", "15 min",
+        "You want to know the moment a critical bug is filed, without watching Jira all day. A webhook pushes the issue to n8n the instant it's created, and you get a readable email instead of a raw JSON payload.",
+        ["**Webhook** node receiving a real third-party webhook (Jira), not a form or schedule", "**Header Auth**: reject unauthenticated calls before your workflow even runs",
+         "Shaping a nested webhook payload (`body.issue.fields...`) into flat, readable fields", "A guard so a malformed or test payload never sends a blank email"],
+        "Webhook POST /jira-alert → Config (your Jira URL + recipient) → Code (shape the issue) → Filter (has a key?) → Gmail",
+        ["Gmail OAuth2", "Header Auth credential: name it anything, value = a long random string (e.g. `openssl rand -hex 24`)"],
+        ["Add **Webhook**: method POST, path `jira-alert`, Authentication → **Header Auth** → create the credential.",
+         "Set your real Jira URL and recipient in **⚙️ Config**.",
+         "Add the **Extract Issue** Code node, then **Filter** `{{ $json.key }}` is not empty.",
+         "Add **Gmail → Send message** with the subject/body from the sticky note.",
+         "**Activate** it, then in Jira: *Settings → System → WebHooks → Create a WebHook*, URL = your Production URL, event = *Issue → created*."],
+        ["`curl -X POST <url> -H 'Authorization: Bearer <key>' -d '{\"webhookEvent\":\"jira:issue_created\",\"issue\":{\"key\":\"PROJ-123\",\"fields\":{\"summary\":\"Login button does nothing\",\"issuetype\":{\"name\":\"Bug\"},\"priority\":{\"name\":\"High\"},\"status\":{\"name\":\"To Do\"},\"reporter\":{\"displayName\":\"Asha Rao\"}}}}'` should email you within seconds.",
+         "The same call with `issue` removed should send **no** email (the Filter blocks it)."],
+        [("No email, no error", "*Worth Alerting?* only passes items with an `issue.key`. Check your test payload matches the real Jira shape."),
+         ("`webhook not registered`", "The workflow must be **Active**, or use *Listen for test event* + the Test URL while building."),
+         ("Jira can't reach my n8n", "On a laptop, use a tunnel (`cloudflared tunnel --url http://localhost:5678`) and put the tunnel URL in Jira's webhook, per docs/getting-started.md.")],
+        ["Route by `priority`: Slack for Low/Medium, email for High/Highest (Switch after *Extract Issue*).", "Log every alert to a sheet for an audit trail.", "Add *issue: updated* and *issue: deleted* events too."]))
+
+
+ALL = [Q01, Q02, Q03, Q04, Q05, Q06, Q07, Q08, Q09]

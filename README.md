@@ -1,16 +1,16 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="n8n Knowledge: 42 real workflows, beginner to production AI systems" width="100%">
+<img src="assets/banner.svg" alt="n8n Knowledge: 43 real workflows, beginner to production AI systems" width="100%">
 
 <br/>
 
-![workflows](https://img.shields.io/badge/workflows-42-7C3AED?style=flat-square)
+![workflows](https://img.shields.io/badge/workflows-43-7C3AED?style=flat-square)
 ![n8n](https://img.shields.io/badge/tested_on-n8n_2.40-EA4B71?style=flat-square)
 ![AI](https://img.shields.io/badge/AI-Gemini_free_tier-4285F4?style=flat-square)
 [![CI](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml/badge.svg)](https://github.com/callme-siva/n8n-knowledge/actions/workflows/validate.yml)
 ![license](https://img.shields.io/badge/license-MIT-334155?style=flat-square)
 
-**Learn n8n by building 42 workflows, from your first node to multi-agent AI: a 22-lesson core path, 8 quick wins and 12 real business processes. Each one comes with a guide, a canvas snapshot and a CI run.**
+**Learn n8n by building 43 workflows, from your first node to multi-agent AI: a 22-lesson core path, 9 quick wins and 12 real business processes. Each one comes with a guide, a canvas snapshot and a CI run.**
 
 <sub>Amounts are in USD. P01's sample invoices are Indian GST invoices (INR, GSTIN) and the default timezone is Asia/Kolkata; change these in each ⚙️ Config node.</sub>
 
@@ -29,7 +29,7 @@
 <td width="33%" valign="top">
 
 ### 🪜 Three tracks + debugging
-A **22-lesson core path** (one new concept at a time), **8 quick wins** you can use today, **12 real business-process projects**, and **🐞 debug challenges** where you fix a broken workflow.
+A **22-lesson core path** (one new concept at a time), **9 quick wins** you can use today, **12 real business-process projects**, and **🐞 debug challenges** where you fix a broken workflow.
 
 </td>
 <td width="33%" valign="top">
@@ -49,7 +49,7 @@ Config nodes, retries on every external call, empty-result guards, human approva
 <td valign="top">
 
 ### 📖 Learn by doing
-Every lesson: **concept first**, build steps, **84 practice challenges** with hints and solutions, a quiz, and ready-made sheet templates.
+Every lesson: **concept first**, build steps, **92 practice challenges** with hints and solutions, a quiz, and ready-made sheet templates.
 
 </td>
 <td valign="top">
@@ -61,7 +61,7 @@ Runs on self-hosted n8n with the Gemini free tier, free public APIs and free tie
 <td valign="top">
 
 ### ✅ Executed in CI
-Every push imports all 46 workflows into n8n 2.40.5 and **runs 45 of them** (P10 is an MCP server, so it's structure-checked). Logic, code, branching, loops and public APIs run for real; credentialed and AI nodes are replaced with fixtures. 95 behaviour checks across 43 workflows.
+Every push imports all 47 workflows into n8n 2.40.5 and **runs 46 of them** (P10 is an MCP server, so it's structure-checked). Logic, code, branching, loops and public APIs run for real; credentialed and AI nodes are replaced with fixtures. 98 behaviour checks across 43 workflows.
 
 </td>
 </tr>
@@ -84,7 +84,7 @@ Every push imports all 46 workflows into n8n 2.40.5 and **runs 45 of them** (P10
 
 ## 🗺️ The learning path
 
-<p align="center"><img src="assets/learning-path.svg" alt="Learning roadmap: core path L01–L22, quick wins Q01–Q08, real-world projects P01–P12" width="100%"></p>
+<p align="center"><img src="assets/learning-path.svg" alt="Learning roadmap: core path L01–L22, quick wins Q01–Q09, real-world projects P01–P12" width="100%"></p>
 
 > [!TIP]
 > **New to n8n?** Follow the core path in order. **Know the basics?** Pick any ⚡ quick win. **Building for a company?** Go to the 🏭 real-world projects. Each one models a real business process: approvals, checkpoints, dedupe and audit logs. Read its credentials and troubleshooting sections before running it for real. **After L05 and L07**, try the 🐞 debug challenges: broken workflows you fix until their ✅ Check node passes.
@@ -144,6 +144,7 @@ Every push imports all 46 workflows into n8n 2.40.5 and **runs 45 of them** (P10
 | **Q06** | [Invoice due & overdue reminders](workflows/Q06-invoice-due-reminders/README.md) | Finance / freelancers / SMB | Date maths for due in N days / N days overdue · Switch routing to different email tones | 25 min |
 | **Q07** | [Gmail AI auto-labeler](workflows/Q07-gmail-ai-auto-labeler/README.md) | Productivity / support | Text Classifier node · Category descriptions are the prompt, so write them carefully | 20 min |
 | **Q08** | [RSS → Telegram channel with dedupe across runs](workflows/Q08-rss-to-telegram-dedupe/README.md) | Marketing / community | Remove Duplicates → Remove items seen in previous executions · History size and what happens when it fills | 15 min |
+| **Q09** | [Jira issue alert → email](workflows/Q09-jira-issue-alert-email/README.md) | Agile / Scrum / support | Webhook node receiving a real third-party webhook · Header Auth | 15 min |
 
 ### 🏭 Projects: real business processes
 
@@ -191,7 +192,7 @@ Every push imports all 46 workflows into n8n 2.40.5 and **runs 45 of them** (P10
 </tr>
 </table>
 
-**[See all 44 canvases →](GALLERY.md)**
+**[See all 45 canvases →](GALLERY.md)**
 <!-- GALLERY:END -->
 
 ---
@@ -207,10 +208,10 @@ Every push imports all 46 workflows into n8n 2.40.5 and **runs 45 of them** (P10
 | Concept-first + system-context architecture per workflow | ❌ | ❌ | ✅ |
 | Design decisions & trade-offs | ❌ | rarely | ✅ all 12 projects |
 | Test data, sheet templates, sample PDFs | ❌ | sometimes | ✅ |
-| Practice challenges with solutions | ❌ | sometimes | ✅ 84 + 30-question quiz |
+| Practice challenges with solutions | ❌ | sometimes | ✅ 92 + 30-question quiz |
 | Troubleshooting per workflow | ❌ | ❌ | ✅ |
 | Production practices | rarely | rarely | ✅ |
-| Every workflow executed in CI | ❌ | n/a | ✅ 45 run · 95 behaviour checks · AI and credentialed nodes mocked |
+| Every workflow executed in CI | ❌ | n/a | ✅ 46 run · 98 behaviour checks · AI and credentialed nodes mocked |
 
 If you want *any* template for a niche app, the big collections are great. This repo is for **learning to design workflows yourself**.
 

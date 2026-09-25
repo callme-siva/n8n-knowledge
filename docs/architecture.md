@@ -2,7 +2,7 @@
 
 # 🏗️ Architecture guide
 
-**How n8n works under the hood, and the design patterns used across all 42 workflows.**
+**How n8n works under the hood, and the design patterns used across all 43 workflows.**
 
 </div>
 

@@ -141,7 +141,7 @@ Alerting every 5 minutes during an outage causes **alert fatigue**; people start
 So humans can **audit and tune** the scoring. A score without a reason is a black box nobody trusts. → [L22](../workflows/L22-ai-lead-qualifier-router/README.md)
 </details>
 
-## ⚡ Quick wins (Q01–Q08)
+## ⚡ Quick wins (Q01–Q09)
 
 **21.** Why is `new Date().toISOString().slice(0, 10)` a bad way to get "today" in n8n?
 <details><summary>Answer</summary>

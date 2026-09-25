@@ -1,0 +1,205 @@
+{
+  "name": "Q09 · Jira issue alert → email (Webhook)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔔 Q09 · Jira → your inbox\nJira posts a webhook the moment an issue is created → n8n emails you a clean summary.\nProtected by **Header Auth**: only calls with the right key are accepted.",
+        "width": 460,
+        "height": 190,
+        "color": 5
+      },
+      "id": "f86fb92b-7e21-5b1b-90c7-189b411eaacc",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jira-alert",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "935a6160-9da9-5cf6-9777-c28b16763aaa",
+      "name": "Jira Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "jira_base_url",
+              "value": "https://your-site.atlassian.net",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "alert_to",
+              "value": "you@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {},
+        "includeOtherFields": true,
+        "include": "all"
+      },
+      "id": "cae580f6-5845-59e8-bd62-61242e87c5ff",
+      "name": "⚙️ Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $json.body || {};\nconst issue = b.issue || {};\nconst f = issue.fields || {};\nreturn [{ json: {\n  jira_base_url: $json.jira_base_url, alert_to: $json.alert_to, event: b.webhookEvent || '', key: issue.key || '',\n  summary: f.summary || '(no summary)', type: f.issuetype?.name || '', priority: f.priority?.name || 'None', status: f.status?.name || '',\n  reporter: f.reporter?.displayName || 'Unknown', assignee: f.assignee?.displayName || 'Unassigned', project: f.project?.name || f.project?.key || '',\n} }];"
+      },
+      "id": "7911fd91-8ba8-529b-a077-8ac3695db505",
+      "name": "Extract Issue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "⚠️ **No email?** Check `key` in this node's output.\nFires only if the webhook body actually contains a Jira `issue` (set in *Extract Issue*).\nTo test: send the sample curl below before wiring up real Jira.",
+        "width": 300,
+        "height": 170,
+        "color": 4
+      },
+      "id": "558d4793-c9dd-5c0e-b12b-7b4d6d0b7e32",
+      "name": "Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.key }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a24dd017-c756-5ac8-90d3-f56906710454",
+      "name": "Worth Alerting?",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.alert_to }}",
+        "subject": "=🔔 {{ $json.type || 'Issue' }} {{ $json.key }}: {{ $json.summary }}",
+        "emailType": "html",
+        "message": "=<p><b>{{ $json.key }}</b> — {{ $json.summary }}</p><p>Type: {{ $json.type }} · Priority: {{ $json.priority }} · Status: {{ $json.status }}</p><p>Reporter: {{ $json.reporter }} · Assignee: {{ $json.assignee }}</p><p><a href=\"{{ $json.jira_base_url }}/browse/{{ $json.key }}\">Open in Jira</a></p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "efb9b961-0572-5c62-9a54-92abf92124b2",
+      "name": "Email Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    }
+  ],
+  "connections": {
+    "Jira Webhook": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config": {
+      "main": [
+        [
+          {
+            "node": "Extract Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Issue": {
+      "main": [
+        [
+          {
+            "node": "Worth Alerting?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Worth Alerting?": {
+      "main": [
+        [
+          {
+            "node": "Email Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {}
+}
