@@ -139,7 +139,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 const DAY_START = 9, DAY_END = 18, MIN_FOCUS = 45; // hours, hours, minutes
 const ev = $input.all().map(i => i.json).filter(e => e.start?.dateTime && e.status !== 'cancelled');
 const t = d => new Date(d);
-const fmt = d => t(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: $now.zoneName });  // workflow timezone
+const fmt = d => t(d).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: $now.zoneName });  // workflow timezone
 const mins = ev.reduce((s, e) => s + (t(e.end.dateTime) - t(e.start.dateTime)) / 60000, 0);
 // find gaps between meetings inside working hours
 // $today = midnight in the workflow timezone, so 9:00–18:00 means your local working day.

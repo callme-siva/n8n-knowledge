@@ -146,7 +146,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `url` | https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&cei… |
+| `url` | https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-US&gl=US&cei… |
 | `⚙️ On error` | Continue (regular output) |
 
 </details>

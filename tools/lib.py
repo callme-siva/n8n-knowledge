@@ -152,7 +152,7 @@ SAMPLE_FILES = {
     "L06": [("invoice-valid.pdf", "email it to yourself as an attachment")],
     "L13": [("hr-policy.pdf", "upload it in the form")],
     "L18": [("resume-sample.pdf", "upload it in the form")],
-    "P01": [("invoice-valid.pdf", "auto-approved → ledger"), ("invoice-large.pdf", "₹1,18,000 → needs approval"), ("invoice-wrong-total.pdf", "subtotal + tax ≠ total → Exceptions")],
+    "P01": [("invoice-valid.pdf", "auto-approved → ledger"), ("invoice-large.pdf", "INR 118,000 → needs approval"), ("invoice-wrong-total.pdf", "subtotal + tax ≠ total → Exceptions")],
 }
 
 

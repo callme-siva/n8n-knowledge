@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 🛠️ L14 · Agents decide which tool to call\nTools here: 🌦️ weather (HTTP), 🧮 calculator, 📖 Wikipedia, 💱 currency (HTTP).\nTry: *\"Is it rainy in Pune tomorrow and what's 18% GST on ₹12,499?\"*\nWatch the **Logs** panel to see each tool call.",
+        "content": "## 🛠️ L14 · Agents decide which tool to call\nTools here: 🌦️ weather (HTTP), 🧮 calculator, 📖 Wikipedia, 💱 currency (HTTP).\nTry: *\"Is it rainy in Boston tomorrow and what's 18% VAT on $12,499?\"*\nWatch the **Logs** panel to see each tool call.",
         "width": 500,
         "height": 240,
         "color": 5
@@ -128,7 +128,7 @@
     },
     {
       "parameters": {
-        "toolDescription": "Get latest exchange rates for a base currency code like USD, EUR, INR.",
+        "toolDescription": "Get latest exchange rates for a base currency code like USD, EUR, GBP.",
         "url": "https://open.er-api.com/v6/latest/{base}",
         "placeholderDefinitions": {
           "values": [

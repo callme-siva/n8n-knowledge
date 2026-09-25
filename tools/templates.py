@@ -80,8 +80,8 @@ def sample_files(root):
           ("1. Casual leave: 12 days per calendar year, max 3 consecutive days. Unused casual leave lapses on 31 Dec.", 10),
           ("2. Earned leave: 18 days per year, carry forward up to 30 days.", 10),
           ("3. Work from home: up to 2 days per week with manager approval.", 10),
-          ("   Broadband reimbursed up to INR 1,000/month with bill.", 10),
-          ("4. Travel: economy class for flights under 4 hours. Hotel limit INR 6,000/night in metro cities.", 10),
+          ("   Broadband reimbursed up to $50/month with bill.", 10),
+          ("4. Travel: economy class for flights under 4 hours. Hotel limit $200/night in major cities.", 10),
           ("5. Sick leave beyond 2 days requires a medical certificate.", 10)], os.path.join(d, "hr-policy.pdf"))
     _pdf([("Priya Sharma", 18), ("Scrum Master · Bengaluru · priya@example.com", 10), ("", 11), ("SUMMARY", 12),
           ("Certified Scrum Master (CSM) with 6 years in fintech; coached 4 teams through SAFe adoption.", 10), ("", 11),

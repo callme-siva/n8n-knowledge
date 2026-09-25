@@ -175,7 +175,7 @@ return [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, c
 | `chartOptions.width` | 700 |
 | `chartOptions.height` | 320 |
 | `chartOptions.backgroundColor` | #ffffff |
-| `datasetOptions.label` | Weekly revenue (₹) |
+| `datasetOptions.label` | Weekly revenue ($) |
 | `datasetOptions.backgroundColor` | #7C3AED |
 
 </details>
@@ -187,9 +187,9 @@ return [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, c
 | Property | Value |
 |---|---|
 | `sendTo` | you@example.com |
-| `subject` | `Weekly revenue ₹{{ $json.last.toLocaleString('en-IN') }} ({{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%)` |
+| `subject` | `Weekly revenue ${{ $json.last.toLocaleString('en-US') }} ({{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%)` |
 | `emailType` | html |
-| `message` | `<p>Last week: <b>₹{{ $json.last.toLocaleString('en-IN') }}</b>, previous: ₹{{ $json.prev.toLocaleString('en-IN') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>` |
+| `message` | `<p>Last week: <b>${{ $json.last.toLocaleString('en-US') }}</b>, previous: ${{ $json.prev.toLocaleString('en-US') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>` |
 | `appendAttribution` | off |
 | `attachmentsUi.attachmentsBinary.property` | chart |
 | `⚙️ Retry on fail` | ✅ on |
@@ -214,7 +214,7 @@ Problems specific to this workflow are below. For general ones (expressions, ite
 
 <details><summary><b>Chart is empty</b></summary>
 
-Revenue values were strings with commas. The code uses `Number()`, so strip `₹` and `,` in the sheet.
+Revenue values were strings with commas. The code uses `Number()`, so strip `$` and `,` in the sheet.
 
 </details>
 

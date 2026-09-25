@@ -140,7 +140,7 @@ if (cmd === '/exp') {
   const [amt, category, ...note] = rest;
   const amount = Number(amt);
   if (!Number.isFinite(amount)) return { json: { ...base, kind: 'error', reply: '⚠️ Usage: /exp 450 food lunch' } };
-  return { json: { ...base, kind: 'expense', amount, category: category || 'other', text: note.join(' '), reply: `✅ ₹${amount} logged under ${category || 'other'}` } };
+  return { json: { ...base, kind: 'expense', amount, category: category || 'other', text: note.join(' '), reply: `✅ $${amount} logged under ${category || 'other'}` } };
 }
 if (cmd === '/todo' || cmd === '/note') return { json: { ...base, kind: cmd.slice(1), text: body, reply: `✅ ${cmd.slice(1)} saved` } };
 return { json: { ...base, kind: 'error', reply: 'Commands: /todo …, /note …, /exp <amount> <category> <note>' } };

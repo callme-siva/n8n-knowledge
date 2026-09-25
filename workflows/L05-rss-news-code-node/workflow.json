@@ -51,7 +51,7 @@
     },
     {
       "parameters": {
-        "url": "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&ceid=IN:en",
+        "url": "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-US&gl=US&ceid=US:en",
         "options": {}
       },
       "id": "c4dfa553-bbc1-52e4-82f4-34fdf4a43c0b",

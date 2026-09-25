@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## ✅ P06 · Approvals without chasing people\nForm → request ID → **manager** approves (3-day timeout) → above ₹1,00,000 also **finance** approves → requester notified at every step → every decision logged in an audit sheet.",
+        "content": "## ✅ P06 · Approvals without chasing people\nForm → request ID → **manager** approves (3-day timeout) → above $2,000 also **finance** approves → requester notified at every step → every decision logged in an audit sheet.",
         "width": 560,
         "height": 300,
         "color": 7
@@ -32,7 +32,7 @@
               "requiredField": true
             },
             {
-              "fieldLabel": "Amount (INR)",
+              "fieldLabel": "Amount (USD)",
               "fieldType": "number",
               "requiredField": true
             },
@@ -91,7 +91,7 @@
             {
               "id": "a1",
               "name": "finance_threshold",
-              "value": 100000,
+              "value": 2000,
               "type": "number"
             }
           ]
@@ -225,7 +225,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const f = $('Purchase Request Form').item.json;\n// $execution.id is unique and increasing, so IDs never collide and sort in order.\nconst id = 'PR-' + $now.toFormat('yyMMdd') + '-' + $execution.id;\nreturn { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (INR)']),\n  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: $now.toISO() } };"
+        "jsCode": "const f = $('Purchase Request Form').item.json;\n// $execution.id is unique and increasing, so IDs never collide and sort in order.\nconst id = 'PR-' + $now.toFormat('yyMMdd') + '-' + $execution.id;\nreturn { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (USD)']),\n  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: $now.toISO() } };"
       },
       "id": "b7d62a4f-8541-5ff0-84dc-984cee65efac",
       "name": "Create Request",
@@ -275,8 +275,8 @@
       "parameters": {
         "operation": "sendAndWait",
         "sendTo": "={{ $('Create Request').item.json.manager }}",
-        "subject": "=Approve {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})?",
-        "message": "=<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>",
+        "subject": "=Approve {{ $('Create Request').item.json.request_id }} (${{ $('Create Request').item.json.amount }})?",
+        "message": "=<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>${{ $('Create Request').item.json.amount.toLocaleString('en-US') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>",
         "approvalOptions": {
           "values": {
             "approvalType": "double"
@@ -406,8 +406,8 @@
       "parameters": {
         "operation": "sendAndWait",
         "sendTo": "={{ $('⚙️ Config').item.json.finance_email }}",
-        "subject": "=Finance approval: {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})",
-        "message": "=<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote><p>✅ Manager approved.</p>",
+        "subject": "=Finance approval: {{ $('Create Request').item.json.request_id }} (${{ $('Create Request').item.json.amount }})",
+        "message": "=<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>${{ $('Create Request').item.json.amount.toLocaleString('en-US') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote><p>✅ Manager approved.</p>",
         "approvalOptions": {
           "values": {
             "approvalType": "double"

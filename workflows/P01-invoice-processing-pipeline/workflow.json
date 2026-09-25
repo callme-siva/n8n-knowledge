@@ -193,7 +193,7 @@
             {
               "name": "currency",
               "type": "string",
-              "description": "ISO currency code, e.g. INR"
+              "description": "ISO currency code, e.g. USD, EUR or INR"
             }
           ]
         },
@@ -359,8 +359,8 @@
       "parameters": {
         "operation": "sendAndWait",
         "sendTo": "={{ $('⚙️ Config').item.json.approver_email }}",
-        "subject": "=Approve ₹{{ $json.grand_total }} invoice from {{ $json.vendor_name }}?",
-        "message": "=<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>₹{{ $json.grand_total }}</b> (tax ₹{{ $json.tax_total }}), due {{ $json.due_date }}</p>",
+        "subject": "=Approve {{ $json.currency || '' }} {{ $json.grand_total }} invoice from {{ $json.vendor_name }}?",
+        "message": "=<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>{{ $json.currency || '' }} {{ $json.grand_total }}</b> (tax {{ $json.tax_total }}), due {{ $json.due_date }}</p>",
         "approvalOptions": {
           "values": {
             "approvalType": "double"
@@ -421,7 +421,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const inv = $('Validate').item.json;\nreturn { json: { logged_at: $now.toISO(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,\n  invoice_date: inv.invoice_date, due_date: inv.due_date || '', subtotal: inv.subtotal, tax: inv.tax_total, total: inv.grand_total,\n  currency: inv.currency || 'INR', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };"
+        "jsCode": "const inv = $('Validate').item.json;\nreturn { json: { logged_at: $now.toISO(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,\n  invoice_date: inv.invoice_date, due_date: inv.due_date || '', subtotal: inv.subtotal, tax: inv.tax_total, total: inv.grand_total,\n  currency: inv.currency || '', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };"
       },
       "id": "a1362c60-d0f2-5442-9485-40c1c5257156",
       "name": "Ledger Row",

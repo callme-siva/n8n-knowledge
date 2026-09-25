@@ -29,7 +29,7 @@ def P01(root):
         {"name": "subtotal", "type": "number", "description": "Amount before tax"},
         {"name": "tax_total", "type": "number", "description": "Total GST/VAT/tax amount"},
         {"name": "grand_total", "type": "number", "description": "Final payable amount", "required": True},
-        {"name": "currency", "type": "string", "description": "ISO currency code, e.g. INR"}]},
+        {"name": "currency", "type": "string", "description": "ISO currency code, e.g. USD, EUR or INR"}]},
         "options": {"systemPromptTemplate": "You extract data from supplier invoices. Only use values printed in the text. If a value is absent, omit it. Never guess numbers."}}, (820, 0))
     w.gemini("Gemini", (820, 220), 0)
     w.add("Validate", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
@@ -51,14 +51,14 @@ def P01(root):
     w.note("⚠️ **Same invoice twice?** It's skipped here if its `dedupe_key` (vendor + invoice no.) is already in the **Ledger** sheet.\nThe ledger is the memory, so an invoice that failed to append or was rejected is picked up again next time.\nTo re-test: delete its Ledger row.", (1620, 30), 300, 190, 4)
     w.add("New Invoice?", "if", 2.2, {"conditions": conditions(cond("={{ $json.already_logged }}", "boolean", "false")), "options": {}}, (1640, -120))
     w.add("Needs Approval?", "if", 2.2, {"conditions": conditions(cond("={{ $json.grand_total }}", "number", "gt", f"={{{{ {CFG}.approval_limit }}}}")), "options": {}}, (1840, -120))
-    w.add("Ask Approver", "gmail", 2.1, approval(f"={{{{ {CFG}.approver_email }}}}", "=Approve ₹{{ $json.grand_total }} invoice from {{ $json.vendor_name }}?",
-        "=<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>₹{{ $json.grand_total }}</b> (tax ₹{{ $json.tax_total }}), due {{ $json.due_date }}</p>", 3), (2040, -220))
+    w.add("Ask Approver", "gmail", 2.1, approval(f"={{{{ {CFG}.approver_email }}}}", "=Approve {{ $json.currency || '' }} {{ $json.grand_total }} invoice from {{ $json.vendor_name }}?",
+        "=<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>{{ $json.currency || '' }} {{ $json.grand_total }}</b> (tax {{ $json.tax_total }}), due {{ $json.due_date }}</p>", 3), (2040, -220))
     w.add("Approved?", "if", 2.2, {"conditions": conditions(cond("={{ $json.data.approved }}", "boolean", "true")), "options": {}}, (2240, -220))
     w.add("Ledger Row", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "const inv = $('Validate').item.json;\n"
         "return { json: { logged_at: $now.toISO(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,\n"
         "  invoice_date: inv.invoice_date, due_date: inv.due_date || '', subtotal: inv.subtotal, tax: inv.tax_total, total: inv.grand_total,\n"
-        "  currency: inv.currency || 'INR', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };"}, (2440, -120))
+        "  currency: inv.currency || '', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };"}, (2440, -120))
     w.add("Append to Ledger", "googleSheets", 4.5, sheet_append("Ledger"), (2640, -120))
     w.add("Log Exception", "code", 2, {"mode": "runOnceForEachItem", "jsCode":
         "const inv = $('Validate').item.json;\n"
@@ -322,12 +322,12 @@ def P05(root):
 
 def P06(root):
     w = WF("P06-purchase-approval-multilevel", "P06 · Purchase request with multi-level approval, timeouts and audit trail")
-    w.note("## ✅ P06 · Approvals without chasing people\nForm → request ID → **manager** approves (3-day timeout) → above ₹1,00,000 also **finance** approves → requester notified at every step → every decision logged in an audit sheet.", (0, 0), 560)
+    w.note("## ✅ P06 · Approvals without chasing people\nForm → request ID → **manager** approves (3-day timeout) → above $2,000 also **finance** approves → requester notified at every step → every decision logged in an audit sheet.", (0, 0), 560)
     w.add("Purchase Request Form", "formTrigger", 2.2, {"formTitle": "Purchase request", "formFields": {"values": [
         form_field("Your email", "email", True), form_field("Item / service", required=True),
-        form_field("Amount (INR)", "number", True), form_field("Cost centre", "dropdown", True, ["Engineering", "Sales", "Marketing", "Operations", "HR"]),
+        form_field("Amount (USD)", "number", True), form_field("Cost centre", "dropdown", True, ["Engineering", "Sales", "Marketing", "Operations", "HR"]),
         form_field("Justification", "textarea", True)]}, "options": {}}, (0, 0))
-    w.add("⚙️ Config", "set", 3.4, assign(finance_email=EMAIL, finance_threshold=100000), (200, 0))
+    w.add("⚙️ Config", "set", 3.4, assign(finance_email=EMAIL, finance_threshold=2000), (200, 0))
     w.note("🔒 **Who approves is looked up, never typed.** The requester's manager comes from the `Team` sheet (`email` → `manager_email`), so nobody can route a request to themselves.\nNot in the sheet, or listed as their own manager? The request is refused.", (400, 200), 320, 170, 4)
     w.add("Lookup Manager", "googleSheets", 4.5, sheet_read("Team", "email", "={{ $('Purchase Request Form').item.json['Your email'].trim().toLowerCase() }}"), (400, 0), alwaysOutputData=True)
     w.add("Manager OK?", "if", 2.2, {"conditions": conditions(
@@ -339,17 +339,17 @@ def P06(root):
         "const f = $('Purchase Request Form').item.json;\n"
         "// $execution.id is unique and increasing, so IDs never collide and sort in order.\n"
         "const id = 'PR-' + $now.toFormat('yyMMdd') + '-' + $execution.id;\n"
-        "return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (INR)']),\n"
+        "return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (USD)']),\n"
         "  cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: $now.toISO() } };"}, (800, 0))
     w.add("Audit: Created", "googleSheets", 4.5, sheet_upsert("Requests", "request_id"), (1000, 0))
-    card = "=<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>"
-    w.add("Manager Approval", "gmail", 2.1, approval("={{ $('Create Request').item.json.manager }}", "=Approve {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})?", card, 3), (1200, 0))
+    card = "=<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>${{ $('Create Request').item.json.amount.toLocaleString('en-US') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>"
+    w.add("Manager Approval", "gmail", 2.1, approval("={{ $('Create Request').item.json.manager }}", "=Approve {{ $('Create Request').item.json.request_id }} (${{ $('Create Request').item.json.amount }})?", card, 3), (1200, 0))
     w.add("Manager Decision", "switch", 3.2, {"rules": {"values": [
         {"conditions": conditions(cond("={{ $json.data?.approved }}", "boolean", "true")), "renameOutput": True, "outputKey": "Approved"},
         {"conditions": conditions(cond("={{ $json.data?.approved }}", "boolean", "false")), "renameOutput": True, "outputKey": "Rejected"}]},
         "options": {"fallbackOutput": "extra", "renameFallbackOutput": "Timed out"}}, (1400, 0))
     w.add("Needs Finance?", "if", 2.2, {"conditions": conditions(cond("={{ $('Create Request').item.json.amount }}", "number", "gt", f"={{{{ {CFG}.finance_threshold }}}}")), "options": {}}, (1640, -160))
-    w.add("Finance Approval", "gmail", 2.1, approval(f"={{{{ {CFG}.finance_email }}}}", "=Finance approval: {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})", card + "<p>✅ Manager approved.</p>", 3), (1860, -260))
+    w.add("Finance Approval", "gmail", 2.1, approval(f"={{{{ {CFG}.finance_email }}}}", "=Finance approval: {{ $('Create Request').item.json.request_id }} (${{ $('Create Request').item.json.amount }})", card + "<p>✅ Manager approved.</p>", 3), (1860, -260))
     w.add("Finance Approved?", "if", 2.2, {"conditions": conditions(cond("={{ $json.data?.approved }}", "boolean", "true")), "options": {}}, (2080, -260))
     for i, (name, status, y) in enumerate([("Final: Approved", "approved", -160), ("Final: Rejected", "rejected", 80), ("Final: Escalated (timeout)", "timed_out", 260)]):
         w.add(name, "set", 3.4, assign(request_id="={{ $('Create Request').item.json.request_id }}", requester="={{ $('Create Request').item.json.requester }}",
@@ -372,11 +372,11 @@ def P06(root):
         ["Chained **Send and Wait** approvals with time limits", "A 3-way **Switch** on approved / rejected / **timed out** (missing response)",
          "Routing by business rule (amount > threshold → second approver)", "**Approver lookup** from a Team sheet, so requesters can't pick (or be) their own approver", "Collision-free request IDs from `$execution.id`",
          "An **audit trail**: upsert the same row as the status changes"],
-        "Form → Config → look up manager in Team sheet (missing or self? → refuse) → Create ID → Audit row → Manager approval ⏸3d → Switch\n  ├ Approved → amount > ₹1L? ─ yes → Finance approval ⏸3d → approved? ─ yes/no ┐\n  │                          └ no ─────────────────────────────────────────────┤\n  ├ Rejected ─────────────────────────────────────────────────────────────────────┤→ Set final status → Audit upsert → Notify requester\n  └ Timed out → escalate to finance ──────────────────────────────────────────────┘",
+        "Form → Config → look up manager in Team sheet (missing or self? → refuse) → Create ID → Audit row → Manager approval ⏸3d → Switch\n  ├ Approved → amount > $2,000? ─ yes → Finance approval ⏸3d → approved? ─ yes/no ┐\n  │                          └ no ─────────────────────────────────────────────┤\n  ├ Rejected ─────────────────────────────────────────────────────────────────────┤→ Set final status → Audit upsert → Notify requester\n  └ Timed out → escalate to finance ──────────────────────────────────────────────┘",
         ["Gmail OAuth2", "Google Sheets OAuth2 (tab `Team`: email, manager_email; tab `Requests`: request_id, requester, manager, item, amount, cost_centre, justification, status, created, decided)"],
         ["Create the `Team` tab (one row per employee: `email`, `manager_email`) and the `Requests` tab.", "Import it, set the finance email and threshold in Config.",
          "For testing, set both approval time limits to a few minutes (Options → *Limit wait time*).",
-         "Submit 3 requests: ₹20,000 (manager only), ₹2,00,000 (manager + finance), one you ignore (timeout)."],
+         "Submit 3 requests: $500 (manager only), $3,000 (manager + finance), one you ignore (timeout)."],
         ["Submit from an email that isn't in `Team`, or whose manager_email is itself: the request is refused, no approval is sent.", "Each request's row goes from `pending_manager` to its final status.", "The requester gets exactly one final email."],
         [("Buttons in the email show an error page", "Approval links call your n8n. It must be reachable (set `WEBHOOK_URL`)."),
          ("Timeout path never runs", "It only runs after the wait limit. Check *Limit wait time* is on for both approvals.")],

@@ -9,7 +9,7 @@
 <text x="-46" y="-130" font-size="15" fill="#5B4B12" font-weight="700">🔀 L04 · Branching</text>
 <text x="-46" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">IF = two roads (true/false).</text>
 <text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Switch = many roads.</text>
-<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">USD→INR is checked every hour; you get an email only when</text>
+<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">USD→EUR is checked every hour; you get an email only when</text>
 <text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">something interesting happens.</text>
 <path d="M100,50.0 C160.0,50.0 160.0,50.0 216,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M320,50.0 C380.0,50.0 380.0,50.0 436,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>

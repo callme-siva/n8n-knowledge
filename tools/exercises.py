@@ -194,7 +194,7 @@ EX = {
     "L22": [
         (1, "Add **Budget** as a form field and let it influence the score.",
          "Form field + prompt mention; the schema stays the same.",
-         "Add the dropdown *Budget* (< 1L / 1–5L / > 5L), include it in the prompt text, and add to the system message: *\"budget > 5L adds up to 15 points\"*. Re-test the 3 sample leads."),
+         "Add the dropdown *Budget* (< $1,000 / $1,000–$5,000 / > $5,000), include it in the prompt text, and add to the system message: *\"budget > $5,000 adds up to 15 points\"*. Re-test the 3 sample leads."),
         (2, "Add a **human approval** before the AI reply is sent to hot leads.",
          "Insert Send-and-Wait between the alert and the personal reply.",
          "Put a Gmail **Send and Wait** (response: free text) to the sales lead, showing the AI draft. Use the edited text if provided (`{{ $json.data.text || $('Build CRM Row').item.json.reply }}`)."),

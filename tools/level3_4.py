@@ -44,7 +44,7 @@ def L11(root):
     w = WF("L11-ai-news-digest-llm-chain", "L11 · AI news briefing (Basic LLM Chain + Gemini)")
     w.note("## 🤖 L11 · Your first LLM call\nSame pipeline as L05, but **Gemini** turns 25 headlines into a 5-bullet executive briefing.\nFree Gemini key: aistudio.google.com → Get API key.", (-60, -420), 460, 220, 5)
     w.add("Every Morning 8 AM", "scheduleTrigger", 1.2, {"rule": {"interval": [{"triggerAtHour": 8}]}}, (0, 0))
-    feeds = [("Google News · AI", "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&ceid=IN:en"),
+    feeds = [("Google News · AI", "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-US&gl=US&ceid=US:en"),
              ("TechCrunch · AI", "https://techcrunch.com/category/artificial-intelligence/feed/"),
              ("The Verge · AI", "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml")]
     w.add("Merge Feeds", "merge", 3, {"numberInputs": 3}, (480, 0))
@@ -172,7 +172,7 @@ def L13(root):
 # ---------- L14 agent with tools ----------
 def L14(root):
     w = WF("L14-ai-agent-with-tools", "L14 · Personal assistant agent (tools + memory)")
-    w.note("## 🛠️ L14 · Agents decide which tool to call\nTools here: 🌦️ weather (HTTP), 🧮 calculator, 📖 Wikipedia, 💱 currency (HTTP).\nTry: *\"Is it rainy in Pune tomorrow and what's 18% GST on ₹12,499?\"*\nWatch the **Logs** panel to see each tool call.", (-60, -440), 500, 240, 5)
+    w.note("## 🛠️ L14 · Agents decide which tool to call\nTools here: 🌦️ weather (HTTP), 🧮 calculator, 📖 Wikipedia, 💱 currency (HTTP).\nTry: *\"Is it rainy in Boston tomorrow and what's 18% VAT on $12,499?\"*\nWatch the **Logs** panel to see each tool call.", (-60, -440), 500, 240, 5)
     w.lc("Chat", "chatTrigger", 1.1, {"options": {}}, (0, 0))
     w.lc("Assistant Agent", "agent", 2.2, {"options": {"systemMessage":
         "=You are a helpful personal assistant for a user in India. Today is {{ $now.toFormat('cccc, dd LLL yyyy') }}. "
@@ -187,7 +187,7 @@ def L14(root):
         "placeholderDefinitions": {"values": [{"name": "lat", "description": "latitude in decimal degrees", "type": "number"},
                                               {"name": "lon", "description": "longitude in decimal degrees", "type": "number"}]},
         "optimizeResponse": True}, (520, 240))
-    w.lc("get_exchange_rate", "toolHttpRequest", 1.1, {"toolDescription": "Get latest exchange rates for a base currency code like USD, EUR, INR.",
+    w.lc("get_exchange_rate", "toolHttpRequest", 1.1, {"toolDescription": "Get latest exchange rates for a base currency code like USD, EUR, GBP.",
         "url": "https://open.er-api.com/v6/latest/{base}",
         "placeholderDefinitions": {"values": [{"name": "base", "description": "3-letter ISO currency code", "type": "string"}]},
         "optimizeResponse": True, "dataField": "rates", "fieldsToInclude": "all"}, (640, 240))

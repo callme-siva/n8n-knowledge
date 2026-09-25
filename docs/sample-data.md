@@ -29,8 +29,8 @@ Expected: about 2 Risks, 1 Assumption, 1 Issue, 1 Dependency.
 ACME Leave & Remote Work Policy (2026)
 1. Casual leave: 12 days per calendar year, max 3 consecutive days. Unused casual leave lapses on 31 Dec.
 2. Earned leave: 18 days per year, carry forward up to 30 days.
-3. Work from home: up to 2 days per week with manager approval. Broadband reimbursed up to INR 1,000/month with bill.
-4. Travel: economy class for flights under 4 hours. Hotel limit INR 6,000/night in metro cities.
+3. Work from home: up to 2 days per week with manager approval. Broadband reimbursed up to $50/month with bill.
+4. Travel: economy class for flights under 4 hours. Hotel limit $200/night in major cities.
 5. Sick leave beyond 2 days requires a medical certificate.
 ```
 Try asking: *How many casual leaves can I carry forward?* · *Is broadband reimbursed?* · *What's the hotel limit in Mumbai?* · *What is the CEO's salary?* (it should refuse)
@@ -44,7 +44,7 @@ Try asking: *How many casual leaves can I carry forward?* · *Is broadband reimb
 
 ## Customer complaints
 *(for L17)*
-1. **Angry, high value:** "I paid ₹74,999 for the laptop (order ORD-88213) and it arrived with a cracked screen. This is the second time. I want a replacement TODAY or I'm going to consumer court."
+1. **Angry, high value:** "I paid $899 for the laptop (order ORD-88213) and it arrived with a cracked screen. This is the second time. I want a replacement TODAY or I'm going to consumer court."
 2. **Mild:** "Hi, my order ORD-10022 shows delivered but I can't find it. Could you check with the courier? Thanks."
 
 ## Sales leads

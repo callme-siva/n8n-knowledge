@@ -114,7 +114,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 |---|---|
 | `formTitle` | Book a free demo |
 | `formDescription` | Tell us a little about you. We reply within one business day. |
-| `formFields.values` | Name *, Email *, Company, Interested in *, Monthly budget (INR) |
+| `formFields.values` | Name *, Email *, Company, Interested in *, Monthly budget (USD) |
 | `respondWithOptions.formSubmittedText` | Thanks! Check your inbox for a confirmation. |
 
 </details>
@@ -130,7 +130,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | `email` | `{{ $json.Email.trim().toLowerCase() }}` |
 | `company` | `{{ $json.Company \|\| '-' }}` |
 | `interest` | `{{ $json['Interested in'] }}` |
-| `budget` | `{{ $json['Monthly budget (INR)'] \|\| 'not given' }}` |
+| `budget` | `{{ $json['Monthly budget (USD)'] \|\| 'not given' }}` |
 | `source` | web-form |
 
 </details>

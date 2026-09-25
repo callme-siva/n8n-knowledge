@@ -1,4 +1,4 @@
 time,name,changed,code,error,ms,since,status,url
-2026-09-24T08:08:06.540Z,n8n website,False,200,,10069,2026-09-24T08:08:06.539Z,UP,https://n8n.io
-2026-09-24T08:08:06.540Z,GitHub API,False,200,,10070,2026-09-24T08:08:06.540Z,UP,https://api.github.com
-2026-09-24T08:08:06.540Z,Demo: always down,False,0,timeout of 10000ms exceeded,10070,2026-09-24T08:08:06.540Z,DOWN,https://httpstat.us/503
+2026-09-25T03:54:42.291Z,n8n website,False,200,,8314,2026-09-25T03:54:42.291Z,UP,https://n8n.io
+2026-09-25T03:54:42.291Z,GitHub API,False,200,,8314,2026-09-25T03:54:42.291Z,UP,https://api.github.com
+2026-09-25T03:54:42.291Z,Demo: always down,False,404,,8314,2026-09-25T03:54:42.291Z,DOWN,https://httpstat.us/503

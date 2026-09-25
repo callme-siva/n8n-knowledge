@@ -100,7 +100,7 @@ def L03(root):
     w.add("Format Email", "code", 2, {"jsCode":
         "const cfg = $('⚙️ Config').first().json;\n"
         "const jobs = ($input.first().json.jobs_results || []).slice(0, cfg.max_jobs);\n"
-        "const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });\n"
+        "const today = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });\n"
         "const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));\n"
         "const rows = jobs.map(j => {\n"
         "  const link = j.apply_options?.[0]?.link || j.share_link || '#';\n"
@@ -137,9 +137,9 @@ def L03(root):
 
 def L04(root):
     w = WF("L04-currency-alert-switch", "L04 · Currency rate alert (IF + Switch)")
-    w.note("## 🔀 L04 · Branching\n**IF** = two roads (true/false).\n**Switch** = many roads.\nUSD→INR is checked every hour; you get an email only when something interesting happens.", (-60, -300), 420, 220, 5)
+    w.note("## 🔀 L04 · Branching\n**IF** = two roads (true/false).\n**Switch** = many roads.\nUSD→EUR is checked every hour; you get an email only when something interesting happens.", (-60, -300), 420, 220, 5)
     w.add("Every Hour", "scheduleTrigger", 1.2, {"rule": {"interval": [{"field": "hours", "hoursInterval": 1}]}}, (0, 0))
-    w.add("⚙️ Config", "set", 3.4, assign(base="USD", target="INR", high=88.5, low=83.0, email_to=EMAIL), (220, 0))
+    w.add("⚙️ Config", "set", 3.4, assign(base="USD", target="EUR", high=0.95, low=0.85, email_to=EMAIL), (220, 0))
     w.add("Get Exchange Rate", "httpRequest", 4.2, {"url": "=https://open.er-api.com/v6/latest/{{ $json.base }}", "options": {}}, (440, 0), retryOnFail=True)
     w.add("API OK?", "if", 2.2, {"conditions": conditions(cond("={{ $json.result }}", "string", "equals", "success")), "options": {}}, (660, 0))
     w.add("Extract Rate", "set", 3.4, assign(rate="={{ $json.rates[$('⚙️ Config').item.json.target] }}",
@@ -186,7 +186,7 @@ def L05(root):
     w = WF("L05-rss-news-code-node", "L05 · Tech news digest (RSS + Merge + Code)")
     w.note("## 🧑‍💻 L05 · Code node superpowers\nThree RSS feeds → Merge → **one Code node** that:\n• keeps the last 24 h\n• removes duplicates\n• sorts newest first\n• builds HTML\n(No AI yet. L11 adds Gemini on top of this.)", (-60, -380), 440, 260, 5)
     w.add("Every Morning 8 AM", "scheduleTrigger", 1.2, {"rule": {"interval": [{"triggerAtHour": 8}]}}, (0, 0))
-    feeds = [("Google News · AI", "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-IN&gl=IN&ceid=IN:en"),
+    feeds = [("Google News · AI", "https://news.google.com/rss/search?q=artificial+intelligence+when:1d&hl=en-US&gl=US&ceid=US:en"),
              ("TechCrunch · AI", "https://techcrunch.com/category/artificial-intelligence/feed/"),
              ("The Verge · AI", "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml")]
     w.add("Merge Feeds", "merge", 3, {"numberInputs": 3}, (480, 0))
@@ -275,7 +275,7 @@ def L06(root):
         [("Same file uploaded again and again", "This was the bug in the original version: nothing marked the email as read. Keep the last node."),
          ("No binary data", "*Download attachments* is off, or *Simplify* is on."),
          ("Drive 404 folder", "Use the folder URL, and make sure your Google account owns the folder.")],
-        ["Route by sender: bank → /Bank, employer → /Payslips (use Switch).", "Use Gemini to read the PDF and rename it `2026-09 Airtel bill ₹799.pdf` (see L12)."])
+        ["Route by sender: bank → /Bank, employer → /Payslips (use Switch).", "Use Gemini to read the PDF and rename it `2026-09 Phone bill $49.pdf` (see L12)."])
     write(root, w, r)
 
 
@@ -285,11 +285,11 @@ def L07(root):
     w.add("Lead Form", "formTrigger", 2.2, {"formTitle": "Book a free demo", "formDescription": "Tell us a little about you. We reply within one business day.",
         "formFields": {"values": [form_field("Name", required=True), form_field("Email", "email", True),
             form_field("Company"), form_field("Interested in", "dropdown", True, ["Automation consulting", "n8n training", "AI agents", "Other"]),
-            form_field("Monthly budget (INR)", "dropdown", False, ["< 25k", "25k – 1L", "> 1L"])]},
+            form_field("Monthly budget (USD)", "dropdown", False, ["< $500", "$500 – $2,000", "> $2,000"])]},
         "options": {"respondWithOptions": {"values": {"formSubmittedText": "Thanks! Check your inbox for a confirmation."}}}}, (0, 0))
     w.add("Clean Lead", "set", 3.4, assign(timestamp="={{ $now.toISO() }}", name="={{ $json.Name.trim() }}",
         email="={{ $json.Email.trim().toLowerCase() }}", company="={{ $json.Company || '-' }}",
-        interest="={{ $json['Interested in'] }}", budget="={{ $json['Monthly budget (INR)'] || 'not given' }}", source="web-form"), (220, 0))
+        interest="={{ $json['Interested in'] }}", budget="={{ $json['Monthly budget (USD)'] || 'not given' }}", source="web-form"), (220, 0))
     w.add("Append to Leads Sheet", "googleSheets", 4.5, sheet_append("Leads"), (440, 0))
     w.add("Welcome Email", "gmail", 2.1, gmail_send("={{ $('Clean Lead').item.json.email }}", "=Thanks {{ $('Clean Lead').item.json.name }} — your demo request",
         "=<p>Hi {{ $('Clean Lead').item.json.name }},</p><p>Thanks for your interest in <b>{{ $('Clean Lead').item.json.interest }}</b>. We'll reply within one business day with a few slots.</p><p>— Team</p>"), (660, 0))

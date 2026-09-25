@@ -14,7 +14,7 @@
 |---|---|---|---|
 | **[n8n Cloud](https://app.n8n.cloud/register)** — sign up, no card | Fastest start, no install | 14-day trial, then paid | ✅ |
 | **npx** on your laptop | Learning L01–L15 | Free | ❌ only while the laptop is on |
-| **Docker** on laptop / VPS | Serious use, L19–L21 | Free (plus VPS about ₹500/month) | ✅ on a VPS |
+| **Docker** on laptop / VPS | Serious use, L19–L21 | Free (plus a VPS from about $5/month) | ✅ on a VPS |
 
 ### npx (needs Node.js 20+)
 ```bash

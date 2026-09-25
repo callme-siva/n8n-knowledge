@@ -187,7 +187,7 @@ return $input.all().map(i => i.json)
 | `sendTo` | `{{ $json.email }}` |
 | `subject` | `Invoice {{ $json.invoice_no }} due on {{ $json.due_date }}` |
 | `emailType` | html |
-| `message` | `<p>Hi {{ $json.client }},</p><p>A quick heads-up that invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} is due on {{ $json.due_date }}.</p><p>Thank you!</p>` |
+| `message` | `<p>Hi {{ $json.client }},</p><p>A quick heads-up that invoice <b>{{ $json.invoice_no }}</b> for ${{ $json.amount }} is due on {{ $json.due_date }}.</p><p>Thank you!</p>` |
 | `appendAttribution` | off |
 | `⚙️ Retry on fail` | ✅ on |
 | `⚙️ Max tries` | 3 |
@@ -204,7 +204,7 @@ return $input.all().map(i => i.json)
 | `sendTo` | `{{ $json.email }}` |
 | `subject` | `Overdue: invoice {{ $json.invoice_no }} ({{ -$json.days }} days)` |
 | `emailType` | html |
-| `message` | `<p>Hi {{ $json.client }},</p><p>Invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} was due on {{ $json.due_date }} and is now {{ -$json.days }} days overdue.</p><p>Please arrange payment or reply if there's an issue.</p>` |
+| `message` | `<p>Hi {{ $json.client }},</p><p>Invoice <b>{{ $json.invoice_no }}</b> for ${{ $json.amount }} was due on {{ $json.due_date }} and is now {{ -$json.days }} days overdue.</p><p>Please arrange payment or reply if there's an issue.</p>` |
 | `appendAttribution` | off |
 | `⚙️ Retry on fail` | ✅ on |
 | `⚙️ Max tries` | 3 |

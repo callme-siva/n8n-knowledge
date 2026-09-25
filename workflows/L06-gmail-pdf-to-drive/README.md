@@ -237,7 +237,7 @@ After the split, add **Crypto → Hash → SHA256** with *Binary file* on (prope
 ## 🚀 Ideas to extend it
 
 - Route by sender: bank → /Bank, employer → /Payslips (use Switch).
-- Use Gemini to read the PDF and rename it `2026-09 Airtel bill ₹799.pdf` (see L12).
+- Use Gemini to read the PDF and rename it `2026-09 Phone bill $49.pdf` (see L12).
 
 ---
 

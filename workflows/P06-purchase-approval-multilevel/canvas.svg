@@ -7,9 +7,9 @@
 <text x="-4" y="-194" font-size="13" fill="#E5E7EB" font-weight="600">P06 · Purchase request with multi-level approval, timeouts and audit trail</text>
 <rect x="-40" y="-141" width="560" height="101" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
 <text x="-26" y="-113" font-size="15" fill="#5B4B12" font-weight="700">✅ P06 · Approvals without chasing people</text>
-<text x="-26" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Form → request ID → manager approves (3-day timeout) → above ₹1,00,000 also</text>
-<text x="-26" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">finance approves → requester notified at every step → every decision logged in an</text>
-<text x="-26" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">audit sheet.</text>
+<text x="-26" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">Form → request ID → manager approves (3-day timeout) → above $2,000 also finance</text>
+<text x="-26" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">approves → requester notified at every step → every decision logged in an audit</text>
+<text x="-26" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">sheet.</text>
 <rect x="400" y="200" width="320" height="172" rx="8" fill="#FFF8DB" stroke="#F2D675"/>
 <text x="414" y="228" font-size="15" fill="#5B4B12" font-weight="700">🔒 Who approves is looked up, never</text>
 <text x="414" y="250" font-size="15" fill="#5B4B12" font-weight="700">typed. The requester&#x27;s manager comes</text>

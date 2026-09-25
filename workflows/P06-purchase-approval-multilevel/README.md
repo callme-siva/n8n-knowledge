@@ -150,7 +150,7 @@ Create each tab from its template, so column names match exactly: **Google Sheet
 1. Create the `Team` tab (one row per employee: `email`, `manager_email`) and the `Requests` tab.
 2. Import it, set the finance email and threshold in Config.
 3. For testing, set both approval time limits to a few minutes (Options → *Limit wait time*).
-4. Submit 3 requests: ₹20,000 (manager only), ₹2,00,000 (manager + finance), one you ignore (timeout).
+4. Submit 3 requests: $500 (manager only), $3,000 (manager + finance), one you ignore (timeout).
 
 ## 🔍 Node-by-node reference
 
@@ -163,7 +163,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `formTitle` | Purchase request |
-| `formFields.values` | Your email *, Item / service *, Amount (INR) *, Cost centre *, Justification * |
+| `formFields.values` | Your email *, Item / service *, Amount (USD) *, Cost centre *, Justification * |
 
 </details>
 
@@ -174,7 +174,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `finance_email` | you@example.com |
-| `finance_threshold` | 100000 |
+| `finance_threshold` | 2000 |
 
 </details>
 
@@ -237,7 +237,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 const f = $('Purchase Request Form').item.json;
 // $execution.id is unique and increasing, so IDs never collide and sort in order.
 const id = 'PR-' + $now.toFormat('yyMMdd') + '-' + $execution.id;
-return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (INR)']),
+return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase(), manager: $json.manager_email.trim().toLowerCase(), item: f['Item / service'], amount: Number(f['Amount (USD)']),
   cost_centre: f['Cost centre'], justification: f['Justification'], status: 'pending_manager', created: $now.toISO() } };
 ```
 
@@ -268,8 +268,8 @@ return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase()
 |---|---|
 | `operation` | sendAndWait |
 | `sendTo` | `{{ $('Create Request').item.json.manager }}` |
-| `subject` | `Approve {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})?` |
-| `message` | `<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>` |
+| `subject` | `Approve {{ $('Create Request').item.json.request_id }} (${{ $('Create Request').item.json.amount }})?` |
+| `message` | `<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>${{ $('Create Request').item.json.amount.toLocaleString('en-US') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote>` |
 | `approvalOptions.approvalType` | double |
 | `limitWaitTime.limitType` | afterTimeInterval |
 | `limitWaitTime.resumeAmount` | 3 |
@@ -312,8 +312,8 @@ return { json: { request_id: id, requester: f['Your email'].trim().toLowerCase()
 |---|---|
 | `operation` | sendAndWait |
 | `sendTo` | `{{ $('⚙️ Config').item.json.finance_email }}` |
-| `subject` | `Finance approval: {{ $('Create Request').item.json.request_id }} (₹{{ $('Create Request').item.json.amount }})` |
-| `message` | `<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>₹{{ $('Create Request').item.json.amount.toLocaleString('en-IN') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote><p>✅ Manager approved.</p>` |
+| `subject` | `Finance approval: {{ $('Create Request').item.json.request_id }} (${{ $('Create Request').item.json.amount }})` |
+| `message` | `<p><b>{{ $('Create Request').item.json.request_id }}</b>: {{ $('Create Request').item.json.item }}</p><p>Amount: <b>${{ $('Create Request').item.json.amount.toLocaleString('en-US') }}</b> · {{ $('Create Request').item.json.cost_centre }}</p><p>Requested by {{ $('Create Request').item.json.requester }}</p><blockquote>{{ $('Create Request').item.json.justification }}</blockquote><p>✅ Manager approved.</p>` |
 | `approvalOptions.approvalType` | double |
 | `limitWaitTime.limitType` | afterTimeInterval |
 | `limitWaitTime.resumeAmount` | 3 |

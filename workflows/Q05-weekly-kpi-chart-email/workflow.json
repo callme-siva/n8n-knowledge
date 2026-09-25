@@ -89,7 +89,7 @@
           "backgroundColor": "#ffffff"
         },
         "datasetOptions": {
-          "label": "Weekly revenue (₹)",
+          "label": "Weekly revenue ($)",
           "backgroundColor": "#7C3AED"
         }
       },
@@ -105,9 +105,9 @@
     {
       "parameters": {
         "sendTo": "you@example.com",
-        "subject": "=Weekly revenue ₹{{ $json.last.toLocaleString('en-IN') }} ({{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%)",
+        "subject": "=Weekly revenue ${{ $json.last.toLocaleString('en-US') }} ({{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%)",
         "emailType": "html",
-        "message": "=<p>Last week: <b>₹{{ $json.last.toLocaleString('en-IN') }}</b>, previous: ₹{{ $json.prev.toLocaleString('en-IN') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>",
+        "message": "=<p>Last week: <b>${{ $json.last.toLocaleString('en-US') }}</b>, previous: ${{ $json.prev.toLocaleString('en-US') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>",
         "options": {
           "appendAttribution": false,
           "attachmentsUi": {

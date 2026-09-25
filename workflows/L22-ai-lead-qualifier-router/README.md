@@ -325,7 +325,7 @@ Form field + prompt mention; the schema stays the same.
 </details>
 <details><summary>✅ Solution</summary>
 
-Add the dropdown *Budget* (< 1L / 1–5L / > 5L), include it in the prompt text, and add to the system message: *"budget > 5L adds up to 15 points"*. Re-test the 3 sample leads.
+Add the dropdown *Budget* (< $1,000 / $1,000–$5,000 / > $5,000), include it in the prompt text, and add to the system message: *"budget > $5,000 adds up to 15 points"*. Re-test the 3 sample leads.
 
 </details>
 

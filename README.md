@@ -12,7 +12,7 @@
 
 **Learn n8n by building 42 workflows, from your first node to multi-agent AI: a 22-lesson core path, 8 quick wins and 12 real business processes. Each one comes with a guide, a canvas snapshot and a CI run.**
 
-<sub>Examples use India defaults (INR, GSTIN, Asia/Kolkata). Change them in each ⚙️ Config node.</sub>
+<sub>Amounts are in USD. P01's sample invoices are Indian GST invoices (INR, GSTIN) and the default timezone is Asia/Kolkata; change these in each ⚙️ Config node.</sub>
 
 [🚀 Start](#-start-in-3-steps) · [🗺️ Learning path](#-the-learning-path) · [🖼️ Gallery](#-gallery) · [🏗️ Architecture](docs/architecture.md) · [🧯 Mistakes](docs/common-mistakes.md) · [🧪 Testing](docs/testing.md) · [🤝 Contribute](CONTRIBUTING.md)
 

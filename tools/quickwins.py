@@ -14,7 +14,7 @@ def Q01(root):
         "const DAY_START = 9, DAY_END = 18, MIN_FOCUS = 45; // hours, hours, minutes\n"
         "const ev = $input.all().map(i => i.json).filter(e => e.start?.dateTime && e.status !== 'cancelled');\n"
         "const t = d => new Date(d);\n"
-        "const fmt = d => t(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: $now.zoneName });  // workflow timezone\n"
+        "const fmt = d => t(d).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: $now.zoneName });  // workflow timezone\n"
         "const mins = ev.reduce((s, e) => s + (t(e.end.dateTime) - t(e.start.dateTime)) / 60000, 0);\n"
         "// find gaps between meetings inside working hours\n"
         "// $today = midnight in the workflow timezone, so 9:00–18:00 means your local working day.\n"
@@ -110,7 +110,7 @@ def Q03(root):
         "  const [amt, category, ...note] = rest;\n"
         "  const amount = Number(amt);\n"
         "  if (!Number.isFinite(amount)) return { json: { ...base, kind: 'error', reply: '⚠️ Usage: /exp 450 food lunch' } };\n"
-        "  return { json: { ...base, kind: 'expense', amount, category: category || 'other', text: note.join(' '), reply: `✅ ₹${amount} logged under ${category || 'other'}` } };\n"
+        "  return { json: { ...base, kind: 'expense', amount, category: category || 'other', text: note.join(' '), reply: `✅ $${amount} logged under ${category || 'other'}` } };\n"
         "}\n"
         "if (cmd === '/todo' || cmd === '/note') return { json: { ...base, kind: cmd.slice(1), text: body, reply: `✅ ${cmd.slice(1)} saved` } };\n"
         "return { json: { ...base, kind: 'error', reply: 'Commands: /todo …, /note …, /exp <amount> <category> <note>' } };"}, (220, 0))
@@ -185,9 +185,9 @@ def Q05(root):
         "const change = prev ? Math.round((last - prev) / prev * 1000) / 10 : 0;\n"
         "return [{ json: { labels: keys.map(k => k.slice(5)), revenue: rev, last, prev, change } }];"}, (440, 0))
     w.add("Draw Chart", "quickChart", 1, {"chartType": "bar", "labelsMode": "array", "labelsArray": "={{ $json.labels }}", "data": "={{ $json.revenue }}",
-        "output": "chart", "chartOptions": {"width": 700, "height": 320, "backgroundColor": "#ffffff"}, "datasetOptions": {"label": "Weekly revenue (₹)", "backgroundColor": "#7C3AED"}}, (660, 0))
-    w.add("Email Report", "gmail", 2.1, {"sendTo": EMAIL, "subject": "=Weekly revenue ₹{{ $json.last.toLocaleString('en-IN') }} ({{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%)",
-        "emailType": "html", "message": "=<p>Last week: <b>₹{{ $json.last.toLocaleString('en-IN') }}</b>, previous: ₹{{ $json.prev.toLocaleString('en-IN') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>",
+        "output": "chart", "chartOptions": {"width": 700, "height": 320, "backgroundColor": "#ffffff"}, "datasetOptions": {"label": "Weekly revenue ($)", "backgroundColor": "#7C3AED"}}, (660, 0))
+    w.add("Email Report", "gmail", 2.1, {"sendTo": EMAIL, "subject": "=Weekly revenue ${{ $json.last.toLocaleString('en-US') }} ({{ $json.change >= 0 ? '▲' : '▼' }} {{ $json.change }}%)",
+        "emailType": "html", "message": "=<p>Last week: <b>${{ $json.last.toLocaleString('en-US') }}</b>, previous: ${{ $json.prev.toLocaleString('en-US') }} ({{ $json.change }}%).</p><p>Chart attached (last 8 weeks).</p>",
         "options": {"appendAttribution": False, "attachmentsUi": {"attachmentsBinary": [{"property": "chart"}]}}}, (880, 0))
     w.chain("Mondays 8:00", "Read Daily Sales", "Group by Week", "Draw Chart", "Email Report")
     write(root, w, readme("Q05", "Weekly KPI chart email", Q, "Management / sales", "20 min",
@@ -201,7 +201,7 @@ def Q05(root):
          "**QuickChart**: type Bar, labels *from array* `{{ $json.labels }}`, data `{{ $json.revenue }}`, output field `chart`.",
          "Gmail → Options → **Attachments** → property `chart`."],
         ["Run it and open the PNG in the QuickChart output's Binary tab before emailing."],
-        [("Chart is empty", "Revenue values were strings with commas. The code uses `Number()`, so strip `₹` and `,` in the sheet."),
+        [("Chart is empty", "Revenue values were strings with commas. The code uses `Number()`, so strip `$` and `,` in the sheet."),
          ("No attachment", "The attachment property name must match the QuickChart *output* field (`chart`).")],
         ["Add an AI narrative of the trend (see P12).", "Chart orders and revenue as two datasets."]))
 
@@ -225,9 +225,9 @@ def Q06(root):
         {"conditions": conditions(cond("={{ $json.stage }}", "string", "equals", "upcoming")), "renameOutput": True, "outputKey": "Upcoming"},
         {"conditions": conditions(cond("={{ $json.stage }}", "string", "equals", "overdue")), "renameOutput": True, "outputKey": "Overdue"}]}, "options": {}}, (660, 0))
     w.add("Friendly Nudge", "gmail", 2.1, gmail_send("={{ $json.email }}", "=Invoice {{ $json.invoice_no }} due on {{ $json.due_date }}",
-        "=<p>Hi {{ $json.client }},</p><p>A quick heads-up that invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} is due on {{ $json.due_date }}.</p><p>Thank you!</p>"), (900, -100))
+        "=<p>Hi {{ $json.client }},</p><p>A quick heads-up that invoice <b>{{ $json.invoice_no }}</b> for ${{ $json.amount }} is due on {{ $json.due_date }}.</p><p>Thank you!</p>"), (900, -100))
     w.add("Firm Reminder", "gmail", 2.1, gmail_send("={{ $json.email }}", "=Overdue: invoice {{ $json.invoice_no }} ({{ -$json.days }} days)",
-        "=<p>Hi {{ $json.client }},</p><p>Invoice <b>{{ $json.invoice_no }}</b> for ₹{{ $json.amount }} was due on {{ $json.due_date }} and is now {{ -$json.days }} days overdue.</p><p>Please arrange payment or reply if there's an issue.</p>"), (900, 100))
+        "=<p>Hi {{ $json.client }},</p><p>Invoice <b>{{ $json.invoice_no }}</b> for ${{ $json.amount }} was due on {{ $json.due_date }} and is now {{ -$json.days }} days overdue.</p><p>Please arrange payment or reply if there's an issue.</p>"), (900, 100))
     w.add("Mark Reminded", "set", 3.4, assign(invoice_no="={{ $('Who Needs a Reminder?').item.json.invoice_no }}", last_reminded="={{ $today.toISODate() }}"), (1120, 0))
     w.add("Write Back", "googleSheets", 4.5, sheet_upsert("Invoices", "invoice_no"), (1340, 0))
     w.chain("Daily 10:00", "Read Invoices", "Who Needs a Reminder?", "Stage")

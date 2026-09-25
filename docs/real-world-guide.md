@@ -70,10 +70,10 @@ Managers fund what they can measure. Use this before building, and again 30 days
 | Volume per month | 400 invoices |
 | Minutes saved per item | 6 min |
 | Hours saved per month | 400 × 6 / 60 = **40 h** |
-| Loaded cost per hour | ₹600 |
-| **Monthly saving** | **₹24,000** |
-| Error cost avoided | 1 duplicate payment of ₹45,000 per year → **₹3,750/month** |
-| Running cost | n8n VPS ₹800 + Gemini ~₹300 → **₹1,100/month** |
+| Loaded cost per hour | $40 |
+| **Monthly saving** | **$1,600** |
+| Error cost avoided | 1 duplicate payment of $3,000 per year → **$250/month** |
+| Running cost | n8n VPS $10 + Gemini ~$5 → **$15/month** |
 | Build + maintain | 16 h build + 2 h/month upkeep |
 | **Payback** | Under 1 month |
 

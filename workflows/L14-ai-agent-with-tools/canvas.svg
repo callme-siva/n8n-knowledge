@@ -9,7 +9,7 @@
 <text x="-46" y="-130" font-size="15" fill="#5B4B12" font-weight="700">🛠️ L14 · Agents decide which tool to call</text>
 <text x="-46" y="-108" font-size="12.5" fill="#5B4B12" font-weight="400">Tools here: 🌦️ weather (HTTP), 🧮 calculator, 📖 Wikipedia, 💱 currency</text>
 <text x="-46" y="-91" font-size="12.5" fill="#5B4B12" font-weight="400">(HTTP).</text>
-<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">Try: &quot;Is it rainy in Pune tomorrow and what&#x27;s 18% GST on ₹12,499?&quot;</text>
+<text x="-46" y="-74" font-size="12.5" fill="#5B4B12" font-weight="400">Try: &quot;Is it rainy in Boston tomorrow and what&#x27;s 18% VAT on $12,499?&quot;</text>
 <text x="-46" y="-57" font-size="12.5" fill="#5B4B12" font-weight="400">Watch the Logs panel to see each tool call.</text>
 <path d="M100,50.0 C180.0,50.0 180.0,50.0 256,50.0" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
 <path d="M32.0,240 C32.0,187.0 310.0,187.0 310.0,136" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>

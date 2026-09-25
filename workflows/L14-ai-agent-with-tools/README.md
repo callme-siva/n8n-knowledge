@@ -185,7 +185,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 
 | Property | Value |
 |---|---|
-| `toolDescription` | Get latest exchange rates for a base currency code like USD, EUR, INR. |
+| `toolDescription` | Get latest exchange rates for a base currency code like USD, EUR, GBP. |
 | `url` | https://open.er-api.com/v6/latest/{base} |
 | `placeholderDefinitions.name` | base |
 | `placeholderDefinitions.description` | 3-letter ISO currency code |

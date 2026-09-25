@@ -133,9 +133,9 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 | Property | Value |
 |---|---|
 | `base` | USD |
-| `target` | INR |
-| `high` | 88.5 |
-| `low` | 83.0 |
+| `target` | EUR |
+| `high` | 0.95 |
+| `low` | 0.85 |
 | `email_to` | you@example.com |
 
 </details>

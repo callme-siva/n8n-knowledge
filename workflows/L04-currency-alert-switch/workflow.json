@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## 🔀 L04 · Branching\n**IF** = two roads (true/false).\n**Switch** = many roads.\nUSD→INR is checked every hour; you get an email only when something interesting happens.",
+        "content": "## 🔀 L04 · Branching\n**IF** = two roads (true/false).\n**Switch** = many roads.\nUSD→EUR is checked every hour; you get an email only when something interesting happens.",
         "width": 420,
         "height": 220,
         "color": 5
@@ -50,19 +50,19 @@
             {
               "id": "a1",
               "name": "target",
-              "value": "INR",
+              "value": "EUR",
               "type": "string"
             },
             {
               "id": "a2",
               "name": "high",
-              "value": 88.5,
+              "value": 0.95,
               "type": "number"
             },
             {
               "id": "a3",
               "name": "low",
-              "value": 83.0,
+              "value": 0.85,
               "type": "number"
             },
             {

@@ -57,18 +57,18 @@
               }
             },
             {
-              "fieldLabel": "Monthly budget (INR)",
+              "fieldLabel": "Monthly budget (USD)",
               "fieldType": "dropdown",
               "fieldOptions": {
                 "values": [
                   {
-                    "option": "< 25k"
+                    "option": "< $500"
                   },
                   {
-                    "option": "25k – 1L"
+                    "option": "$500 – $2,000"
                   },
                   {
-                    "option": "> 1L"
+                    "option": "> $2,000"
                   }
                 ]
               }
@@ -129,7 +129,7 @@
             {
               "id": "a5",
               "name": "budget",
-              "value": "={{ $json['Monthly budget (INR)'] || 'not given' }}",
+              "value": "={{ $json['Monthly budget (USD)'] || 'not given' }}",
               "type": "string"
             },
             {

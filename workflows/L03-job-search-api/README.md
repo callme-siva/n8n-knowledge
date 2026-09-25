@@ -158,7 +158,7 @@ Every node in this workflow and every setting inside it, generated from [`workfl
 ```javascript
 const cfg = $('⚙️ Config').first().json;
 const jobs = ($input.first().json.jobs_results || []).slice(0, cfg.max_jobs);
-const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+const today = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const rows = jobs.map(j => {
   const link = j.apply_options?.[0]?.link || j.share_link || '#';

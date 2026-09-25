@@ -148,7 +148,7 @@ Create each tab from its template, so column names match exactly: **Google Sheet
 
 <sub>Columns are generated from what this workflow actually reads and writes in the automated test, so they can't drift from the workflow.</sub>
 
-Sample files: [invoice-valid.pdf](../../templates/files/invoice-valid.pdf) (auto-approved → ledger) · [invoice-large.pdf](../../templates/files/invoice-large.pdf) (₹1,18,000 → needs approval) · [invoice-wrong-total.pdf](../../templates/files/invoice-wrong-total.pdf) (subtotal + tax ≠ total → Exceptions)
+Sample files: [invoice-valid.pdf](../../templates/files/invoice-valid.pdf) (auto-approved → ledger) · [invoice-large.pdf](../../templates/files/invoice-large.pdf) (INR 118,000 → needs approval) · [invoice-wrong-total.pdf](../../templates/files/invoice-wrong-total.pdf) (subtotal + tax ≠ total → Exceptions)
 
 ## 🛠️ Build it step by step
 
@@ -355,8 +355,8 @@ return { json: { ...x, subtotal: sub || null, tax_total: tax || null, grand_tota
 |---|---|
 | `operation` | sendAndWait |
 | `sendTo` | `{{ $('⚙️ Config').item.json.approver_email }}` |
-| `subject` | `Approve ₹{{ $json.grand_total }} invoice from {{ $json.vendor_name }}?` |
-| `message` | `<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>₹{{ $json.grand_total }}</b> (tax ₹{{ $json.tax_total }}), due {{ $json.due_date }}</p>` |
+| `subject` | `Approve {{ $json.currency \|\| '' }} {{ $json.grand_total }} invoice from {{ $json.vendor_name }}?` |
+| `message` | `<p><b>{{ $json.vendor_name }}</b> · invoice {{ $json.invoice_number }} · dated {{ $json.invoice_date }}</p><p>Total <b>{{ $json.currency \|\| '' }} {{ $json.grand_total }}</b> (tax {{ $json.tax_total }}), due {{ $json.due_date }}</p>` |
 | `approvalOptions.approvalType` | double |
 | `limitWaitTime.limitType` | afterTimeInterval |
 | `limitWaitTime.resumeAmount` | 3 |
@@ -389,7 +389,7 @@ return { json: { ...x, subtotal: sub || null, tax_total: tax || null, grand_tota
 const inv = $('Validate').item.json;
 return { json: { logged_at: $now.toISO(), vendor: inv.vendor_name, gstin: inv.vendor_gstin || '', invoice_no: inv.invoice_number,
   invoice_date: inv.invoice_date, due_date: inv.due_date || '', subtotal: inv.subtotal, tax: inv.tax_total, total: inv.grand_total,
-  currency: inv.currency || 'INR', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };
+  currency: inv.currency || '', approval: $json.data ? 'approved' : 'auto (under limit)', file: inv.file, dedupe_key: inv.dedupe_key } };
 ```
 
 </details>
